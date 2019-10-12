@@ -17,3 +17,4 @@
         android:text="@string/hello_blank_fragment" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+
