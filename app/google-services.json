@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "786712111078",
+    "firebase_url": "https://e-shop-bb94c.firebaseio.com",
+    "project_id": "e-shop-bb94c",
+    "storage_bucket": "e-shop-bb94c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:786712111078:android:84cb8810bfe223d69c9827",
+        "android_client_info": {
+          "package_name": "com.nativeboys.eshop"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "786712111078-hgv2k3v5s75dgeo04k9uu4pp792akcgu.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nativeboys.eshop",
+            "certificate_hash": "1e1804579d2b60ee6056a6681fef6559134b402b"
+          }
+        },
+        {
+          "client_id": "786712111078-lsm82385sro1vmmfcoilbeoq2npof8jr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBhB3Azf3GTyud24g34RxNntiv0U35tm50"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "786712111078-lsm82385sro1vmmfcoilbeoq2npof8jr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
