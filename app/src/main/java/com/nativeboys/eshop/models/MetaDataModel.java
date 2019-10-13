@@ -1,5 +1,7 @@
 package com.nativeboys.eshop.models;
 
+import androidx.annotation.NonNull;
+
 import com.google.firebase.database.IgnoreExtraProperties;
 
 @IgnoreExtraProperties
@@ -41,5 +43,15 @@ public class MetaDataModel {
 
     public void setLastMessage(MessageModel lastMessage) {
         this.lastMessage = lastMessage;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "MetaDataModel{" +
+                "id='" + id + '\'' +
+                ", conversationId='" + conversationId + '\'' +
+                ", lastMessage=" + lastMessage +
+                '}';
     }
 }

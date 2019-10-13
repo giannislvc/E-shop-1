@@ -1,5 +1,7 @@
 package com.nativeboys.eshop.models;
 
+import androidx.annotation.NonNull;
+
 import com.google.firebase.database.IgnoreExtraProperties;
 
 @IgnoreExtraProperties
@@ -9,13 +11,13 @@ public class MessageModel {
     private String senderId;
     private String text;
     private String timestamp;
-    private String type; // text or image
+    private int type; // text or image
 
     public MessageModel() {
         // Required empty
     }
 
-    public MessageModel(String id, String senderId, String text, String timestamp, String type) {
+    public MessageModel(String id, String senderId, String text, String timestamp, int type) {
         this.id = id;
         this.senderId = senderId;
         this.text = text;
@@ -55,12 +57,23 @@ public class MessageModel {
         this.timestamp = timestamp;
     }
 
-    public String getType() {
+    public int getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(int type) {
         this.type = type;
     }
 
+    @NonNull
+    @Override
+    public String toString() {
+        return "MessageModel{" +
+                "id='" + id + '\'' +
+                ", senderId='" + senderId + '\'' +
+                ", text='" + text + '\'' +
+                ", timestamp='" + timestamp + '\'' +
+                ", type=" + type +
+                '}';
+    }
 }

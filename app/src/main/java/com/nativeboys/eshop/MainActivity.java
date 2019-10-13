@@ -10,7 +10,7 @@ import androidx.viewpager.widget.ViewPager;
 import android.os.Bundle;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.nativeboys.eshop.messages.MessagesFragment;
+import com.nativeboys.eshop.conversations.ConversationsFragment;
 import com.nativeboys.eshop.products.ProductsFragment;
 import com.nativeboys.eshop.profile.ProfileFragment;
 
@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
             switch (position) {
                 case 1 : {
-                    return new MessagesFragment();
+                    return new ConversationsFragment();
                 }
                 case 2 : {
                     return new ProfileFragment();

@@ -1,5 +1,7 @@
 package com.nativeboys.eshop.models;
 
+import androidx.annotation.NonNull;
+
 import com.google.firebase.database.IgnoreExtraProperties;
 
 @IgnoreExtraProperties
@@ -51,5 +53,16 @@ public class UserModel {
 
     public void setPickPath(String pickPath) {
         this.pickPath = pickPath;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "UserModel{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", pickPath='" + pickPath + '\'' +
+                '}';
     }
 }

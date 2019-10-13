@@ -5,7 +5,13 @@
     <string name="profile">Profile</string>
 
     <string name="go_back">Go back</string>
+    <string name="type_message">Type a message…</string>
+    <string name="user_image">User image</string>
+    <string name="user_name_format">%1$s %2$s</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="test_name">John Doe</string>
+    <string name="test_message">Good morning my dear friend!</string>
+    <string name="test_timestamp">10-07 19:47</string>
 </resources>

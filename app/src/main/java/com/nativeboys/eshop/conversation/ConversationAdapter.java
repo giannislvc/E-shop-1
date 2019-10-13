@@ -1,4 +1,4 @@
-package com.nativeboys.eshop.conversationFragment;
+package com.nativeboys.eshop.conversation;
 
 import android.content.Context;
 import android.util.DisplayMetrics;
@@ -41,7 +41,7 @@ public class ConversationAdapter extends ListAdapter<MessageModel, ConversationA
     @Override
     public int getItemViewType(int position) {
         super.getItemViewType(position);
-        return getItem(position).getId().equals(clientId) ? 1 : 2;
+        return getItem(position).getSenderId().equals(clientId) ? 1 : 2;
     }
 
     ConversationAdapter(@NonNull Context context, @NonNull String clientId) {

@@ -15,7 +15,8 @@
         android:background="@drawable/receiver_message_shape"
         android:fontFamily="@font/champagne_limousines_bold"
         android:textColor="@android:color/white"
-        android:text="Good morning my dear friend!"/>
+        android:textSize="15.5sp"
+        android:text="@string/test_message"/>
 
     <TextView
         android:id="@+id/time_stamp"
@@ -29,6 +30,6 @@
         android:textSize="12sp"
         android:fontFamily="@font/champagne_limousines_bold"
         android:textColor="@color/gray"
-        android:text="10-07 19:47"/>
+        android:text="@string/test_timestamp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
