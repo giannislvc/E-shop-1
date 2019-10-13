@@ -13,7 +13,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.nativeboys.eshop.models.MessageModel;
 import com.nativeboys.eshop.models.MetaDataModel;
 import com.nativeboys.eshop.models.UserModel;
 
@@ -30,33 +29,21 @@ public class SharedViewModel extends AndroidViewModel {
 
     private final static String USERS = "users";
     private final static String METADATA = "metadata";
-    private final static String CONVERSATIONS = "conversations";
 
-    private DatabaseReference usersRef, metadataRef, conversationsRef;
+    private DatabaseReference usersRef, metadataRef;
 
     private MutableLiveData<List<UserModel>> users;
     private MutableLiveData<List<MetaDataModel>> metaData;
 
-    private LiveData<String> conversationId;
-    private MutableLiveData<List<MessageModel>> conversation;
-
-    private Query conversationQuery;
-    private ValueEventListener conversationListener;
-
     {
         users = new MutableLiveData<>();
         metaData = new MutableLiveData<>();
-        conversationId = new MutableLiveData<>();
-        conversationQuery = null;
-        conversationListener = null;
     }
 
     public SharedViewModel(@NonNull Application application) {
         super(application);
         usersRef = FirebaseDatabase.getInstance().getReference(USERS);
         metadataRef = FirebaseDatabase.getInstance().getReference(METADATA);
-        conversationsRef = FirebaseDatabase.getInstance().getReference(CONVERSATIONS);
-        // conversation = Transformations.switchMap(conversationId, )
         setUpDatabaseTriggers();
     }
 
@@ -150,45 +137,5 @@ public class SharedViewModel extends AndroidViewModel {
             }
         });
     }
-
-/*    private LiveData<List<MessageModel>> getConversation(String conversationId) {
-
-        MutableLiveData<List<MessageModel>> conversation = new MutableLiveData<>();
-
-        conversationQuery = conversationsRef.child(conversationId);
-
-        conversationListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) { }
-        };
-
-        query.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                List<MetaDataModel> metaData = new ArrayList<>();
-                for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
-                    String id = userSnapshot.getKey();
-                    if (id == null) continue;
-                    MetaDataModel meta = userSnapshot.getValue(MetaDataModel.class);
-                    if (meta != null) {
-                        meta.setId(id);
-                        metaData.add(meta);
-                    }
-                }
-                SharedViewModel.this.metaData.setValue(metaData);
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) { }
-        });
-        return conversation;
-    }*/
 
 }
