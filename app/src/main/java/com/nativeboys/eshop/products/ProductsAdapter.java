@@ -38,7 +38,7 @@ public class ProductsAdapter extends ListAdapter<UserModel, ProductsAdapter.Prod
 
         @Override
         public boolean areContentsTheSame(@NonNull UserModel model, @NonNull UserModel t1) {
-            return model.getName().equals(t1.getName());
+            return model.getName().equals(t1.getName()) && model.getLastName().equals(t1.getLastName()) && model.getPickPath().equals(t1.getPickPath());
         }
 
     };

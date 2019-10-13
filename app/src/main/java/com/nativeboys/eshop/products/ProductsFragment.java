@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -14,24 +15,32 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import com.nativeboys.eshop.R;
-import com.nativeboys.eshop.models.UserModel;
+import com.nativeboys.eshop.SharedViewModel;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class ProductsFragment extends Fragment {
 
     private final String TAG = getClass().getSimpleName();
 
     private FragmentActivity activity;
+    private SharedViewModel viewModel;
 
     private RecyclerView recycler_view;
     private ProductsAdapter adapter;
+    private Button add_button;
 
     public ProductsFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        viewModel = ViewModelProviders.of(activity).get(SharedViewModel.class);
     }
 
     @Override
@@ -45,18 +54,22 @@ public class ProductsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         recycler_view = view.findViewById(R.id.recycler_view);
+        add_button = view.findViewById(R.id.add_button);
         adapter = new ProductsAdapter(activity.getApplicationContext());
         recycler_view.setAdapter(adapter);
         recycler_view.setLayoutManager(new LinearLayoutManager(activity));
-        adapter.setOnUserClickListener((itemView, user) -> Log.i(TAG, "onUserClicked: " + user.toString()));
-        adapter.submitList(new ArrayList<>(mockData()));
+        setUpListeners();
     }
 
-    private List<UserModel> mockData() {
-        List<UserModel> list = new ArrayList<>();
-        list.add(new UserModel("1", "Giannis", "Dougos", "https://cdn0.iconfinder.com/data/icons/emojis-colored-outlined-pixel-perfect/64/emoji-67-512.png"));
-        list.add(new UserModel("2", "Vaggelis", "Boudis", "https://cdn0.iconfinder.com/data/icons/emojis-flat-pixel-perfect-w-skin-tone-2/64/c3_emoji-emoticon-face-bored-tired-angry-drop-512.png"));
-        return list;
+    private void setUpListeners() {
+        adapter.setOnUserClickListener((itemView, user) -> {
+            viewModel.getConversationIdWith(user.getId(), model -> Log.i(TAG, "onResponse: " + model));
+        });
+        add_button.setOnClickListener(v-> viewModel.addUser("John", "Doe", "https://cdn0.iconfinder.com/data/icons/emojis-colored-outlined-pixel-perfect/64/emoji-67-512.png"));
+        viewModel.getUsers().observe(this, users -> {
+            if (users == null) { return; }
+            adapter.submitList(new ArrayList<>(users));
+        });
     }
 
     @Override

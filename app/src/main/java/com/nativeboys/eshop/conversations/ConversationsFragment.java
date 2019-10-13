@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -15,22 +16,27 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.nativeboys.eshop.R;
+import com.nativeboys.eshop.SharedViewModel;
 import com.nativeboys.eshop.conversation.ConversationFragment;
-import com.nativeboys.eshop.models.MessageModel;
-import com.nativeboys.eshop.models.MetaDataModel;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class ConversationsFragment extends Fragment {
 
     private FragmentActivity activity;
+    private SharedViewModel viewModel;
 
     private RecyclerView recycler_view;
     private ConversationsAdapter adapter;
 
     public ConversationsFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        viewModel = ViewModelProviders.of(activity).get(SharedViewModel.class);
     }
 
     @Override
@@ -51,14 +57,10 @@ public class ConversationsFragment extends Fragment {
             // TODO: Pass arguments
             new ConversationFragment().show(getChildFragmentManager(), ConversationFragment.class.getSimpleName());
         });
-        adapter.submitList(new ArrayList<>(mockData()));
-    }
-
-    private List<MetaDataModel> mockData() {
-        List<MetaDataModel> list = new ArrayList<>();
-        list.add(new MetaDataModel("1", "2", new MessageModel("5", "200", "Hello World", "123", 1)));
-        list.add(new MetaDataModel("3", "4", new MessageModel("10", "200", "Hello Baby!!", "123", 1)));
-        return list;
+        viewModel.getMetaData().observe(this, metaData -> {
+            if (metaData == null) { return; }
+            adapter.submitList(new ArrayList<>(metaData));
+        });
     }
 
     @Override

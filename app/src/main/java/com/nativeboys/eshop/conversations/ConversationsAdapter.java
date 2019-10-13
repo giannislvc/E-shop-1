@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.nativeboys.eshop.R;
+import com.nativeboys.eshop.models.MessageModel;
 import com.nativeboys.eshop.models.MetaDataModel;
 
 public class ConversationsAdapter extends ListAdapter<MetaDataModel, ConversationsAdapter.ConversationsViewHolder> {
@@ -41,7 +42,10 @@ public class ConversationsAdapter extends ListAdapter<MetaDataModel, Conversatio
 
         @Override
         public boolean areContentsTheSame(@NonNull MetaDataModel model, @NonNull MetaDataModel t1) {
-            return model.getConversationId().equals(t1.getConversationId());
+            MessageModel m1 = model.getLastMessage();
+            MessageModel m2 = t1.getLastMessage();
+            if (m1 != null && m2 != null) return m1.getText().equals(m2.getText());
+            return false;
         }
 
     };

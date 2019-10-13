@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">E-shop</string>
     <string name="products">Products</string>
-    <string name="chat">Chat</string>
+    <string name="inbox">Inbox</string>
     <string name="profile">Profile</string>
 
     <string name="go_back">Go back</string>

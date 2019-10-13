@@ -20,10 +20,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.nativeboys.eshop.R;
-import com.nativeboys.eshop.models.MessageModel;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class ConversationFragment extends DialogFragment {
 
@@ -67,7 +63,7 @@ public class ConversationFragment extends DialogFragment {
         recycler_view.setAdapter(adapter);
         recycler_view.setLayoutManager(new LinearLayoutManager(activity));
         setUpListeners();
-        adapter.submitList(new ArrayList<>(mockData()));
+        //adapter.submitList(new ArrayList<>(mockData()));
     }
 
     private void setUpListeners() {
@@ -98,31 +94,6 @@ public class ConversationFragment extends DialogFragment {
     public void onDetach() {
         super.onDetach();
         activity = null;
-    }
-
-    private List<MessageModel> mockData() {
-        List<MessageModel> list = new ArrayList<>();
-        list.add(new MessageModel("1", "200", "Hello World Hello World Hello World Hello World", "123", 1));
-        list.add(new MessageModel("2", "100", "World World World World", "123", 1));
-        list.add(new MessageModel("3", "200", "Hello World", "123", 1));
-        list.add(new MessageModel("4", "100", "World", "123", 1));
-        list.add(new MessageModel("5", "200", "Hello World", "123", 1));
-        list.add(new MessageModel("6", "100", "World", "123", 1));
-        list.add(new MessageModel("7", "200", "Hello World", "123", 1));
-        list.add(new MessageModel("8", "100", "World", "123", 1));
-        list.add(new MessageModel("9", "200", "Hello World", "123", 1));
-        list.add(new MessageModel("10", "100", "World", "123", 1));
-        list.add(new MessageModel("11", "200", "Hello World", "123", 1));
-        list.add(new MessageModel("12", "100", "World", "123", 1));
-        list.add(new MessageModel("13", "200", "Hello World", "123", 1));
-        list.add(new MessageModel("14", "100", "World", "123", 1));
-        list.add(new MessageModel("15", "200", "Hello World", "123", 1));
-        list.add(new MessageModel("16", "100", "World", "123", 1));
-        list.add(new MessageModel("17", "200", "Hello World", "123", 1));
-        list.add(new MessageModel("18", "100", "World", "123", 1));
-        list.add(new MessageModel("19", "200", "Hello World", "123", 1));
-        list.add(new MessageModel("20", "100", "World", "123", 1));
-        return list;
     }
 
 }

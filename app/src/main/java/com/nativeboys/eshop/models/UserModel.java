@@ -16,8 +16,7 @@ public class UserModel {
         // Required empty
     }
 
-    public UserModel(String id, String name, String lastName, String pickPath) {
-        this.id = id;
+    public UserModel(String name, String lastName, String pickPath) {
         this.name = name;
         this.lastName = lastName;
         this.pickPath = pickPath;

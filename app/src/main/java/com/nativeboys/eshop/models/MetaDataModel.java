@@ -15,8 +15,7 @@ public class MetaDataModel {
         // Required Empty
     }
 
-    public MetaDataModel(String id, String conversationId, MessageModel lastMessage) {
-        this.id = id;
+    public MetaDataModel(String conversationId, MessageModel lastMessage) {
         this.conversationId = conversationId;
         this.lastMessage = lastMessage;
     }

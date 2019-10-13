@@ -10,15 +10,14 @@ public class MessageModel {
     private String id;
     private String senderId;
     private String text;
-    private String timestamp;
+    private long timestamp;
     private int type; // text or image
 
     public MessageModel() {
         // Required empty
     }
 
-    public MessageModel(String id, String senderId, String text, String timestamp, int type) {
-        this.id = id;
+    public MessageModel(String senderId, String text, long timestamp, int type) {
         this.senderId = senderId;
         this.text = text;
         this.timestamp = timestamp;
@@ -49,11 +48,11 @@ public class MessageModel {
         this.text = text;
     }
 
-    public String getTimestamp() {
+    public long getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(String timestamp) {
+    public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
     }
 
