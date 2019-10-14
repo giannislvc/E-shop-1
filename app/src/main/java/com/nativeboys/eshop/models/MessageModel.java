@@ -4,6 +4,9 @@ import androidx.annotation.NonNull;
 
 import com.google.firebase.database.IgnoreExtraProperties;
 
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+
 @IgnoreExtraProperties
 public class MessageModel {
 
@@ -50,6 +53,11 @@ public class MessageModel {
 
     public long getTimestamp() {
         return timestamp;
+    }
+
+    public String getFormatedTimestamp() {
+        SimpleDateFormat sdf = new SimpleDateFormat("MM-dd mm:ss", Locale.US);
+        return sdf.format(timestamp);
     }
 
     public void setTimestamp(long timestamp) {

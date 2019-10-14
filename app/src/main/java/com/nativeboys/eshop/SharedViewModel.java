@@ -22,10 +22,12 @@ import java.util.List;
 public class SharedViewModel extends AndroidViewModel {
 
     // TODO: Offline, Paging, Photos in Chat, Authentication - Login, Register - Unregister FB Listeners,
-    //  Handle new Conversation offline, handle on error
+    //  Handle new Conversation offline, handle on error, replace value events. Check similarities and create DAO if you want
 
     // TODO: Remove static ids
-    private final static String USER_ID = "-Lr4ZsW5YBrsRbAl-09n";
+    // public final String USER_ID = "-Lr4ZsW5YBrsRbAl-09n";
+    public final String USER_ID = "-Lr4ZfYW8Gig9pKXD8qL";
+
 
     private final static String USERS = "users";
     private final static String METADATA = "metadata";

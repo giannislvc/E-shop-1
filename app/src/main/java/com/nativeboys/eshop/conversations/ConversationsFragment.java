@@ -53,14 +53,19 @@ public class ConversationsFragment extends Fragment {
         adapter = new ConversationsAdapter(activity.getApplicationContext());
         recycler_view.setAdapter(adapter);
         recycler_view.setLayoutManager(new LinearLayoutManager(activity));
-        adapter.setConversationClickListener((itemView, meta) -> {
-            // TODO: Pass arguments
-            new ConversationFragment().show(getChildFragmentManager(), ConversationFragment.class.getSimpleName());
-        });
+        adapter.setConversationClickListener((itemView, meta) -> openConversation(meta.getConversationId(), meta.getId()));
         viewModel.getMetaData().observe(this, metaData -> {
             if (metaData == null) { return; }
             adapter.submitList(new ArrayList<>(metaData));
         });
+    }
+
+    private void openConversation(String conversationId, String friendId) {
+        String userId = viewModel.USER_ID;
+        if (conversationId != null && friendId != null) {
+            ConversationFragment.newInstance(conversationId, userId, friendId)
+                    .show(getChildFragmentManager(), ConversationFragment.class.getSimpleName());
+        }
     }
 
     @Override

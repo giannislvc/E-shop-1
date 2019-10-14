@@ -70,7 +70,7 @@ public class ConversationAdapter extends ListAdapter<MessageModel, ConversationA
         if (width != null) holder.text_message.setMaxWidth(width);
         MessageModel model = getItem(position);
         holder.text_message.setText(model.getText());
-        holder.time_stamp.setText(String.valueOf(model.getTimestamp())); // TODO: deserialization date format
+        holder.time_stamp.setText(model.getFormatedTimestamp()); // TODO: deserialization date format
     }
 
     // TODO: Remove it

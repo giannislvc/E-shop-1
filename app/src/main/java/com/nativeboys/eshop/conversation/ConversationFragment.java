@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,11 +22,19 @@ import android.widget.TextView;
 
 import com.nativeboys.eshop.R;
 
+import java.util.ArrayList;
+
 public class ConversationFragment extends DialogFragment {
 
-    private FragmentActivity activity;
+    private final static String CONVERSATION_ID = "conversation_id";
+    private final static String USER_ID = "user_id";
+    private final static String FRIEND_ID = "friend_id";
 
-    private ConstraintLayout parent_view;
+    private FragmentActivity activity;
+    private ConversationViewModel viewModel;
+    private String conversationId, userId, friendId;
+
+    private ConstraintLayout bottom;
     private ImageView back_arrow;
     private TextView headline;
     private RecyclerView recycler_view;
@@ -37,10 +46,27 @@ public class ConversationFragment extends DialogFragment {
         // Required empty public constructor
     }
 
+    public static ConversationFragment newInstance(@NonNull String conversationId, @NonNull String userId, @NonNull String friendId) {
+        ConversationFragment fragment = new ConversationFragment();
+        Bundle args = new Bundle();
+        args.putString(CONVERSATION_ID, conversationId);
+        args.putString(USER_ID, userId);
+        args.putString(FRIEND_ID, friendId);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setStyle(DialogFragment.STYLE_NORMAL, R.style.FadeFragmentTheme);
+        if (getArguments() != null) {
+            conversationId = getArguments().getString(CONVERSATION_ID);
+            userId = getArguments().getString(USER_ID);
+            friendId = getArguments().getString(FRIEND_ID);
+        }
+        ConversationViewModelFactory factory = new ConversationViewModelFactory(activity.getApplication(), conversationId, userId, friendId);
+        viewModel = ViewModelProviders.of(this, factory).get(ConversationViewModel.class);
     }
 
     @Override
@@ -53,34 +79,44 @@ public class ConversationFragment extends DialogFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        parent_view = view.findViewById(R.id.parent_view);
+        bottom = view.findViewById(R.id.bottom);
         back_arrow = view.findViewById(R.id.back_arrow);
         headline = view.findViewById(R.id.headline);
         recycler_view = view.findViewById(R.id.recycler_view);
         message_field = view.findViewById(R.id.message_field);
         send_button = view.findViewById(R.id.send_button);
-        adapter = new ConversationAdapter(activity.getApplicationContext(), "200");
+        adapter = new ConversationAdapter(activity.getApplicationContext(), userId);
         recycler_view.setAdapter(adapter);
         recycler_view.setLayoutManager(new LinearLayoutManager(activity));
         setUpListeners();
-        //adapter.submitList(new ArrayList<>(mockData()));
     }
 
     private void setUpListeners() {
-        parent_view.addOnLayoutChangeListener((v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
-            if (oldBottom > bottom) scrollToBottom();
+        bottom.addOnLayoutChangeListener((v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
+            if (oldBottom > bottom || top < oldTop) scrollToBottom();
         });
         back_arrow.setOnClickListener(v -> dismiss());
+        adapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onItemRangeInserted(int positionStart, int itemCount) {
+                super.onItemRangeInserted(positionStart, itemCount);
+                scrollToBottom();
+            }
+        });
         send_button.setOnClickListener( v-> {
             String message = message_field.getText() != null ? message_field.getText().toString() : "";
-            if (message.isEmpty()) { return; }
-            // TODO: implement Send Message
+            if (message.isEmpty()) return;
+            viewModel.sendMessage(message.trim());
             message_field.setText(null);
+        });
+        viewModel.getMessages().observe(this, messages -> {
+            if (messages == null) return;
+            adapter.submitList(new ArrayList<>(messages));
         });
     }
 
     private void scrollToBottom() {
-        if(adapter.getItemCount() < 1) { return; }
+        if(adapter.getItemCount() < 1) return;
         recycler_view.scrollToPosition(adapter.getItemCount() - 1);
     }
 

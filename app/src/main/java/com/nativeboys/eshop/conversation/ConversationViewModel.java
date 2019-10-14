@@ -1,6 +1,7 @@
 package com.nativeboys.eshop.conversation;
 
 import android.app.Application;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -21,6 +22,8 @@ import java.util.List;
 
 class ConversationViewModel extends AndroidViewModel {
 
+    private final String TAG = getClass().getSimpleName();
+
     private final static String CONVERSATIONS = "conversations";
     private final static String METADATA = "metadata";
 
@@ -28,17 +31,19 @@ class ConversationViewModel extends AndroidViewModel {
 
     private MutableLiveData<List<MessageModel>> messages = new MutableLiveData<>();
 
-    private String userId, friendId;
+    private final String userId, friendId, conversationId;
 
     private final Query query;
 
     // TODO: Replace with ChildEventListener
+
     private final ValueEventListener listener = new ValueEventListener() {
         @Override
         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
             List<MessageModel> messages = new ArrayList<>();
             for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
                 String id = userSnapshot.getKey();
+                Log.i(TAG, "onDataChange: " + id);
                 if (id == null) continue;
                 MessageModel message = userSnapshot.getValue(MessageModel.class);
                 if (message != null) {
@@ -57,6 +62,7 @@ class ConversationViewModel extends AndroidViewModel {
         super(application);
         this.userId = userId;
         this.friendId = friendId;
+        this.conversationId = conversationId;
         conversationsRef = FirebaseDatabase.getInstance().getReference(CONVERSATIONS);
         metadataRef = FirebaseDatabase.getInstance().getReference(METADATA);
         query = conversationsRef.child(conversationId);
@@ -72,7 +78,7 @@ class ConversationViewModel extends AndroidViewModel {
         if (messageId != null) {
             MessageModel message = new MessageModel(userId, text, new Timestamp(System.currentTimeMillis()).getTime(), 1);
             // TODO: Replace with batch operations (HashMap)
-            conversationsRef.child(messageId).setValue(message);
+            conversationsRef.child(conversationId).child(messageId).setValue(message);
             metadataRef.child(userId).child(friendId).child("lastMessage").setValue(message);
             metadataRef.child(friendId).child(userId).child("lastMessage").setValue(message);
         }

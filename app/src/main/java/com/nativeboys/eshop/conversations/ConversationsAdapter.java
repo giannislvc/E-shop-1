@@ -66,6 +66,7 @@ public class ConversationsAdapter extends ListAdapter<MetaDataModel, Conversatio
     public void onBindViewHolder(@NonNull ConversationsViewHolder holder, int position) {
         MetaDataModel model = getItem(position);
         holder.user_name.setText(model.getId());
+        if (model.getLastMessage() != null) holder.last_message.setText(model.getLastMessage().getText());
         Glide.with(context).load(test_image).into(holder.user_image);
     }
 
