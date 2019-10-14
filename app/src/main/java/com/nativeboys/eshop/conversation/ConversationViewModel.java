@@ -66,7 +66,7 @@ class ConversationViewModel extends AndroidViewModel {
         conversationsRef = FirebaseDatabase.getInstance().getReference(CONVERSATIONS);
         metadataRef = FirebaseDatabase.getInstance().getReference(METADATA);
         query = conversationsRef.child(conversationId);
-        query.addValueEventListener(listener);
+        query.orderByKey().endAt("-LrB-Rxtg-uSrbQDvnxG").limitToLast(8).addValueEventListener(listener);
     }
 
     LiveData<List<MessageModel>> getMessages() {

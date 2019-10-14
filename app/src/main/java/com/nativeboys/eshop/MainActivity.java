@@ -10,6 +10,7 @@ import androidx.viewpager.widget.ViewPager;
 import android.os.Bundle;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.database.FirebaseDatabase;
 import com.nativeboys.eshop.conversations.ConversationsFragment;
 import com.nativeboys.eshop.products.ProductsFragment;
 import com.nativeboys.eshop.profile.ProfileFragment;
@@ -24,6 +25,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+
         view_pager = findViewById(R.id.view_pager);
         navigation_bar = findViewById(R.id.navigation_bar);
         adapter = new MainPagerAdapter(getSupportFragmentManager());
