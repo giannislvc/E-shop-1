@@ -17,6 +17,12 @@ import com.nativeboys.eshop.profile.ProfileFragment;
 
 public class MainActivity extends AppCompatActivity {
 
+    /*Static fields are executed before the constructor (before an instance of this class)
+    now we bypass the following exception -> "Calls to setPersistenceEnabled() must be made before any other usage of FirebaseDatabase instance"*/
+    static {
+        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+    }
+
     private ViewPager view_pager;
     private BottomNavigationView navigation_bar;
     private MainPagerAdapter adapter;
@@ -25,8 +31,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
-
         view_pager = findViewById(R.id.view_pager);
         navigation_bar = findViewById(R.id.navigation_bar);
         adapter = new MainPagerAdapter(getSupportFragmentManager());

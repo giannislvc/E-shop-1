@@ -4,10 +4,12 @@ import android.app.Application;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -37,13 +39,42 @@ class ConversationViewModel extends AndroidViewModel {
 
     // TODO: Replace with ChildEventListener
 
+    private final ChildEventListener childListener = new ChildEventListener() {
+        @Override
+        public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+            String id = dataSnapshot.getKey();
+            if (id == null) return;
+            MessageModel message = dataSnapshot.getValue(MessageModel.class);
+            if (message != null) {
+                message.setId(id);
+                List<MessageModel> messages = ConversationViewModel.this.messages.getValue();
+                if (messages == null) messages = new ArrayList<>();
+                messages.add(message);
+                ConversationViewModel.this.messages.setValue(messages);
+            }
+        }
+
+        @Override
+        public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) { }
+
+        @Override
+        public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) { }
+
+        @Override
+        public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) { }
+
+        @Override
+        public void onCancelled(@NonNull DatabaseError databaseError) {
+            // TODO : Implement internet error
+        }
+    };
+
     private final ValueEventListener listener = new ValueEventListener() {
         @Override
         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
             List<MessageModel> messages = new ArrayList<>();
             for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
                 String id = userSnapshot.getKey();
-                Log.i(TAG, "onDataChange: " + id);
                 if (id == null) continue;
                 MessageModel message = userSnapshot.getValue(MessageModel.class);
                 if (message != null) {
@@ -66,7 +97,8 @@ class ConversationViewModel extends AndroidViewModel {
         conversationsRef = FirebaseDatabase.getInstance().getReference(CONVERSATIONS);
         metadataRef = FirebaseDatabase.getInstance().getReference(METADATA);
         query = conversationsRef.child(conversationId);
-        query.orderByKey().endAt("-LrB-Rxtg-uSrbQDvnxG").limitToLast(8).addValueEventListener(listener);
+        query.limitToLast(5).addChildEventListener(childListener);
+        // query.orderByKey().endAt("-LrB-Rxtg-uSrbQDvnxG").limitToLast(8).addValueEventListener(listener);
     }
 
     LiveData<List<MessageModel>> getMessages() {

@@ -17,6 +17,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.nativeboys.eshop.R;
 import com.nativeboys.eshop.models.MessageModel;
 
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+
 public class ConversationAdapter extends ListAdapter<MessageModel, ConversationAdapter.TextMessageViewHolder> {
 
     // TODO: implement image type
@@ -70,7 +73,9 @@ public class ConversationAdapter extends ListAdapter<MessageModel, ConversationA
         if (width != null) holder.text_message.setMaxWidth(width);
         MessageModel model = getItem(position);
         holder.text_message.setText(model.getText());
-        holder.time_stamp.setText(model.getFormatedTimestamp()); // TODO: deserialization date format
+        // TODO: deserialization date format
+        SimpleDateFormat sdf = new SimpleDateFormat("MM-dd HH:mm", Locale.US);
+        holder.time_stamp.setText(sdf.format(model.getTimestamp()));
     }
 
     // TODO: Remove it
