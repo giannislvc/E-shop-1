@@ -37,8 +37,6 @@ class ConversationViewModel extends AndroidViewModel {
 
     private final Query query;
 
-    // TODO: Replace with ChildEventListener
-
     private final ChildEventListener childListener = new ChildEventListener() {
         @Override
         public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
@@ -96,9 +94,9 @@ class ConversationViewModel extends AndroidViewModel {
         this.conversationId = conversationId;
         conversationsRef = FirebaseDatabase.getInstance().getReference(CONVERSATIONS);
         metadataRef = FirebaseDatabase.getInstance().getReference(METADATA);
-        query = conversationsRef.child(conversationId);
-        query.limitToLast(5).addChildEventListener(childListener);
-        // query.orderByKey().endAt("-LrB-Rxtg-uSrbQDvnxG").limitToLast(8).addValueEventListener(listener);
+        query = conversationsRef.child(conversationId).limitToLast(5);
+        query.addChildEventListener(childListener);
+        //conversationsRef.child(conversationId).orderByKey().endAt("-LrGBjdwsCmUjOVD90za").limitToLast(5).addChildEventListener(childListener);
     }
 
     LiveData<List<MessageModel>> getMessages() {
@@ -119,6 +117,6 @@ class ConversationViewModel extends AndroidViewModel {
     @Override
     protected void onCleared() {
         super.onCleared();
-        if (query != null) query.removeEventListener(listener);
+        if (query != null) query.removeEventListener(childListener);
     }
 }
