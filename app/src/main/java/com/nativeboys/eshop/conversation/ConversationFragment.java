@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +27,8 @@ import java.util.ArrayList;
 
 public class ConversationFragment extends DialogFragment {
 
+    private final String TAG = getClass().getSimpleName();
+
     private final static String CONVERSATION_ID = "conversation_id";
     private final static String USER_ID = "user_id";
     private final static String FRIEND_ID = "friend_id";
@@ -37,10 +40,12 @@ public class ConversationFragment extends DialogFragment {
     private ConstraintLayout bottom;
     private ImageView back_arrow;
     private TextView headline;
-    private RecyclerView recycler_view;
     private EditText message_field;
     private Button send_button;
+
+    private RecyclerView recycler_view;
     private ConversationAdapter adapter;
+    private LinearLayoutManager manager;
 
     public ConversationFragment() {
         // Required empty public constructor
@@ -85,34 +90,46 @@ public class ConversationFragment extends DialogFragment {
         recycler_view = view.findViewById(R.id.recycler_view);
         message_field = view.findViewById(R.id.message_field);
         send_button = view.findViewById(R.id.send_button);
+
         adapter = new ConversationAdapter(activity.getApplicationContext(), userId);
+        manager = new LinearLayoutManager(recycler_view.getContext());
+
         recycler_view.setAdapter(adapter);
-        recycler_view.setLayoutManager(new LinearLayoutManager(activity));
+        recycler_view.setLayoutManager(manager);
         setUpListeners();
     }
 
     private void setUpListeners() {
+
+        back_arrow.setOnClickListener(v -> dismiss());
+
         bottom.addOnLayoutChangeListener((v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
             if (oldBottom > bottom || top < oldTop) scrollToBottom();
         });
-        back_arrow.setOnClickListener(v -> dismiss());
+
         adapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
             public void onItemRangeInserted(int positionStart, int itemCount) {
-                super.onItemRangeInserted(positionStart, itemCount);
-                scrollToBottom();
+                if (positionStart != 0) scrollToBottom();
             }
         });
+
+        viewModel.getMessages().observe(this, messageModels -> adapter.submitList(new ArrayList<>(messageModels)));
+
         send_button.setOnClickListener( v-> {
             String message = message_field.getText() != null ? message_field.getText().toString() : "";
             if (message.isEmpty()) return;
             viewModel.sendMessage(message.trim());
             message_field.setText(null);
         });
-        viewModel.getMessages().observe(this, messages -> {
-            if (messages == null) return;
-            adapter.submitList(new ArrayList<>(messages));
-        });
+
+        new Handler().postDelayed(() -> recycler_view.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                if (manager.findFirstCompletelyVisibleItemPosition() != 0) return;
+                viewModel.getPreviousData();
+            }
+        }), 1250);
     }
 
     private void scrollToBottom() {

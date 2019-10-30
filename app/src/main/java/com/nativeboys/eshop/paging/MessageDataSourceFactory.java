@@ -30,5 +30,3 @@ public class MessageDataSourceFactory extends DataSource.Factory {
         return messageLiveDataSource;
     }
 }
-
-// database = FirebaseDatabase.getInstance().getReference(CONVERSATIONS).child(conversationId);

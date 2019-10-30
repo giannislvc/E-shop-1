@@ -28,28 +28,27 @@ class ConversationViewModel extends AndroidViewModel {
 
     private final static String CONVERSATIONS = "conversations";
     private final static String METADATA = "metadata";
+    private final static int MESSAGES_LIMIT = 10;
 
     private DatabaseReference conversationsRef, metadataRef;
 
     private MutableLiveData<List<MessageModel>> messages = new MutableLiveData<>();
 
-    private final String userId, friendId, conversationId;
+    private final String userId, friendId;
 
     private final Query query;
 
     private final ChildEventListener childListener = new ChildEventListener() {
         @Override
         public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-            String id = dataSnapshot.getKey();
-            if (id == null) return;
             MessageModel message = dataSnapshot.getValue(MessageModel.class);
-            if (message != null) {
-                message.setId(id);
-                List<MessageModel> messages = ConversationViewModel.this.messages.getValue();
-                if (messages == null) messages = new ArrayList<>();
-                messages.add(message);
-                ConversationViewModel.this.messages.setValue(messages);
-            }
+            String id = dataSnapshot.getKey();
+            if (id == null || message == null) return;
+            message.setId(id);
+            List<MessageModel> messages = ConversationViewModel.this.messages.getValue();
+            if (messages == null) messages = new ArrayList<>();
+            messages.add(message);
+            ConversationViewModel.this.messages.setValue(messages);
         }
 
         @Override
@@ -67,36 +66,16 @@ class ConversationViewModel extends AndroidViewModel {
         }
     };
 
-    private final ValueEventListener listener = new ValueEventListener() {
-        @Override
-        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-            List<MessageModel> messages = new ArrayList<>();
-            for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
-                String id = userSnapshot.getKey();
-                if (id == null) continue;
-                MessageModel message = userSnapshot.getValue(MessageModel.class);
-                if (message != null) {
-                    message.setId(id);
-                    messages.add(message);
-                }
-            }
-            ConversationViewModel.this.messages.setValue(messages);
-        }
-
-        @Override
-        public void onCancelled(@NonNull DatabaseError databaseError) { }
-    };
-
     ConversationViewModel(@NonNull Application application, @NonNull String conversationId, @NonNull String userId, @NonNull String friendId) {
         super(application);
         this.userId = userId;
         this.friendId = friendId;
-        this.conversationId = conversationId;
-        conversationsRef = FirebaseDatabase.getInstance().getReference(CONVERSATIONS);
+        conversationsRef = FirebaseDatabase.getInstance().getReference(CONVERSATIONS).child(conversationId);
         metadataRef = FirebaseDatabase.getInstance().getReference(METADATA);
-        query = conversationsRef.child(conversationId).limitToLast(5);
+
+        conversationsRef.keepSynced(false);
+        query = conversationsRef.limitToLast(MESSAGES_LIMIT);
         query.addChildEventListener(childListener);
-        //conversationsRef.child(conversationId).orderByKey().endAt("-LrGBjdwsCmUjOVD90za").limitToLast(5).addChildEventListener(childListener);
     }
 
     LiveData<List<MessageModel>> getMessages() {
@@ -108,10 +87,40 @@ class ConversationViewModel extends AndroidViewModel {
         if (messageId != null) {
             MessageModel message = new MessageModel(userId, text, new Timestamp(System.currentTimeMillis()).getTime(), 1);
             // TODO: Replace with batch operations (HashMap)
-            conversationsRef.child(conversationId).child(messageId).setValue(message);
+            conversationsRef.child(messageId).setValue(message);
             metadataRef.child(userId).child(friendId).child("lastMessage").setValue(message);
             metadataRef.child(friendId).child(userId).child("lastMessage").setValue(message);
         }
+    }
+
+    void getPreviousData() {
+        List<MessageModel> list = messages.getValue();
+        if (list == null || list.isEmpty()) return;
+        String messageId = list.get(0).getId();
+        if (messageId == null) return;
+        conversationsRef.orderByKey().limitToLast(MESSAGES_LIMIT).endAt(messageId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Log.i(TAG, "onDataChange: ");
+                List<MessageModel> messages = new ArrayList<>();
+                for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
+                    String id = userSnapshot.getKey();
+                    if (id == null || id.equals(messageId)) continue;
+                    MessageModel message = userSnapshot.getValue(MessageModel.class);
+                    if (message != null) {
+                        message.setId(id);
+                        messages.add(message);
+                    }
+                }
+                list.addAll(0, messages);
+                ConversationViewModel.this.messages.setValue(list);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.i(TAG, "onCancelled: ");
+            }
+        });
     }
 
     @Override

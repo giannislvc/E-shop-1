@@ -14,7 +14,7 @@ import java.util.List;
 
 public class MessageDataSource extends PageKeyedDataSource<String, MessageModel> {
 
-    private final static int PAGE_SIZE = 10;
+    public final static int PAGE_SIZE = 5;
 
     private final DatabaseReference database;
 
@@ -49,20 +49,22 @@ public class MessageDataSource extends PageKeyedDataSource<String, MessageModel>
     @Override
     public void loadBefore(@NonNull LoadParams<String> params, @NonNull LoadCallback<String, MessageModel> callback) {
 
-        database.orderByKey().endAt(params.key).limitToLast(PAGE_SIZE).addListenerForSingleValueEvent(new ValueEventListener() {
+        database.orderByKey().limitToLast(PAGE_SIZE).endAt(params.key).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 List<MessageModel> messages = new ArrayList<>();
                 for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
                     String id = userSnapshot.getKey();
-                    if (id == null) continue;
+                    if (id == null || id.equals(params.key)) continue;
                     MessageModel message = userSnapshot.getValue(MessageModel.class);
                     if (message != null) {
                         message.setId(id);
                         messages.add(message);
                     }
                 }
-                callback.onResult(messages, messages.get(0).getId());
+                if (messages.size() > 0 && !messages.get(0).getId().equals(params.key)) {
+                    callback.onResult(messages, messages.get(0).getId());
+                }
             }
 
             @Override

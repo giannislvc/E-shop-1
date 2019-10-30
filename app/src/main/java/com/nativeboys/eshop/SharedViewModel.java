@@ -21,8 +21,8 @@ import java.util.List;
 
 public class SharedViewModel extends AndroidViewModel {
 
-    // TODO: Offline, Paging, Photos in Chat, Authentication - Login, Register - Unregister FB Listeners,
-    //  Handle new Conversation offline, handle on error, replace value events. Check similarities and create DAO if you want
+    // TODO: Offline, Photos in Chat, Authentication - Login, Register - Unregister FB Listeners,
+    //  Handle new Conversation offline, handle on error, replace value events. Check similarities and create DAO if you want, Holder like fonts for metas users
 
     // TODO: Remove static ids
     // public final String USER_ID = "-Lr4ZsW5YBrsRbAl-09n";
