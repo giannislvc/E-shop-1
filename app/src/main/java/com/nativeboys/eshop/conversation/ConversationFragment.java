@@ -4,7 +4,6 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -18,7 +17,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Handler;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,14 +37,15 @@ public class ConversationFragment extends DialogFragment {
 
     private final String TAG = getClass().getSimpleName();
 
-    private final static String CONVERSATION_ID = "conversation_id";
-    private final static String USER_ID = "user_id";
-    private final static String FRIEND_ID = "friend_id";
+    private static final int PICK_IMAGE_REQUEST = 1;
+
+    private static final String CONVERSATION_ID = "conversation_id";
+    private static final String USER_ID = "user_id";
+    private static final String FRIEND_ID = "friend_id";
 
     private FragmentActivity activity;
     private ConversationViewModel viewModel;
     private String conversationId, userId, friendId;
-
 
     private ConstraintLayout bottom;
     private LinearLayout moreOptionsContainer;
@@ -134,7 +133,7 @@ public class ConversationFragment extends DialogFragment {
 
         viewModel.getMessages().observe(this, messageModels -> adapter.submitList(new ArrayList<>(messageModels)));
 
-        picturesBtn.setOnClickListener(view -> pickImageFromGallery());
+        picturesBtn.setOnClickListener(view -> openGallery());
 
         bottom.addOnLayoutChangeListener((v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
             if (oldBottom > bottom || top < oldTop) scrollToBottom();
@@ -160,34 +159,33 @@ public class ConversationFragment extends DialogFragment {
         }), 1250);
     }
 
-    private void pickImageFromGallery() {
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ContextCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE)
-                    == PackageManager.PERMISSION_DENIED) {
-                requestPermissions(new String[]{ Manifest.permission.READ_EXTERNAL_STORAGE }, 200);
-                return;
-            }
+    private void openGallery() {
+        if (ContextCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_DENIED) {
+            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PICK_IMAGE_REQUEST);
+        } else {
+            openFileChooser();
         }
-        openGallery();
+    }
+
+    private void openFileChooser() {
+        startActivityForResult(new Intent()
+                .setType("image/*")
+                .setAction(Intent.ACTION_GET_CONTENT), PICK_IMAGE_REQUEST);
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == 200 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            openGallery();
+        if (requestCode == PICK_IMAGE_REQUEST && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            openFileChooser();
         }
-    }
-
-    private void openGallery() {
-        Intent intent = new Intent(Intent.ACTION_PICK);
-        intent.setType("image/*");
-        startActivityForResult(intent, 200);
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if (resultCode == RESULT_OK && requestCode == 200 && data != null) {
-            Log.i(TAG, "onActivityResult: " + data.getData());
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK
+                && data != null && data.getData() != null) {
+            viewModel.sendImage(data.getData());
         }
     }
 
@@ -211,3 +209,5 @@ public class ConversationFragment extends DialogFragment {
 }
 
 // https://www.learningsomethingnew.com/how-to-use-a-recycler-view-to-show-images-from-storage
+// https://coderwall.com/p/35xi3w/layout-change-animations-sliding-height
+// https://github.com/chrisbanes/PhotoView

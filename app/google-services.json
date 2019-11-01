@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "786712111078-effkinqol8eu3f2rlo64i2bglf1nrmos.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nativeboys.eshop",
+            "certificate_hash": "a73bf222607aac0fcf9a88bddefd3603a5dd85d9"
+          }
+        },
+        {
           "client_id": "786712111078-hgv2k3v5s75dgeo04k9uu4pp792akcgu.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

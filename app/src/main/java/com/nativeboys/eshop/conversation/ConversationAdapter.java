@@ -26,8 +26,6 @@ import java.util.Locale;
 
 public class ConversationAdapter extends ListAdapter<MessageModel, ConversationAdapter.MessageViewHolder> {
 
-    private final static String TEST_PICK_PATH = "https://demolay.org/wp-content/uploads/2018/12/Vacation.jpg";
-
     public interface OnImageClickListener {
         void onClick(@NonNull View itemView, @NonNull String pickPath);
     }
@@ -58,25 +56,46 @@ public class ConversationAdapter extends ListAdapter<MessageModel, ConversationA
         imageClickListener = listener;
     }
 
+    /*
+    Type 1: Text Sender
+    Type 2: Image Sender
+    Type 3: Text Receiver
+    Type 4: Image Receiver
+    */
+
     @Override
     public int getItemViewType(int position) {
-        return getItem(position).getSenderId().equals(clientId) ? 1 : 2;
+        MessageModel message = getItem(position);
+        boolean sender = message.getSenderId().equals(clientId);
+        if (sender) { // Sender
+            return message.getType() == 2 ? 2 : 1;
+        } else { // Receiver
+            return message.getType() == 2 ? 4 : 3;
+        }
     }
 
     @NonNull
     @Override
     public ConversationAdapter.MessageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
-        if (viewType == 2) {
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_sender_cell, parent, false);
-            return new ConversationAdapter.TextMessageViewHolder(view);
-        } else {
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.image_receiver_cell, parent, false);
-            return new ConversationAdapter.ImageMessageViewHolder(view);
-            /*View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_receiver_cell, parent, false);
-            return new ConversationAdapter.TextMessageViewHolder(view);*/
+        switch (viewType) {
+            case 2: {
+                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.image_sender_cell, parent, false);
+                return new ImageMessageViewHolder(view);
+            }
+            case 3: {
+                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_receiver_cell, parent, false);
+                return new TextMessageViewHolder(view);
+            }
+            case 4: {
+                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.image_receiver_cell, parent, false);
+                return new ImageMessageViewHolder(view);
+            }
+            default: {
+                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_sender_cell, parent, false);
+                return new TextMessageViewHolder(view);
+            }
         }
-
     }
 
     @Override
@@ -89,20 +108,19 @@ public class ConversationAdapter extends ListAdapter<MessageModel, ConversationA
         SimpleDateFormat sdf = new SimpleDateFormat("MM-dd HH:mm", Locale.US);
         holder.timeStamp.setText(sdf.format(model.getTimestamp()));
 
-        if (viewType == 2) {
+        if (viewType == 1 || viewType == 3) {
             TextMessageViewHolder textHolder = (TextMessageViewHolder) holder;
             textHolder.textMessage.setText(model.getText());
 
             Integer width = calculateWidth(textHolder.textMessage.getContext());
             if (width != null) textHolder.textMessage.setMaxWidth(width);
-        } else {
+        } else if(viewType == 2 || viewType == 4) {
             ImageMessageViewHolder imageHolder = (ImageMessageViewHolder) holder;
             Glide.with(imageHolder.imageMessage.getContext())
-                    .load(TEST_PICK_PATH)
+                    .load(model.getText())
                     .transform(new CenterCrop(), new RoundedCorners(30))
                     .into(imageHolder.imageMessage);
         }
-
     }
 
     // TODO: Remove it
@@ -147,7 +165,7 @@ public class ConversationAdapter extends ListAdapter<MessageModel, ConversationA
                 if (imageClickListener == null) return;
                 int position = getAdapterPosition();
                 if (position == RecyclerView.NO_POSITION) return;
-                imageClickListener.onClick(v, TEST_PICK_PATH);
+                imageClickListener.onClick(v, getItem(position).getText());
             });
         }
 

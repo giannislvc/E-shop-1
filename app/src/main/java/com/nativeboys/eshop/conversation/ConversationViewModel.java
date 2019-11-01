@@ -1,7 +1,9 @@
 package com.nativeboys.eshop.conversation;
 
 import android.app.Application;
-import android.util.Log;
+import android.content.ContentResolver;
+import android.net.Uri;
+import android.webkit.MimeTypeMap;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -16,6 +18,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.nativeboys.eshop.models.MessageModel;
 
 import java.sql.Timestamp;
@@ -24,20 +28,26 @@ import java.util.List;
 
 class ConversationViewModel extends AndroidViewModel {
 
-    private final String TAG = getClass().getSimpleName();
-
     private final static String CONVERSATIONS = "conversations";
     private final static String METADATA = "metadata";
+    private final static String UPLOADS = "uploads";
+
     private final static int MESSAGES_LIMIT = 10;
+
+    public enum MessageType {
+        TEXT,
+        IMAGE
+    }
 
     private DatabaseReference conversationsRef, metadataRef;
 
-    private MutableLiveData<List<MessageModel>> messages;
+    private StorageReference storageRef;
+    private final ContentResolver contentResolver;
 
     private final String userId, friendId;
-
     private final Query query;
 
+    private MutableLiveData<List<MessageModel>> messages;
     private boolean fetchingDataState;
 
     {
@@ -77,8 +87,11 @@ class ConversationViewModel extends AndroidViewModel {
         super(application);
         this.userId = userId;
         this.friendId = friendId;
+        contentResolver = application.getContentResolver();
+
         conversationsRef = FirebaseDatabase.getInstance().getReference(CONVERSATIONS).child(conversationId);
         metadataRef = FirebaseDatabase.getInstance().getReference(METADATA);
+        storageRef = FirebaseStorage.getInstance().getReference(UPLOADS);
 
         conversationsRef.keepSynced(false);
         query = conversationsRef.limitToLast(MESSAGES_LIMIT);
@@ -89,15 +102,30 @@ class ConversationViewModel extends AndroidViewModel {
         return messages;
     }
 
-    void sendMessage(String text) {
+    private void sendToServer(@NonNull String text, @NonNull MessageType messageType) {
         String messageId = conversationsRef.push().getKey();
         if (messageId != null) {
-            MessageModel message = new MessageModel(userId, text, new Timestamp(System.currentTimeMillis()).getTime(), 1);
+            int type = (messageType == MessageType.TEXT ? 1 : 2);
+            MessageModel message = new MessageModel(userId, text, new Timestamp(System.currentTimeMillis()).getTime(), type);
             // TODO: Replace with batch operations (HashMap)
             conversationsRef.child(messageId).setValue(message);
             metadataRef.child(userId).child(friendId).child("lastMessage").setValue(message);
             metadataRef.child(friendId).child(userId).child("lastMessage").setValue(message);
         }
+    }
+
+    void sendMessage(@NonNull String text) {
+        sendToServer(text, MessageType.TEXT);
+    }
+
+    void sendImage(@NonNull Uri uri) {
+        StorageReference fileReference = storageRef.child(System.currentTimeMillis() + getFileExtension(uri));
+        fileReference.putFile(uri).continueWithTask(task -> task.isSuccessful() ? fileReference.getDownloadUrl() : null)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        sendToServer(task.getResult().toString(), MessageType.IMAGE);
+                    }
+                });
     }
 
     void getPreviousData() {
@@ -132,9 +160,17 @@ class ConversationViewModel extends AndroidViewModel {
         });
     }
 
+    private String getFileExtension(@NonNull Uri uri) {
+        MimeTypeMap mime = MimeTypeMap.getSingleton();
+        return mime.getExtensionFromMimeType(contentResolver.getType(uri));
+    }
+
     @Override
     protected void onCleared() {
         super.onCleared();
         if (query != null) query.removeEventListener(childListener);
     }
 }
+
+// https://blog.jetbrains.com/idea/2018/09/using-java-11-in-production-important-things-to-know/
+// https://youtu.be/VX3UBvwJtyA

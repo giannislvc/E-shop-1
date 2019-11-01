@@ -21,13 +21,15 @@ import java.util.List;
 
 public class SharedViewModel extends AndroidViewModel {
 
-    // TODO: Offline, Photos in Chat, Authentication - Login, Register - Unregister FB Listeners,
-    //  Handle new Conversation offline, handle on error, replace value events. Check similarities and create DAO if you want, Holder like fonts for metas users
+    // TODO: Offline overview, photos loading, take photo fragment, Authentication - Login,
+    // TODO: offline - send message - another room chat - go online (check it ??)
+    // TODO: new conversation offline, replace value events, DAO Firebase
+    // TODO: chat offline send image
+    // TODO: set up pre conversation (meta data)
 
     // TODO: Remove static ids
     // public final String USER_ID = "-Lr4ZsW5YBrsRbAl-09n";
     public final String USER_ID = "-Lr4ZfYW8Gig9pKXD8qL";
-
 
     private final static String USERS = "users";
     private final static String METADATA = "metadata";
