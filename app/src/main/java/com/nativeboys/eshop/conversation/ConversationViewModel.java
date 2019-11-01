@@ -32,11 +32,18 @@ class ConversationViewModel extends AndroidViewModel {
 
     private DatabaseReference conversationsRef, metadataRef;
 
-    private MutableLiveData<List<MessageModel>> messages = new MutableLiveData<>();
+    private MutableLiveData<List<MessageModel>> messages;
 
     private final String userId, friendId;
 
     private final Query query;
+
+    private boolean fetchingDataState;
+
+    {
+        messages = new MutableLiveData<>();
+        fetchingDataState = false;
+    }
 
     private final ChildEventListener childListener = new ChildEventListener() {
         @Override
@@ -94,6 +101,8 @@ class ConversationViewModel extends AndroidViewModel {
     }
 
     void getPreviousData() {
+        if(fetchingDataState) return;
+        fetchingDataState = true;
         List<MessageModel> list = messages.getValue();
         if (list == null || list.isEmpty()) return;
         String messageId = list.get(0).getId();
@@ -101,7 +110,6 @@ class ConversationViewModel extends AndroidViewModel {
         conversationsRef.orderByKey().limitToLast(MESSAGES_LIMIT).endAt(messageId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                Log.i(TAG, "onDataChange: ");
                 List<MessageModel> messages = new ArrayList<>();
                 for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
                     String id = userSnapshot.getKey();
@@ -114,11 +122,12 @@ class ConversationViewModel extends AndroidViewModel {
                 }
                 list.addAll(0, messages);
                 ConversationViewModel.this.messages.setValue(list);
+                fetchingDataState = false;
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.i(TAG, "onCancelled: ");
+                fetchingDataState = false;
             }
         });
     }

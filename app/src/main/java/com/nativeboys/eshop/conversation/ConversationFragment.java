@@ -1,11 +1,16 @@
 package com.nativeboys.eshop.conversation;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProviders;
@@ -13,17 +18,22 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.nativeboys.eshop.R;
+import com.nativeboys.eshop.conversation.imageDisplay.ImageDisplayFragment;
 
 import java.util.ArrayList;
+
+import static android.app.Activity.RESULT_OK;
 
 public class ConversationFragment extends DialogFragment {
 
@@ -37,13 +47,16 @@ public class ConversationFragment extends DialogFragment {
     private ConversationViewModel viewModel;
     private String conversationId, userId, friendId;
 
-    private ConstraintLayout bottom;
-    private ImageView back_arrow;
-    private TextView headline;
-    private EditText message_field;
-    private Button send_button;
 
-    private RecyclerView recycler_view;
+    private ConstraintLayout bottom;
+    private LinearLayout moreOptionsContainer;
+
+    private TextView headline, picturesBtn, takePhotoBtn;
+    private ImageView backBtn, moreOptionsBtn;
+    private EditText messageField;
+    private Button sendBtn;
+
+    private RecyclerView recyclerView;
     private ConversationAdapter adapter;
     private LinearLayoutManager manager;
 
@@ -85,23 +98,43 @@ public class ConversationFragment extends DialogFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         bottom = view.findViewById(R.id.bottom);
-        back_arrow = view.findViewById(R.id.back_arrow);
+        backBtn = view.findViewById(R.id.back_arrow);
         headline = view.findViewById(R.id.headline);
-        recycler_view = view.findViewById(R.id.recycler_view);
-        message_field = view.findViewById(R.id.message_field);
-        send_button = view.findViewById(R.id.send_button);
+        recyclerView = view.findViewById(R.id.recycler_view);
+        messageField = view.findViewById(R.id.message_field);
+        sendBtn = view.findViewById(R.id.send_button);
 
-        adapter = new ConversationAdapter(activity.getApplicationContext(), userId);
-        manager = new LinearLayoutManager(recycler_view.getContext());
+        moreOptionsContainer = view.findViewById(R.id.more_options_holder);
+        moreOptionsBtn = view.findViewById(R.id.more_options_btn);
+        takePhotoBtn = view.findViewById(R.id.take_photo_btn);
+        picturesBtn = view.findViewById(R.id.pictures_btn);
 
-        recycler_view.setAdapter(adapter);
-        recycler_view.setLayoutManager(manager);
+        adapter = new ConversationAdapter(userId);
+        manager = new LinearLayoutManager(recyclerView.getContext());
+
+        recyclerView.setAdapter(adapter);
+        recyclerView.setLayoutManager(manager);
+
         setUpListeners();
     }
 
     private void setUpListeners() {
 
-        back_arrow.setOnClickListener(v -> dismiss());
+        backBtn.setOnClickListener(v -> dismiss());
+
+        sendBtn.setOnClickListener(v-> {
+            String message = messageField.getText() != null ? messageField.getText().toString() : "";
+            if (message.isEmpty()) return;
+            viewModel.sendMessage(message.trim());
+            messageField.setText(null);
+        });
+
+        moreOptionsBtn.setOnClickListener(view ->
+                moreOptionsContainer.setVisibility(moreOptionsContainer.getVisibility() == View.VISIBLE ? View.GONE: View.VISIBLE));
+
+        viewModel.getMessages().observe(this, messageModels -> adapter.submitList(new ArrayList<>(messageModels)));
+
+        picturesBtn.setOnClickListener(view -> pickImageFromGallery());
 
         bottom.addOnLayoutChangeListener((v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
             if (oldBottom > bottom || top < oldTop) scrollToBottom();
@@ -114,16 +147,11 @@ public class ConversationFragment extends DialogFragment {
             }
         });
 
-        viewModel.getMessages().observe(this, messageModels -> adapter.submitList(new ArrayList<>(messageModels)));
+        adapter.setImageClickListener((itemView, pickPath) ->
+                ImageDisplayFragment.newInstance(pickPath)
+                        .show(getChildFragmentManager(), ImageDisplayFragment.class.getSimpleName()));
 
-        send_button.setOnClickListener( v-> {
-            String message = message_field.getText() != null ? message_field.getText().toString() : "";
-            if (message.isEmpty()) return;
-            viewModel.sendMessage(message.trim());
-            message_field.setText(null);
-        });
-
-        new Handler().postDelayed(() -> recycler_view.addOnScrollListener(new RecyclerView.OnScrollListener() {
+        new Handler().postDelayed(() -> recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 if (manager.findFirstCompletelyVisibleItemPosition() != 0) return;
@@ -132,9 +160,40 @@ public class ConversationFragment extends DialogFragment {
         }), 1250);
     }
 
+    private void pickImageFromGallery() {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ContextCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE)
+                    == PackageManager.PERMISSION_DENIED) {
+                requestPermissions(new String[]{ Manifest.permission.READ_EXTERNAL_STORAGE }, 200);
+                return;
+            }
+        }
+        openGallery();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == 200 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            openGallery();
+        }
+    }
+
+    private void openGallery() {
+        Intent intent = new Intent(Intent.ACTION_PICK);
+        intent.setType("image/*");
+        startActivityForResult(intent, 200);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (resultCode == RESULT_OK && requestCode == 200 && data != null) {
+            Log.i(TAG, "onActivityResult: " + data.getData());
+        }
+    }
+
     private void scrollToBottom() {
         if(adapter.getItemCount() < 1) return;
-        recycler_view.scrollToPosition(adapter.getItemCount() - 1);
+        recyclerView.scrollToPosition(adapter.getItemCount() - 1);
     }
 
     @Override
@@ -150,3 +209,5 @@ public class ConversationFragment extends DialogFragment {
     }
 
 }
+
+// https://www.learningsomethingnew.com/how-to-use-a-recycler-view-to-show-images-from-storage
