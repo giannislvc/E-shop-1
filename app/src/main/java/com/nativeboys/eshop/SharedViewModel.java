@@ -28,7 +28,7 @@ public class SharedViewModel extends AndroidViewModel {
     // TODO: set up pre conversation (meta data)
 
     // TODO: Remove static ids
-    // public final String USER_ID = "-Lr4ZsW5YBrsRbAl-09n";
+    //public final String USER_ID = "-Lr4ZsW5YBrsRbAl-09n";
     public final String USER_ID = "-Lr4ZfYW8Gig9pKXD8qL";
 
     private final static String USERS = "users";

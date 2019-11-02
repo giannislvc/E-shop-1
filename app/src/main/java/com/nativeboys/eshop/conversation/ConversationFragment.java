@@ -16,7 +16,6 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -142,7 +141,7 @@ public class ConversationFragment extends DialogFragment {
         adapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
             public void onItemRangeInserted(int positionStart, int itemCount) {
-                if (positionStart != 0) scrollToBottom();
+                if (positionStart + itemCount == adapter.getItemCount()) scrollToBottom();
             }
         });
 
@@ -150,13 +149,13 @@ public class ConversationFragment extends DialogFragment {
                 ImageDisplayFragment.newInstance(pickPath)
                         .show(getChildFragmentManager(), ImageDisplayFragment.class.getSimpleName()));
 
-        new Handler().postDelayed(() -> recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 if (manager.findFirstCompletelyVisibleItemPosition() != 0) return;
                 viewModel.getPreviousData();
             }
-        }), 1250);
+        });
     }
 
     private void openGallery() {

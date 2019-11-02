@@ -1,6 +1,7 @@
 package com.nativeboys.eshop.models;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.google.firebase.database.IgnoreExtraProperties;
 
@@ -62,6 +63,15 @@ public class MessageModel {
 
     public void setType(int type) {
         this.type = type;
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (obj instanceof MessageModel) {
+            MessageModel msg = (MessageModel) obj;
+            return msg.getId().equals(id);
+        }
+        return false;
     }
 
     @NonNull

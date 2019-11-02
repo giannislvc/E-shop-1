@@ -6,19 +6,37 @@
     android:background="@android:color/transparent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <ImageView
-        android:id="@+id/image_message"
-        android:layout_width="130dp"
-        android:layout_height="200dp"
+    <androidx.cardview.widget.CardView
+        android:id="@+id/image_holder"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:contentDescription="@string/chat_image"/>
+        app:cardBackgroundColor="#aaadc2"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="0dp"
+        app:cardPreventCornerOverlap="false">
+
+        <com.wang.avi.AVLoadingIndicatorView
+            android:id="@+id/progress_widget"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+            app:indicatorName="BallClipRotateIndicator"/>
+
+        <ImageView
+            android:id="@+id/image_message"
+            android:layout_width="130dp"
+            android:layout_height="200dp"
+            android:contentDescription="@string/chat_image"/>
+
+    </androidx.cardview.widget.CardView>
 
     <TextView
         android:id="@+id/time_stamp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/image_message"
+        app:layout_constraintTop_toBottomOf="@id/image_holder"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginEnd="2dp"

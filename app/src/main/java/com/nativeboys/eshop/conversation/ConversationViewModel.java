@@ -3,6 +3,7 @@ package com.nativeboys.eshop.conversation;
 import android.app.Application;
 import android.content.ContentResolver;
 import android.net.Uri;
+import android.util.Log;
 import android.webkit.MimeTypeMap;
 
 import androidx.annotation.NonNull;
@@ -28,11 +29,13 @@ import java.util.List;
 
 class ConversationViewModel extends AndroidViewModel {
 
+    private final String TAG = getClass().getSimpleName();
+
     private final static String CONVERSATIONS = "conversations";
     private final static String METADATA = "metadata";
     private final static String UPLOADS = "uploads";
 
-    private final static int MESSAGES_LIMIT = 10;
+    final static int MESSAGES_LIMIT = 10;
 
     public enum MessageType {
         TEXT,
@@ -45,7 +48,9 @@ class ConversationViewModel extends AndroidViewModel {
     private final ContentResolver contentResolver;
 
     private final String userId, friendId;
-    private final Query query;
+
+    private final Query initQuery;
+    private Query liveQuery;
 
     private MutableLiveData<List<MessageModel>> messages;
     private boolean fetchingDataState;
@@ -58,14 +63,16 @@ class ConversationViewModel extends AndroidViewModel {
     private final ChildEventListener childListener = new ChildEventListener() {
         @Override
         public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+            Log.i(TAG, "onChildAdded: ");
             MessageModel message = dataSnapshot.getValue(MessageModel.class);
             String id = dataSnapshot.getKey();
             if (id == null || message == null) return;
             message.setId(id);
             List<MessageModel> messages = ConversationViewModel.this.messages.getValue();
-            if (messages == null) messages = new ArrayList<>();
-            messages.add(message);
-            ConversationViewModel.this.messages.setValue(messages);
+            if (messages != null && !messages.contains(message)) {
+                messages.add(message);
+                ConversationViewModel.this.messages.setValue(messages);
+            }
         }
 
         @Override
@@ -93,9 +100,10 @@ class ConversationViewModel extends AndroidViewModel {
         metadataRef = FirebaseDatabase.getInstance().getReference(METADATA);
         storageRef = FirebaseStorage.getInstance().getReference(UPLOADS);
 
-        conversationsRef.keepSynced(false);
-        query = conversationsRef.limitToLast(MESSAGES_LIMIT);
-        query.addChildEventListener(childListener);
+        initQuery = conversationsRef.limitToLast(MESSAGES_LIMIT);
+        initQuery.keepSynced(true);
+
+        getInitData();
     }
 
     LiveData<List<MessageModel>> getMessages() {
@@ -128,8 +136,47 @@ class ConversationViewModel extends AndroidViewModel {
                 });
     }
 
+    private void getInitData() {
+
+        Log.i(TAG, "getInitData: ");
+
+        fetchingDataState = true;
+
+        initQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                List<MessageModel> messages = new ArrayList<>();
+                for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
+                    String id = userSnapshot.getKey();
+                    if (id == null) continue;
+                    MessageModel message = userSnapshot.getValue(MessageModel.class);
+                    if (message != null) {
+                        message.setId(id);
+                        messages.add(message);
+                    }
+                }
+
+                ConversationViewModel.this.messages.setValue(messages);
+
+                if (messages.size() > 0) {
+                    liveQuery = conversationsRef.orderByKey().startAt(messages.get(messages.size() - 1).getId());
+                    liveQuery.addChildEventListener(childListener);
+                }
+
+                fetchingDataState = false;
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                fetchingDataState = false;
+            }
+        });
+    }
+
     void getPreviousData() {
-        if(fetchingDataState) return;
+        if (fetchingDataState) return;
+        Log.i(TAG, "getPreviousData: ");
         fetchingDataState = true;
         List<MessageModel> list = messages.getValue();
         if (list == null || list.isEmpty()) return;
@@ -168,7 +215,8 @@ class ConversationViewModel extends AndroidViewModel {
     @Override
     protected void onCleared() {
         super.onCleared();
-        if (query != null) query.removeEventListener(childListener);
+        initQuery.keepSynced(false);
+        if (liveQuery != null) liveQuery.removeEventListener(childListener);
     }
 }
 

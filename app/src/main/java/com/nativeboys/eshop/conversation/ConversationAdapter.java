@@ -15,11 +15,9 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.bitmap.CenterCrop;
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.nativeboys.eshop.R;
 import com.nativeboys.eshop.models.MessageModel;
+import com.wang.avi.AVLoadingIndicatorView;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -100,7 +98,6 @@ public class ConversationAdapter extends ListAdapter<MessageModel, ConversationA
 
     @Override
     public void onBindViewHolder(@NonNull ConversationAdapter.MessageViewHolder holder, int position) {
-
         int viewType = getItemViewType(position);
         MessageModel model = getItem(position);
 
@@ -111,15 +108,16 @@ public class ConversationAdapter extends ListAdapter<MessageModel, ConversationA
         if (viewType == 1 || viewType == 3) {
             TextMessageViewHolder textHolder = (TextMessageViewHolder) holder;
             textHolder.textMessage.setText(model.getText());
-
             Integer width = calculateWidth(textHolder.textMessage.getContext());
             if (width != null) textHolder.textMessage.setMaxWidth(width);
         } else if(viewType == 2 || viewType == 4) {
             ImageMessageViewHolder imageHolder = (ImageMessageViewHolder) holder;
-            Glide.with(imageHolder.imageMessage.getContext())
+            /*Glide.with(imageHolder.imageMessage.getContext())
                     .load(model.getText())
-                    .transform(new CenterCrop(), new RoundedCorners(30))
-                    .into(imageHolder.imageMessage);
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .transform(new CenterCrop())
+                    .transition(new DrawableTransitionOptions().crossFade())
+                    .into(imageHolder.imageMessage);*/
         }
     }
 
@@ -157,10 +155,12 @@ public class ConversationAdapter extends ListAdapter<MessageModel, ConversationA
     class ImageMessageViewHolder extends MessageViewHolder {
 
         private ImageView imageMessage;
+        private AVLoadingIndicatorView progressWidget;
 
         ImageMessageViewHolder(@NonNull View itemView) {
             super(itemView);
             imageMessage = itemView.findViewById(R.id.image_message);
+            progressWidget = itemView.findViewById(R.id.progress_widget);
             imageMessage.setOnClickListener(v -> {
                 if (imageClickListener == null) return;
                 int position = getAdapterPosition();
