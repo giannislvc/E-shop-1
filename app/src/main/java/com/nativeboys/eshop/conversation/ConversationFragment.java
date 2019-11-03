@@ -16,6 +16,7 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -141,6 +142,7 @@ public class ConversationFragment extends DialogFragment {
         adapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
             public void onItemRangeInserted(int positionStart, int itemCount) {
+                Log.i(TAG, "positionStart: " + positionStart + " itemCount: " + itemCount + " sumCount: " + adapter.getItemCount());
                 if (positionStart + itemCount == adapter.getItemCount()) scrollToBottom();
             }
         });
@@ -153,7 +155,7 @@ public class ConversationFragment extends DialogFragment {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 if (manager.findFirstCompletelyVisibleItemPosition() != 0) return;
-                viewModel.getPreviousData();
+                viewModel.getPreviousMessages();
             }
         });
     }

@@ -21,7 +21,7 @@ import java.util.List;
 
 public class SharedViewModel extends AndroidViewModel {
 
-    // TODO: Offline overview, photos loading, take photo fragment, Authentication - Login,
+    // TODO: Offline overview, take photo fragment, Authentication - Login,
     // TODO: offline - send message - another room chat - go online (check it ??)
     // TODO: new conversation offline, replace value events, DAO Firebase
     // TODO: chat offline send image
