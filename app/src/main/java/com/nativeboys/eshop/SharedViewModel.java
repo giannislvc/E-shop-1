@@ -21,11 +21,12 @@ import java.util.List;
 
 public class SharedViewModel extends AndroidViewModel {
 
-    // TODO: Offline overview, take photo fragment, Authentication - Login,
+    // TODO: Authentication - Login, set up pre conversation (meta data)
+
+    // TODO: Offline overview, take photo fragment,
     // TODO: offline - send message - another room chat - go online (check it ??)
     // TODO: new conversation offline, replace value events, DAO Firebase
     // TODO: chat offline send image
-    // TODO: set up pre conversation (meta data)
 
     // TODO: Remove static ids
     //public final String USER_ID = "-Lr4ZsW5YBrsRbAl-09n";

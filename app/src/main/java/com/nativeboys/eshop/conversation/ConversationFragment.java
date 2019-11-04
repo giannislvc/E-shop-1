@@ -16,6 +16,8 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,6 +34,7 @@ import com.nativeboys.eshop.conversation.imageDisplay.ImageDisplayFragment;
 import java.util.ArrayList;
 
 import static android.app.Activity.RESULT_OK;
+import static com.nativeboys.eshop.conversation.ConversationViewModel.MESSAGES_PER_FETCH;
 
 public class ConversationFragment extends DialogFragment {
 
@@ -143,7 +146,7 @@ public class ConversationFragment extends DialogFragment {
             @Override
             public void onItemRangeInserted(int positionStart, int itemCount) {
                 Log.i(TAG, "positionStart: " + positionStart + " itemCount: " + itemCount + " sumCount: " + adapter.getItemCount());
-                if (positionStart + itemCount == adapter.getItemCount()) scrollToBottom();
+                if (positionStart != 0 || adapter.getItemCount() <= MESSAGES_PER_FETCH) scrollToBottom();
             }
         });
 
@@ -151,13 +154,13 @@ public class ConversationFragment extends DialogFragment {
                 ImageDisplayFragment.newInstance(pickPath)
                         .show(getChildFragmentManager(), ImageDisplayFragment.class.getSimpleName()));
 
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+        new Handler(Looper.getMainLooper()).postDelayed(() -> recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 if (manager.findFirstCompletelyVisibleItemPosition() != 0) return;
                 viewModel.getPreviousMessages();
             }
-        });
+        }), 1500);
     }
 
     private void openGallery() {

@@ -29,11 +29,11 @@ class ConversationViewModel extends AndroidViewModel {
 
     private final String TAG = getClass().getSimpleName();
 
+    public final static int MESSAGES_PER_FETCH = 10;
+
     private final static String CONVERSATIONS = "conversations";
     private final static String METADATA = "metadata";
     private final static String UPLOADS = "uploads";
-
-    static int count = 0;
 
     public enum MessageType {
         TEXT,
@@ -46,12 +46,14 @@ class ConversationViewModel extends AndroidViewModel {
     private final ContentResolver contentResolver;
 
     private final String userId, friendId;
+    private int count;
 
     private MutableLiveData<List<MessageModel>> messages;
     private boolean fetchingDataState;
 
     {
         messages = new MutableLiveData<>();
+        count = 0;
     }
 
     private Query liveQuery;
@@ -92,7 +94,7 @@ class ConversationViewModel extends AndroidViewModel {
 
         conversationsRef.keepSynced(true);
 
-        liveQuery = conversationsRef.limitToLast(10);
+        liveQuery = conversationsRef.limitToLast(MESSAGES_PER_FETCH);
         fetchingDataState = true;
         liveQuery.addValueEventListener(valueEventListener);
     }
@@ -103,10 +105,9 @@ class ConversationViewModel extends AndroidViewModel {
         fetchingDataState = true;
         liveQuery.removeEventListener(valueEventListener);
         if (messages.getValue() != null) count = messages.getValue().size();
-        count += 10;
+        count += MESSAGES_PER_FETCH;
         liveQuery = conversationsRef.limitToLast(count);
         liveQuery.addValueEventListener(valueEventListener);
-        fetchingDataState = false;
     }
 
     LiveData<List<MessageModel>> getMessages() {
@@ -147,7 +148,7 @@ class ConversationViewModel extends AndroidViewModel {
     @Override
     protected void onCleared() {
         liveQuery.removeEventListener(valueEventListener);
-        conversationsRef.keepSynced(true);
+        conversationsRef.keepSynced(false);
     }
 }
 
