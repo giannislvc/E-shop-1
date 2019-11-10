@@ -29,8 +29,8 @@ public class SharedViewModel extends AndroidViewModel {
     // TODO: chat offline send image
 
     // TODO: Remove static ids
-    //public final String USER_ID = "-Lr4ZsW5YBrsRbAl-09n";
-    public final String USER_ID = "-Lr4ZfYW8Gig9pKXD8qL";
+    public final String USER_ID = "-Lr4ZsW5YBrsRbAl-09n";
+    //public final String USER_ID = "16T4SQ1zY5RjQlSsAwylIflW1fO2";
 
     private final static String USERS = "users";
     private final static String METADATA = "metadata";

@@ -19,6 +19,7 @@ import android.widget.Button;
 
 import com.nativeboys.eshop.R;
 import com.nativeboys.eshop.SharedViewModel;
+import com.nativeboys.eshop.sign.RegisterFragment;
 
 import java.util.ArrayList;
 
@@ -65,11 +66,12 @@ public class ProductsFragment extends Fragment {
         adapter.setOnUserClickListener((itemView, user) -> {
             viewModel.getConversationIdWith(user.getId(), model -> Log.i(TAG, "onResponse: " + model));
         });
-        add_button.setOnClickListener(v-> viewModel.addUser("John", "Doe", "https://cdn0.iconfinder.com/data/icons/emojis-colored-outlined-pixel-perfect/64/emoji-67-512.png"));
+        //add_button.setOnClickListener(v-> viewModel.addUser("John", "Doe", "https://cdn0.iconfinder.com/data/icons/emojis-colored-outlined-pixel-perfect/64/emoji-67-512.png"));
         viewModel.getUsers().observe(this, users -> {
             if (users == null) { return; }
             adapter.submitList(new ArrayList<>(users));
         });
+        add_button.setOnClickListener(v -> new RegisterFragment().show(getChildFragmentManager(), RegisterFragment.class.getSimpleName()));
     }
 
     @Override

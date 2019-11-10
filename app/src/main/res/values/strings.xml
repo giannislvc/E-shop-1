@@ -12,6 +12,19 @@
     <string name="pictures">Pictures</string>
     <string name="take_photo">Take photo</string>
     <string name="more_options">More options</string>
+    <string name="sign_up">Sign up</string>
+    <string name="login">Login</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="no_account">Don\'t have an account? create a new account</string>
+    <string name="have_account">Already have an account?</string>
+    <string name="welcome_back">Welcome Back</string>
+    <string name="create_account">Create Account</string>
+    <string name="sign_to_continue">Sign to continue</string>
+    <string name="create_new_account">Create a new account</string>
+    <string name="confirm_password">Confirm password</string>
+    <string name="name">Name</string>
+    <string name="already_account">Already have a account ? Login</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
