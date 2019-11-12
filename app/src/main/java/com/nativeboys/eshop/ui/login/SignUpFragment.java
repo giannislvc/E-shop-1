@@ -9,15 +9,16 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProviders;
 
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.nativeboys.eshop.R;
+import com.nativeboys.eshop.customViews.FormEditText;
+import com.nativeboys.eshop.customViews.ToastMessage;
 import com.nativeboys.eshop.viewModels.SharedViewModel;
 
 public class SignUpFragment extends Fragment {
@@ -30,7 +31,9 @@ public class SignUpFragment extends Fragment {
     private OnLoginButtonClickListener loginListener;
     private SharedViewModel viewModel;
 
-    private EditText nameField, emailField, passwordField, confirmPassField;
+    private ToastMessage tMessage;
+
+    private FormEditText nameField, emailField, passwordField, confirmPassField;
     private Button registerBtn;
     private TextView loginBtn;
 
@@ -62,21 +65,31 @@ public class SignUpFragment extends Fragment {
         registerBtn = view.findViewById(R.id.register_btn);
         loginBtn = view.findViewById(R.id.login_btn);
 
-        registerBtn.setOnClickListener(v -> {
-            // TODO: implement client validation
-            String email = emailField.getText().toString().trim();
-            String password = passwordField.getText().toString().trim();
-            String name = nameField.getText().toString().trim();
-            viewModel.register(email, password, name, (success, message) -> {
-                Toast.makeText(activity, message, Toast.LENGTH_SHORT).show();
-                // TODO: Show Error Message, or move to Menu
-            });
-        });
+        tMessage = new ToastMessage(activity);
+        tMessage.setGravity(Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL, 0, 45);
+
+        registerBtn.setOnClickListener(v -> register());
 
         loginBtn.setOnClickListener(v -> {
             if (loginListener != null) loginListener.onClick();
         });
 
+    }
+
+    private void register() {
+        if (emailField.isValid() && nameField.isValid() && passwordField.isValid()) {
+            String email = emailField.getText().toString().trim();
+            String password = passwordField.getText().toString().trim();
+            String name = nameField.getText().toString().trim();
+            viewModel.register(email, password, name, (success, message) -> {
+                if (success) {
+                    // TODO: Move to main menu
+                } else {
+                    tMessage.setText(message);
+                    tMessage.show();
+                }
+            });
+        }
     }
 
     void setOnLoginButtonClickListener(@NonNull OnLoginButtonClickListener listener) {
