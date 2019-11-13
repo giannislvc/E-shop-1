@@ -1,4 +1,4 @@
-package com.nativeboys.eshop.ui.conversation;
+package com.nativeboys.eshop.ui.main.conversation;
 
 import android.Manifest;
 import android.content.Context;
@@ -29,7 +29,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.nativeboys.eshop.R;
-import com.nativeboys.eshop.ui.conversation.imageDisplay.ImageDisplayFragment;
+import com.nativeboys.eshop.ui.main.conversation.imageDisplay.ImageDisplayFragment;
 import com.nativeboys.eshop.viewModels.ConversationViewModel;
 import com.nativeboys.eshop.viewModels.ConversationViewModelFactory;
 
@@ -43,10 +43,6 @@ public class ConversationFragment extends Fragment {
     private final String TAG = getClass().getSimpleName();
 
     private static final int PICK_IMAGE_REQUEST = 1;
-
-    private static final String CONVERSATION_ID = "conversation_id";
-    private static final String USER_ID = "user_id";
-    private static final String FRIEND_ID = "friend_id";
 
     private FragmentActivity activity;
     private ConversationViewModel viewModel;
@@ -68,23 +64,14 @@ public class ConversationFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public static ConversationFragment newInstance(@NonNull String conversationId, @NonNull String userId, @NonNull String friendId) {
-        ConversationFragment fragment = new ConversationFragment();
-        Bundle args = new Bundle();
-        args.putString(CONVERSATION_ID, conversationId);
-        args.putString(USER_ID, userId);
-        args.putString(FRIEND_ID, friendId);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            conversationId = getArguments().getString(CONVERSATION_ID);
-            userId = getArguments().getString(USER_ID);
-            friendId = getArguments().getString(FRIEND_ID);
+            ConversationFragmentArgs args = ConversationFragmentArgs.fromBundle(getArguments());
+            userId = args.getUserId();
+            friendId = args.getFriendId();
+            conversationId = args.getConversationId();
         }
         ConversationViewModelFactory factory = new ConversationViewModelFactory(activity.getApplication(), conversationId, userId, friendId);
         viewModel = ViewModelProviders.of(this, factory).get(ConversationViewModel.class);

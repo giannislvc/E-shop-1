@@ -9,6 +9,10 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.navigation.NavController;
+import androidx.navigation.NavOptions;
+import androidx.navigation.Navigation;
 import androidx.viewpager.widget.ViewPager;
 
 import android.view.LayoutInflater;
@@ -17,10 +21,14 @@ import android.view.ViewGroup;
 
 import com.google.android.material.tabs.TabLayout;
 import com.nativeboys.eshop.R;
+import com.nativeboys.eshop.viewModels.GlobalViewModel;
 
-public class LoginFragment extends Fragment {
+public class LoginFragment extends Fragment implements OnFragmentTransaction {
 
     private FragmentActivity activity;
+    private NavController navController;
+    private GlobalViewModel globalVM;
+
     private ViewPager viewPager;
     private LoginPagerAdapter adapter;
 
@@ -31,6 +39,7 @@ public class LoginFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        globalVM = ViewModelProviders.of(activity).get(GlobalViewModel.class);
     }
 
     @Override
@@ -43,11 +52,18 @@ public class LoginFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        navController = Navigation.findNavController(view);
         viewPager = view.findViewById(R.id.view_pager);
         TabLayout tabLayout = view.findViewById(R.id.tab_layout);
         adapter = new LoginPagerAdapter(getChildFragmentManager());
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
+        if (globalVM.isUserLoggedIn()) toMainMenu();
+    }
+
+    private void toMainMenu() {
+        NavOptions navOptions = new NavOptions.Builder().setPopUpTo(R.id.loginFragment, true).build();
+        navController.navigate(R.id.mainFragment, null, navOptions);
     }
 
     @Override
@@ -55,13 +71,26 @@ public class LoginFragment extends Fragment {
         super.onAttachFragment(childFragment);
         if (childFragment instanceof SignInFragment) {
             SignInFragment signInFragment = (SignInFragment) childFragment;
-            signInFragment.setOnRegisterButtonClickListener(() -> {
-                if (adapter.getCount() > 0) viewPager.setCurrentItem(1);
-            });
+            signInFragment.setOnFragmentTransactionListener(this);
         } else if (childFragment instanceof SignUpFragment) {
             SignUpFragment signUpFragment = (SignUpFragment) childFragment;
-            signUpFragment.setOnLoginButtonClickListener(() -> viewPager.setCurrentItem(0));
+            signUpFragment.setOnFragmentTransactionListener(this);
         }
+    }
+
+    @Override
+    public void moveToRegister() {
+        if (adapter.getCount() > 0) viewPager.setCurrentItem(1);
+    }
+
+    @Override
+    public void moveToLogin() {
+        viewPager.setCurrentItem(0);
+    }
+
+    @Override
+    public void moveToMainMenu() {
+        toMainMenu();
     }
 
     private class LoginPagerAdapter extends FragmentStatePagerAdapter {

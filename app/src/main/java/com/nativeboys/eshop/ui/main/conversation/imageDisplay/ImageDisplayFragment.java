@@ -1,4 +1,4 @@
-package com.nativeboys.eshop.ui.conversation.imageDisplay;
+package com.nativeboys.eshop.ui.main.conversation.imageDisplay;
 
 import android.content.Context;
 import android.os.Bundle;

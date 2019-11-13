@@ -5,8 +5,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/lightPurple"
-    tools:context=".ui.conversation.ConversationFragment">
+    android:background="@android:color/white"
+    tools:context=".ui.main.conversation.ConversationFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/header"
@@ -20,7 +20,7 @@
         android:paddingStart="5dp"
         android:paddingEnd="5dp"
         android:background="@drawable/header_shape"
-        android:elevation="2dp">
+        android:elevation="4dp">
 
         <ImageView
             android:id="@+id/back_arrow"
@@ -56,8 +56,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="@android:color/transparent"/>
+        android:layout_height="0dp" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottom"
@@ -66,8 +65,7 @@
         app:layout_constraintTop_toBottomOf="@+id/recycler_view"
         app:layout_constraintBottom_toTopOf="@+id/more_options_holder"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:background="@android:color/transparent">
+        app:layout_constraintEnd_toEndOf="parent">
 
         <ImageView
             android:id="@+id/more_options_btn"
@@ -134,7 +132,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
-            android:drawableTop="@drawable/ic_photo_black_30dp"
+            android:drawableTop="@drawable/ic_photo_blue_30dp"
             android:fontFamily="@font/breeze_sans_regular"
             android:text="@string/pictures"
             android:textAlignment="center"
@@ -148,7 +146,7 @@
             android:layout_weight="0.5"
             android:textAlignment="center"
             android:textColor="@color/darkGray"
-            android:drawableTop="@drawable/ic_photo_camera_black_30dp"
+            android:drawableTop="@drawable/ic_photo_camera_blue_30dp"
             android:text="@string/take_photo"/>
 
     </LinearLayout>

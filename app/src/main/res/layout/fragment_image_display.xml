@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/transparentGray"
-    tools:context=".ui.conversation.imageDisplay.ImageDisplayFragment">
+    tools:context=".ui.main.conversation.imageDisplay.ImageDisplayFragment">
 
     <ImageView
         android:id="@+id/image_view"

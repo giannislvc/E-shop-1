@@ -1,4 +1,4 @@
-package com.nativeboys.eshop.ui.conversation;
+package com.nativeboys.eshop.ui.main.conversation;
 
 import android.content.Context;
 import android.util.DisplayMetrics;
@@ -15,6 +15,10 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.nativeboys.eshop.R;
 import com.nativeboys.eshop.models.MessageModel;
 import com.wang.avi.AVLoadingIndicatorView;
@@ -112,12 +116,12 @@ public class ConversationAdapter extends ListAdapter<MessageModel, ConversationA
             if (width != null) textHolder.textMessage.setMaxWidth(width);
         } else if(viewType == 2 || viewType == 4) {
             ImageMessageViewHolder imageHolder = (ImageMessageViewHolder) holder;
-            /*Glide.with(imageHolder.imageMessage.getContext())
+            Glide.with(imageHolder.imageMessage.getContext())
                     .load(model.getText())
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .transform(new CenterCrop())
                     .transition(new DrawableTransitionOptions().crossFade())
-                    .into(imageHolder.imageMessage);*/
+                    .into(imageHolder.imageMessage);
         }
     }
 

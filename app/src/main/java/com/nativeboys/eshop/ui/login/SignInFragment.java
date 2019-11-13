@@ -9,7 +9,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProviders;
 
-import android.text.Editable;
+import android.util.Patterns;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,24 +20,15 @@ import android.widget.TextView;
 import com.nativeboys.eshop.R;
 import com.nativeboys.eshop.customViews.FormEditText;
 import com.nativeboys.eshop.customViews.ToastMessage;
-import com.nativeboys.eshop.viewModels.SharedViewModel;
+import com.nativeboys.eshop.viewModels.GlobalViewModel;
 
 public class SignInFragment extends Fragment {
 
-    private final String TAG = getClass().getSimpleName();
-
-    interface OnRegisterButtonClickListener {
-        void onClick();
-    }
-
     private FragmentActivity activity;
-    private OnRegisterButtonClickListener registerListener;
-    private SharedViewModel viewModel;
+    private OnFragmentTransaction listener;
+    private GlobalViewModel viewModel;
 
     private FormEditText emailField, passwordField;
-    private Button loginBtn;
-    private TextView registerBtn;
-
     private ToastMessage tMessage;
 
     public SignInFragment() {
@@ -47,7 +38,7 @@ public class SignInFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        viewModel = ViewModelProviders.of(activity).get(SharedViewModel.class);
+        viewModel = ViewModelProviders.of(activity).get(GlobalViewModel.class);
     }
 
     @Override
@@ -63,27 +54,31 @@ public class SignInFragment extends Fragment {
 
         emailField = view.findViewById(R.id.email_field);
         passwordField = view.findViewById(R.id.password_field);
-        loginBtn = view.findViewById(R.id.login_btn);
-        registerBtn = view.findViewById(R.id.register_btn);
+        Button loginBtn = view.findViewById(R.id.login_btn);
+        TextView registerBtn = view.findViewById(R.id.register_btn);
 
         tMessage = new ToastMessage(activity);
         tMessage.setGravity(Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL, 0, 45);
 
+        emailField.setPattern(Patterns.EMAIL_ADDRESS);
+        passwordField.setPattern(FormEditText.PASSWORD_PATTERN);
+
         loginBtn.setOnClickListener(v -> login());
 
         registerBtn.setOnClickListener(v -> {
-            if (registerListener != null) registerListener.onClick();
+            if (listener != null) listener.moveToRegister();
         });
-
     }
 
     private void login() {
-        if (emailField.isValid() && passwordField.isValid()) {
+        boolean eValid = emailField.isValid();
+        boolean pValid = passwordField.isValid();
+        if (eValid && pValid) {
             String email = emailField.getText().toString().trim();
             String password = passwordField.getText().toString().trim();
             viewModel.login(email, password, (success, message) -> {
                 if (success) {
-                    // TODO: Move to main menu
+                    if (listener != null) listener.moveToMainMenu();
                 } else {
                     tMessage.setText(message);
                     tMessage.show();
@@ -92,8 +87,8 @@ public class SignInFragment extends Fragment {
         }
     }
 
-    void setOnRegisterButtonClickListener(@NonNull OnRegisterButtonClickListener listener) {
-        registerListener = listener;
+    void setOnFragmentTransactionListener(@NonNull OnFragmentTransaction listener) {
+        this.listener = listener;
     }
 
     @Override

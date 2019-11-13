@@ -10,9 +10,26 @@ import androidx.core.content.ContextCompat;
 
 import com.nativeboys.eshop.R;
 
+import java.util.regex.Pattern;
+
 public class FormEditText extends androidx.appcompat.widget.AppCompatEditText {
 
-    private State cState;
+    public static final Pattern PASSWORD_PATTERN =
+            Pattern.compile("^" +
+                    "(?=.*[a-zA-Z0-9@#$%^&+=])" +      // any letter
+                    "(?=\\S+$)" +           // no white spaces
+                    ".{6,}" +               // at least 6 characters
+                    "$");
+
+    public static final Pattern USERNAME_PATTERN =
+            Pattern.compile("^" +
+                    "(?=.*[a-zA-Z])" +      // any character
+                    "(?=\\S+$)" +           // no white spaces
+                    ".+" +               // at least 1 character
+                    "$");
+
+    private State currentState;
+    private Pattern pattern;
 
     public enum State {
         NORMAL,
@@ -45,16 +62,16 @@ public class FormEditText extends androidx.appcompat.widget.AppCompatEditText {
 
             @Override
             public void afterTextChanged(Editable s) {
-                if (cState != null && cState == State.INVALID) setState(State.NORMAL);
+                if (currentState != null && currentState == State.INVALID) setState(State.NORMAL);
             }
         });
     }
 
     public void setState(@NonNull State state) {
-        if (cState == state) return;
-        cState = state;
+        if (currentState == state) return;
+        currentState = state;
         int drawable;
-        switch (cState) {
+        switch (currentState) {
             case VALID: {
                 drawable = R.drawable.edit_text_valid_shape;
                 break;
@@ -72,12 +89,16 @@ public class FormEditText extends androidx.appcompat.widget.AppCompatEditText {
     }
 
     public boolean isValid() {
-        boolean isValid = false;
+        boolean valid = false;
         if (getText() != null) {
-            isValid = !getText().toString().isEmpty();
+            valid = pattern.matcher(getText().toString()).matches();
         }
-        setState(isValid ? State.NORMAL : State.INVALID);
-        return isValid;
+        setState(valid ? State.NORMAL : State.INVALID);
+        return valid;
+    }
+
+    public void setPattern(@NonNull Pattern pattern) {
+        this.pattern = pattern;
     }
 
 }

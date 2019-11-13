@@ -8,6 +8,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -16,16 +18,17 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.nativeboys.eshop.R;
-import com.nativeboys.eshop.viewModels.SharedViewModel;
+import com.nativeboys.eshop.ui.main.MainFragmentDirections;
+import com.nativeboys.eshop.viewModels.GlobalViewModel;
 
 import java.util.ArrayList;
 
 public class ConversationsFragment extends Fragment {
 
     private FragmentActivity activity;
-    private SharedViewModel viewModel;
+    private GlobalViewModel viewModel;
 
-    private RecyclerView recycler_view;
+    private NavController navController;
     private ConversationsAdapter adapter;
 
     public ConversationsFragment() {
@@ -35,7 +38,7 @@ public class ConversationsFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        viewModel = ViewModelProviders.of(activity).get(SharedViewModel.class);
+        viewModel = ViewModelProviders.of(activity).get(GlobalViewModel.class);
     }
 
     @Override
@@ -48,13 +51,15 @@ public class ConversationsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        recycler_view = view.findViewById(R.id.recycler_view);
+        navController = Navigation.findNavController(view);
+        RecyclerView recycler_view = view.findViewById(R.id.recycler_view);
+
         adapter = new ConversationsAdapter(activity.getApplicationContext());
         recycler_view.setAdapter(adapter);
         recycler_view.setLayoutManager(new LinearLayoutManager(activity));
         adapter.setConversationClickListener((itemView, meta) -> openConversation(meta.getConversationId(), meta.getId()));
         viewModel.getMetaData().observe(this, metaData -> {
-            if (metaData == null) { return; }
+            if (metaData == null) return;
             adapter.submitList(new ArrayList<>(metaData));
         });
     }
@@ -62,9 +67,7 @@ public class ConversationsFragment extends Fragment {
     private void openConversation(String conversationId, String friendId) {
         String userId = viewModel.USER_ID;
         if (conversationId != null && friendId != null) {
-            // TODO: Navigation Arguments
-            /*ConversationFragment.newInstance(conversationId, userId, friendId)
-                    .show(getChildFragmentManager(), ConversationFragment.class.getSimpleName());*/
+            navController.navigate(MainFragmentDirections.actionMainToConversation(conversationId, userId, friendId));
         }
     }
 

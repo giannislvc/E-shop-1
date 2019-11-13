@@ -24,7 +24,17 @@
     </fragment>
     <fragment
         android:id="@+id/conversationFragment"
-        android:name="com.nativeboys.eshop.ui.conversation.ConversationFragment"
+        android:name="com.nativeboys.eshop.ui.main.conversation.ConversationFragment"
         android:label="fragment_conversation"
-        tools:layout="@layout/fragment_conversation" />
+        tools:layout="@layout/fragment_conversation" >
+        <argument
+            android:name="conversationId"
+            app:argType="string" />
+        <argument
+            android:name="userId"
+            app:argType="string" />
+        <argument
+            android:name="friendId"
+            app:argType="string" />
+    </fragment>
 </navigation>

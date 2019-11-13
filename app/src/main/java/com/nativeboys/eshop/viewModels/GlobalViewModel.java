@@ -24,7 +24,7 @@ import com.nativeboys.eshop.models.UserModel;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SharedViewModel extends AndroidViewModel {
+public class GlobalViewModel extends AndroidViewModel {
 
     // TODO: set up pre conversation (meta data)
     // TODO: Offline overview, take photo fragment,
@@ -39,30 +39,79 @@ public class SharedViewModel extends AndroidViewModel {
 
     private final String TAG = getClass().getSimpleName();
 
-    private FirebaseAuth mAuth;
-
     private final static String USERS = "users";
     private final static String METADATA = "metadata";
 
+    private FirebaseAuth mAuth;
     private DatabaseReference usersRef, metadataRef;
 
+    private MutableLiveData<FirebaseUser> user; // LoggedIn User
     private MutableLiveData<List<UserModel>> users;
     private MutableLiveData<List<MetaDataModel>> metaData;
 
-    private MutableLiveData<FirebaseUser> firebaseUser;
-
     {
-        firebaseUser = new MutableLiveData<>();
+        user = new MutableLiveData<>();
         users = new MutableLiveData<>();
         metaData = new MutableLiveData<>();
     }
 
-    public SharedViewModel(@NonNull Application application) {
+    private ValueEventListener usersListener = new ValueEventListener() {
+        @Override
+        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+            List<UserModel> users = new ArrayList<>();
+            for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
+                String id = userSnapshot.getKey();
+                if (id == null) continue;
+                UserModel user = userSnapshot.getValue(UserModel.class);
+                if (user != null) {
+                    user.setId(id);
+                    users.add(user);
+                }
+            }
+            GlobalViewModel.this.users.setValue(users);
+        }
+
+        @Override
+        public void onCancelled(@NonNull DatabaseError databaseError) { }
+    };
+
+    private ValueEventListener metaDataListener = new ValueEventListener() {
+        @Override
+        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+            List<MetaDataModel> metaData = new ArrayList<>();
+            for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
+                String id = userSnapshot.getKey();
+                if (id == null) continue;
+                MetaDataModel meta = userSnapshot.getValue(MetaDataModel.class);
+                if (meta != null) {
+                    meta.setId(id);
+                    metaData.add(meta);
+                }
+            }
+            GlobalViewModel.this.metaData.setValue(metaData);
+        }
+
+        @Override
+        public void onCancelled(@NonNull DatabaseError databaseError) { }
+    };
+
+    public GlobalViewModel(@NonNull Application application) {
         super(application);
         mAuth = FirebaseAuth.getInstance();
         usersRef = FirebaseDatabase.getInstance().getReference(USERS);
         metadataRef = FirebaseDatabase.getInstance().getReference(METADATA);
-        setUpListeners();
+
+        mAuth.addAuthStateListener(firebaseAuth -> {
+            FirebaseUser user = firebaseAuth.getCurrentUser();
+            this.user.setValue(user);
+            removeListeners();
+            if (user != null) addListeners();
+            Log.i(TAG, user != null ? "Signed in" : "Sign out");
+        });
+    }
+
+    public LiveData<FirebaseUser> getUser() {
+        return user;
     }
 
     public LiveData<List<UserModel>> getUsers() {
@@ -73,8 +122,8 @@ public class SharedViewModel extends AndroidViewModel {
         return metaData;
     }
 
-    public LiveData<FirebaseUser> getFirebaseUser() {
-        return firebaseUser;
+    public boolean isUserLoggedIn() {
+        return mAuth.getCurrentUser() != null;
     }
 
     public void register(@NonNull String email, @NonNull String password, @NonNull String name, @NonNull AuthCompleteListener listener) {
@@ -94,58 +143,21 @@ public class SharedViewModel extends AndroidViewModel {
         mAuth.signOut();
     }
 
-    private void setUpListeners() {
-
-        mAuth.addAuthStateListener(firebaseAuth -> {
-            firebaseUser.setValue(firebaseAuth.getCurrentUser());
-            Log.i(TAG, firebaseAuth.getCurrentUser() != null ? "Signed in" : "Sign out");
-        });
-
-        usersRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                List<UserModel> users = new ArrayList<>();
-                for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
-                    String id = userSnapshot.getKey();
-                    if (id == null) continue;
-                    UserModel user = userSnapshot.getValue(UserModel.class);
-                    if (user != null) {
-                        user.setId(id);
-                        users.add(user);
-                    }
-                }
-                SharedViewModel.this.users.setValue(users);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) { }
-        });
-        metadataRef.child(USER_ID).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                List<MetaDataModel> metaData = new ArrayList<>();
-                for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
-                    String id = userSnapshot.getKey();
-                    if (id == null) continue;
-                    MetaDataModel meta = userSnapshot.getValue(MetaDataModel.class);
-                    if (meta != null) {
-                        meta.setId(id);
-                        metaData.add(meta);
-                    }
-                }
-                SharedViewModel.this.metaData.setValue(metaData);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) { }
-        });
+    private void addListeners() {
+        usersRef.addValueEventListener(usersListener);
+        metadataRef.child(USER_ID).addValueEventListener(metaDataListener);
     }
 
-    public void addUser(String name, String lastName, String pickPath) {
+    private void removeListeners() {
+        usersRef.removeEventListener(usersListener);
+        metadataRef.child(USER_ID).removeEventListener(metaDataListener);
+    }
+
+/*    public void addUser(String name, String lastName, String pickPath) {
         String id = usersRef.push().getKey();
         if (id == null) return;
         usersRef.child(id).setValue(new UserModel(name, lastName, pickPath));
-    }
+    }*/
 
     public void getConversationIdWith(String friendId, Completion<String> completion) {
         fetchConversationId(friendId, model -> {
@@ -183,4 +195,9 @@ public class SharedViewModel extends AndroidViewModel {
         });
     }
 
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        removeListeners();
+    }
 }

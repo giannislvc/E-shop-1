@@ -18,7 +18,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.nativeboys.eshop.R;
-import com.nativeboys.eshop.viewModels.SharedViewModel;
+import com.nativeboys.eshop.viewModels.GlobalViewModel;
 
 import java.util.ArrayList;
 
@@ -27,7 +27,7 @@ public class ProductsFragment extends Fragment {
     private final String TAG = getClass().getSimpleName();
 
     private FragmentActivity activity;
-    private SharedViewModel viewModel;
+    private GlobalViewModel viewModel;
 
     private RecyclerView recycler_view;
     private ProductsAdapter adapter;
@@ -40,7 +40,7 @@ public class ProductsFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        viewModel = ViewModelProviders.of(activity).get(SharedViewModel.class);
+        viewModel = ViewModelProviders.of(activity).get(GlobalViewModel.class);
     }
 
     @Override
