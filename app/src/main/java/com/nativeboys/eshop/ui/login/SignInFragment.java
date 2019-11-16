@@ -76,7 +76,7 @@ public class SignInFragment extends Fragment {
         if (eValid && pValid) {
             String email = emailField.getText().toString().trim();
             String password = passwordField.getText().toString().trim();
-            viewModel.login(email, password, (success, message) -> {
+            viewModel.loginUser(email, password, (success, message) -> {
                 if (success) {
                     if (listener != null) listener.moveToMainMenu();
                 } else {

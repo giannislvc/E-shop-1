@@ -25,13 +25,14 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.nativeboys.eshop.viewModels.GlobalViewModel.CONVERSATIONS;
+import static com.nativeboys.eshop.viewModels.GlobalViewModel.METADATA;
+
 public class ConversationViewModel extends AndroidViewModel {
 
     private final String TAG = getClass().getSimpleName();
 
     public final static int MESSAGES_PER_FETCH = 10;
-    private final static String CONVERSATIONS = "conversations";
-    private final static String METADATA = "metadata";
     private final static String UPLOADS = "uploads";
 
     public enum MessageType {

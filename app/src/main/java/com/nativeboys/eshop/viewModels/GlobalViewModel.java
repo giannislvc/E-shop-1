@@ -1,9 +1,9 @@
 package com.nativeboys.eshop.viewModels;
 
 import android.app.Application;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -14,7 +14,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.nativeboys.eshop.AuthCompleteListener;
 import com.nativeboys.eshop.Completion;
@@ -33,26 +32,24 @@ public class GlobalViewModel extends AndroidViewModel {
     // TODO: offline - send message - another room chat_png - go online (check it ??)
     // TODO: new conversation offline, replace value events, DAO Firebase
 
-    // TODO: Remove static ids
-    public final String USER_ID = "-Lr4ZsW5YBrsRbAl-09n";
-    //public final String USER_ID = "16T4SQ1zY5RjQlSsAwylIflW1fO2";
-
-    private final String TAG = getClass().getSimpleName();
-
     private final static String USERS = "users";
-    private final static String METADATA = "metadata";
+    final static String METADATA = "metadata";
+    final static String CONVERSATIONS = "conversations";
 
     private FirebaseAuth mAuth;
-    private DatabaseReference usersRef, metadataRef;
+    private DatabaseReference usersRef, metadataRef, conversationsRef;
 
-    private MutableLiveData<FirebaseUser> user; // LoggedIn User
-    private MutableLiveData<List<UserModel>> users;
+    private String userId;
+    private MutableLiveData<FirebaseUser> user;
     private MutableLiveData<List<MetaDataModel>> metaData;
+
+    private MutableLiveData<List<UserModel>> users;
 
     {
         user = new MutableLiveData<>();
-        users = new MutableLiveData<>();
         metaData = new MutableLiveData<>();
+
+        users = new MutableLiveData<>();
     }
 
     private ValueEventListener usersListener = new ValueEventListener() {
@@ -61,11 +58,12 @@ public class GlobalViewModel extends AndroidViewModel {
             List<UserModel> users = new ArrayList<>();
             for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
                 String id = userSnapshot.getKey();
-                if (id == null) continue;
-                UserModel user = userSnapshot.getValue(UserModel.class);
-                if (user != null) {
-                    user.setId(id);
-                    users.add(user);
+                if (id != null && userId != null && !userId.equals(id)) {
+                    UserModel user = userSnapshot.getValue(UserModel.class);
+                    if (user != null) {
+                        user.setId(id);
+                        users.add(user);
+                    }
                 }
             }
             GlobalViewModel.this.users.setValue(users);
@@ -100,13 +98,16 @@ public class GlobalViewModel extends AndroidViewModel {
         mAuth = FirebaseAuth.getInstance();
         usersRef = FirebaseDatabase.getInstance().getReference(USERS);
         metadataRef = FirebaseDatabase.getInstance().getReference(METADATA);
+        conversationsRef = FirebaseDatabase.getInstance().getReference(CONVERSATIONS);
 
         mAuth.addAuthStateListener(firebaseAuth -> {
+            setListeners(false);
             FirebaseUser user = firebaseAuth.getCurrentUser();
-            this.user.setValue(user);
-            removeListeners();
-            if (user != null) addListeners();
-            Log.i(TAG, user != null ? "Signed in" : "Sign out");
+            if (user != null) {
+                this.user.setValue(user);
+                userId = user.getUid();
+                setListeners(true);
+            }
         });
     }
 
@@ -114,26 +115,31 @@ public class GlobalViewModel extends AndroidViewModel {
         return user;
     }
 
-    public LiveData<List<UserModel>> getUsers() {
-        return users;
+    @Nullable
+    public String getUserId() {
+        return userId;
     }
 
     public LiveData<List<MetaDataModel>> getMetaData() {
         return metaData;
     }
 
+    public LiveData<List<UserModel>> getUsers() {
+        return users;
+    }
+
     public boolean isUserLoggedIn() {
         return mAuth.getCurrentUser() != null;
     }
 
-    public void register(@NonNull String email, @NonNull String password, @NonNull String name, @NonNull AuthCompleteListener listener) {
+    public void registerUser(@NonNull String email, @NonNull String password, @NonNull String name, @NonNull AuthCompleteListener listener) {
         // TODO: Apply User inside Database
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnSuccessListener(authResult -> listener.onComplete(true, null))
                 .addOnFailureListener(e -> listener.onComplete(false, e.getLocalizedMessage()));
     }
 
-    public void login(@NonNull String email, @NonNull String password, @NonNull AuthCompleteListener listener) {
+    public void loginUser(@NonNull String email, @NonNull String password, @NonNull AuthCompleteListener listener) {
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnSuccessListener(authResult -> listener.onComplete(true, null))
                 .addOnFailureListener(e -> listener.onComplete(false, e.getLocalizedMessage()));
@@ -143,14 +149,17 @@ public class GlobalViewModel extends AndroidViewModel {
         mAuth.signOut();
     }
 
-    private void addListeners() {
-        usersRef.addValueEventListener(usersListener);
-        metadataRef.child(USER_ID).addValueEventListener(metaDataListener);
-    }
-
-    private void removeListeners() {
-        usersRef.removeEventListener(usersListener);
-        metadataRef.child(USER_ID).removeEventListener(metaDataListener);
+    private void setListeners(boolean enable) {
+        FirebaseUser user = getUser().getValue();
+        if (user == null) return;
+        String userId = user.getUid();
+        if (enable) {
+            usersRef.addValueEventListener(usersListener);
+            metadataRef.child(userId).addValueEventListener(metaDataListener);
+        } else {
+            usersRef.removeEventListener(usersListener);
+            metadataRef.child(userId).removeEventListener(metaDataListener);
+        }
     }
 
 /*    public void addUser(String name, String lastName, String pickPath) {
@@ -159,45 +168,46 @@ public class GlobalViewModel extends AndroidViewModel {
         usersRef.child(id).setValue(new UserModel(name, lastName, pickPath));
     }*/
 
-    public void getConversationIdWith(String friendId, Completion<String> completion) {
-        fetchConversationId(friendId, model -> {
-            if (model == null) {
-                completion.onResponse(setUpNewConversation(friendId));
-            } else {
-                completion.onResponse(model);
-            }
-        });
+    public void getConversationIdWith(@NonNull String friendId, @NonNull Completion<String> completion) {
+        getExistingConversationId(friendId, model ->
+                completion.onResponse(model != null ? model : createConversation(friendId)));
     }
 
-    private String setUpNewConversation(String friendId) {
-        String conId = metadataRef.child(USER_ID).child(friendId).getKey(); // TODO: Check it
+    private void getExistingConversationId(@NonNull String friendId, @NonNull Completion<String> completion) {
+        if (userId != null) {
+            metadataRef.child(userId).child(friendId).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    MetaDataModel model = dataSnapshot.getValue(MetaDataModel.class);
+                    completion.onResponse(model != null ? model.getConversationId() : null);
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    completion.onResponse(null);
+                }
+            });
+        } else {
+            completion.onResponse(null);
+        }
+    }
+
+    @Nullable
+    private String createConversation(String friendId) {
+        // String conId = metadataRef.child(USER_ID).child(friendId).getKey();
+        if (userId == null) return null;
+        String conId = conversationsRef.push().getKey();
         MetaDataModel sharedMeta = new MetaDataModel(conId, null);
         if (conId != null) {
-            metadataRef.child(USER_ID).child(friendId).setValue(sharedMeta);
-            metadataRef.child(friendId).child(USER_ID).setValue(sharedMeta);
+            metadataRef.child(userId).child(friendId).setValue(sharedMeta);
+            metadataRef.child(friendId).child(userId).setValue(sharedMeta);
         }
         return conId;
-    }
-
-    private void fetchConversationId(String friendId, Completion<String> completion) {
-        Query query = metadataRef.child(USER_ID).child(friendId);
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                MetaDataModel model = dataSnapshot.getValue(MetaDataModel.class);
-                completion.onResponse(model != null ? model.getConversationId() : null);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                completion.onResponse(null);
-            }
-        });
     }
 
     @Override
     protected void onCleared() {
         super.onCleared();
-        removeListeners();
+        setListeners(false);
     }
 }

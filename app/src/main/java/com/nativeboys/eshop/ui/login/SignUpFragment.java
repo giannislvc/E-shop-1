@@ -89,7 +89,7 @@ public class SignUpFragment extends Fragment {
             } else {
                 String email = emailField.getText().toString().trim();
                 String name = nameField.getText().toString().trim();
-                viewModel.register(email, password, name, (success, message) -> {
+                viewModel.registerUser(email, password, name, (success, message) -> {
                     if (success) {
                         if (listener != null) listener.moveToMainMenu();
                     } else {
