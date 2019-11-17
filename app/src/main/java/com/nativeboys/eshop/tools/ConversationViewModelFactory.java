@@ -1,4 +1,4 @@
-package com.nativeboys.eshop.viewModels;
+package com.nativeboys.eshop.tools;
 
 import android.app.Application;
 

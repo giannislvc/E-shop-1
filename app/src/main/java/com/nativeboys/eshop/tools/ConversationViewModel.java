@@ -1,4 +1,4 @@
-package com.nativeboys.eshop.viewModels;
+package com.nativeboys.eshop.tools;
 
 import android.app.Application;
 import android.content.ContentResolver;
@@ -7,6 +7,7 @@ import android.util.Log;
 import android.webkit.MimeTypeMap;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -25,8 +26,8 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.nativeboys.eshop.viewModels.GlobalViewModel.CONVERSATIONS;
-import static com.nativeboys.eshop.viewModels.GlobalViewModel.METADATA;
+import static com.nativeboys.eshop.tools.GlobalViewModel.CONVERSATIONS;
+import static com.nativeboys.eshop.tools.GlobalViewModel.METADATA;
 
 public class ConversationViewModel extends AndroidViewModel {
 

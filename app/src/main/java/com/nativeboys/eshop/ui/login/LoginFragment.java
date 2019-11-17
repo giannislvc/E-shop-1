@@ -21,7 +21,7 @@ import android.view.ViewGroup;
 
 import com.google.android.material.tabs.TabLayout;
 import com.nativeboys.eshop.R;
-import com.nativeboys.eshop.viewModels.GlobalViewModel;
+import com.nativeboys.eshop.tools.GlobalViewModel;
 
 public class LoginFragment extends Fragment implements OnFragmentTransaction {
 

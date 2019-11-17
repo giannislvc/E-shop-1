@@ -20,7 +20,7 @@ import android.widget.TextView;
 import com.nativeboys.eshop.R;
 import com.nativeboys.eshop.customViews.FormEditText;
 import com.nativeboys.eshop.customViews.ToastMessage;
-import com.nativeboys.eshop.viewModels.GlobalViewModel;
+import com.nativeboys.eshop.tools.GlobalViewModel;
 
 public class SignUpFragment extends Fragment {
 

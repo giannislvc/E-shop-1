@@ -1,6 +1,7 @@
 package com.nativeboys.eshop.models;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.google.firebase.database.IgnoreExtraProperties;
 
@@ -52,6 +53,15 @@ public class UserModel {
 
     public void setPickPath(String pickPath) {
         this.pickPath = pickPath;
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (obj instanceof UserModel) {
+            UserModel user = (UserModel) obj;
+            return user.id.equals(id);
+        }
+        return false;
     }
 
     @NonNull

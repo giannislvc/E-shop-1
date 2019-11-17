@@ -17,7 +17,7 @@ import android.view.ViewGroup;
 
 import com.nativeboys.eshop.R;
 import com.nativeboys.eshop.ui.main.MainFragmentDirections;
-import com.nativeboys.eshop.viewModels.GlobalViewModel;
+import com.nativeboys.eshop.tools.GlobalViewModel;
 
 import java.util.ArrayList;
 
@@ -42,8 +42,7 @@ public class ConversationsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         navController = Navigation.findNavController(view);
         RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
-
-        adapter = new ConversationsAdapter(recyclerView.getContext());
+        adapter = new ConversationsAdapter();
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
 

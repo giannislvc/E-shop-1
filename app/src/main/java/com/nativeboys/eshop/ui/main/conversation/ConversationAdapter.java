@@ -21,7 +21,6 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.nativeboys.eshop.R;
 import com.nativeboys.eshop.models.MessageModel;
-import com.wang.avi.AVLoadingIndicatorView;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -159,12 +158,11 @@ public class ConversationAdapter extends ListAdapter<MessageModel, ConversationA
     class ImageMessageViewHolder extends MessageViewHolder {
 
         private ImageView imageMessage;
-        private AVLoadingIndicatorView progressWidget;
 
         ImageMessageViewHolder(@NonNull View itemView) {
             super(itemView);
             imageMessage = itemView.findViewById(R.id.image_message);
-            progressWidget = itemView.findViewById(R.id.progress_widget);
+            // AVLoadingIndicatorView progressWidget = itemView.findViewById(R.id.progress_widget);
             imageMessage.setOnClickListener(v -> {
                 if (imageClickListener == null) return;
                 int position = getAdapterPosition();

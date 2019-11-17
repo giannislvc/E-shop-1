@@ -28,15 +28,18 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.nativeboys.eshop.Completion;
 import com.nativeboys.eshop.R;
+import com.nativeboys.eshop.models.UserModel;
+import com.nativeboys.eshop.tools.UsersCache;
 import com.nativeboys.eshop.ui.main.conversation.imageDisplay.ImageDisplayFragment;
-import com.nativeboys.eshop.viewModels.ConversationViewModel;
-import com.nativeboys.eshop.viewModels.ConversationViewModelFactory;
+import com.nativeboys.eshop.tools.ConversationViewModel;
+import com.nativeboys.eshop.tools.ConversationViewModelFactory;
 
 import java.util.ArrayList;
 
 import static android.app.Activity.RESULT_OK;
-import static com.nativeboys.eshop.viewModels.ConversationViewModel.MESSAGES_PER_FETCH;
+import static com.nativeboys.eshop.tools.ConversationViewModel.MESSAGES_PER_FETCH;
 
 public class ConversationFragment extends Fragment {
 
@@ -98,6 +101,10 @@ public class ConversationFragment extends Fragment {
         moreOptionsBtn = view.findViewById(R.id.more_options_btn);
         takePhotoBtn = view.findViewById(R.id.take_photo_btn);
         picturesBtn = view.findViewById(R.id.pictures_btn);
+
+        UsersCache.getUser(friendId, user -> {
+            if (user != null) headline.setText(user.getName());
+        });
 
         adapter = new ConversationAdapter(userId);
         manager = new LinearLayoutManager(recyclerView.getContext());

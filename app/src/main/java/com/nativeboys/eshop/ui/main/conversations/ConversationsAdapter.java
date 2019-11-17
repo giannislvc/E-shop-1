@@ -16,10 +16,10 @@ import com.bumptech.glide.Glide;
 import com.nativeboys.eshop.R;
 import com.nativeboys.eshop.models.MessageModel;
 import com.nativeboys.eshop.models.MetaDataModel;
+import com.nativeboys.eshop.tools.UsersCache;
 
 public class ConversationsAdapter extends ListAdapter<MetaDataModel, ConversationsAdapter.ConversationsViewHolder> {
 
-    private final Context context;
     private OnConversationClickListener clickListener;
 
     public interface OnConversationClickListener {
@@ -29,9 +29,6 @@ public class ConversationsAdapter extends ListAdapter<MetaDataModel, Conversatio
     void setConversationClickListener(OnConversationClickListener listener) {
         this.clickListener = listener;
     }
-
-    // TODO: Replace it with user image url
-    private final static String test_image = "https://cdn1.iconfinder.com/data/icons/business-users/512/circle-512.png";
 
     private static final DiffUtil.ItemCallback<MetaDataModel> DIFF_CALLBACK = new DiffUtil.ItemCallback<MetaDataModel>() {
 
@@ -50,9 +47,8 @@ public class ConversationsAdapter extends ListAdapter<MetaDataModel, Conversatio
 
     };
 
-    ConversationsAdapter(Context context) {
+    ConversationsAdapter() {
         super(DIFF_CALLBACK);
-        this.context = context;
     }
 
     @NonNull
@@ -65,21 +61,36 @@ public class ConversationsAdapter extends ListAdapter<MetaDataModel, Conversatio
     @Override
     public void onBindViewHolder(@NonNull ConversationsViewHolder holder, int position) {
         MetaDataModel model = getItem(position);
-        holder.user_name.setText(model.getId());
-        if (model.getLastMessage() != null) holder.last_message.setText(model.getLastMessage().getText());
-        Glide.with(context).load(test_image).into(holder.user_image);
+        holder.userName.setText(null);
+        UsersCache.getUser(model.getId(), user -> {
+            if (user == null) return;
+            MessageModel message = model.getLastMessage();
+            if (message == null) return;
+            Context context = holder.lastMessage.getContext();
+            String text;
+            if (model.getId().equals(message.getSenderId())) { // Friend
+                text = message.getType() == 1 ? message.getText() :
+                        String.format(context.getResources().getString(R.string.friend_sent_photo), user.getName());
+            } else { // Client
+                text = message.getType() == 1 ? String.format(context.getResources().getString(R.string.you_sent_text), message.getText()) :
+                        context.getResources().getString(R.string.you_sent_photo);
+            }
+            holder.lastMessage.setText(text);
+            holder.userName.setText(user.getName());
+            Glide.with(holder.userImage.getContext()).load(user.getPickPath()).into(holder.userImage);
+        });
     }
 
     class ConversationsViewHolder extends RecyclerView.ViewHolder {
 
-        private ImageView user_image;
-        private TextView user_name, last_message;
+        private ImageView userImage;
+        private TextView userName, lastMessage;
 
         ConversationsViewHolder(@NonNull View itemView) {
             super(itemView);
-            user_image = itemView.findViewById(R.id.user_image);
-            user_name = itemView.findViewById(R.id.user_name);
-            last_message = itemView.findViewById(R.id.last_message);
+            userImage = itemView.findViewById(R.id.user_image);
+            userName = itemView.findViewById(R.id.user_name);
+            lastMessage = itemView.findViewById(R.id.last_message);
             itemView.setOnClickListener(v -> {
                 if (clickListener == null) return;
                 int position = getAdapterPosition();

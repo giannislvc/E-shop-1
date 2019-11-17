@@ -1,4 +1,4 @@
-package com.nativeboys.eshop.viewModels;
+package com.nativeboys.eshop.tools;
 
 import android.app.Application;
 
@@ -25,7 +25,6 @@ import java.util.List;
 
 public class GlobalViewModel extends AndroidViewModel {
 
-    // TODO: set up pre conversation (meta data)
     // TODO: Offline overview, take photo fragment,
     // TODO: chat_png offline send image
 

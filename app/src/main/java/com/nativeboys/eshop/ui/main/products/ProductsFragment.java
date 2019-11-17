@@ -11,27 +11,19 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 
 import com.nativeboys.eshop.R;
-import com.nativeboys.eshop.viewModels.GlobalViewModel;
+import com.nativeboys.eshop.tools.GlobalViewModel;
 
 import java.util.ArrayList;
 
 public class ProductsFragment extends Fragment {
 
-    private final String TAG = getClass().getSimpleName();
-
     private FragmentActivity activity;
     private GlobalViewModel viewModel;
-
-    private RecyclerView recycler_view;
-    private ProductsAdapter adapter;
-    private Button add_button;
 
     public ProductsFragment() {
         // Required empty public constructor
@@ -53,24 +45,14 @@ public class ProductsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        recycler_view = view.findViewById(R.id.recycler_view);
-        add_button = view.findViewById(R.id.add_button);
-        adapter = new ProductsAdapter(activity.getApplicationContext());
-        recycler_view.setAdapter(adapter);
-        recycler_view.setLayoutManager(new LinearLayoutManager(activity));
-        setUpListeners();
-    }
-
-    private void setUpListeners() {
-        adapter.setOnUserClickListener((itemView, user) -> {
-            viewModel.getConversationIdWith(user.getId(), model -> Log.i(TAG, "onResponse: " + model));
-        });
-        //add_button.setOnClickListener(v-> viewModel.addUser("John", "Doe", "https://cdn0.iconfinder.com/data/icons/emojis-colored-outlined-pixel-perfect/64/emoji-67-512.png"));
+        RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
+        ProductsAdapter adapter = new ProductsAdapter(activity.getApplicationContext());
+        recyclerView.setAdapter(adapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(activity));
         viewModel.getUsers().observe(this, users -> {
-            if (users == null) { return; }
+            if (users == null) return;
             adapter.submitList(new ArrayList<>(users));
         });
-        // add_button.setOnClickListener(v -> new LoginFragment().show(getChildFragmentManager(), LoginFragment.class.getSimpleName()));
     }
 
     @Override
