@@ -36,4 +36,10 @@
     <string name="test_name">John Doe</string>
     <string name="test_message">Good morning my dear friend!</string>
     <string name="test_timestamp">10-07 19:47</string>
+
+    <string name="test_product_name">Cotton Shirt</string>
+    <string name="test_product_description">This is 100% cotton shirt which is made by Bangladesh</string>
+    <string name="test_product_price">$112</string>
+    <string name="test_product_views">33</string>
+    <string name="test_product_likes">12</string>
 </resources>

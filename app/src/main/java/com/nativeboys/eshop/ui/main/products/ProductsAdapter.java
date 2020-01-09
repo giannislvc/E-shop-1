@@ -1,6 +1,5 @@
 package com.nativeboys.eshop.ui.main.products;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,12 +12,16 @@ import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.nativeboys.eshop.R;
 import com.nativeboys.eshop.models.UserModel;
 
 public class ProductsAdapter extends ListAdapter<UserModel, ProductsAdapter.ProductsViewHolder> {
 
-    final private Context context;
+    private final static String MOCK_IMAGE = "https://image.dhgate.com/0x0s/f2-albu-g6-M00-D2-47-rBVaSFvW0YqAW9FaAAFFXvijKvE574.jpg/superhero-movie-latex-mask-deadpool-2-marvel.jpg";
+
     private OnUserClickListener clickListener;
 
     public interface OnUserClickListener {
@@ -43,9 +46,8 @@ public class ProductsAdapter extends ListAdapter<UserModel, ProductsAdapter.Prod
 
     };
 
-    ProductsAdapter(@NonNull Context context) {
+    ProductsAdapter() {
         super(DIFF_CALLBACK);
-        this.context = context;
     }
 
     @NonNull
@@ -58,20 +60,19 @@ public class ProductsAdapter extends ListAdapter<UserModel, ProductsAdapter.Prod
     @Override
     public void onBindViewHolder(@NonNull ProductsViewHolder holder, int position) {
         UserModel model = getItem(position);
-        String text = String.format(context.getResources().getString(R.string.user_name_format), model.getName(), model.getLastName());
-        holder.user_name.setText(text);
-        Glide.with(context).load(model.getPickPath()).into(holder.user_image);
+        if (model != null) holder.bind(model);
     }
 
     class ProductsViewHolder extends RecyclerView.ViewHolder {
 
-        private ImageView user_image;
-        private TextView user_name;
+        private ImageView imageHolder;
+        private TextView nameField, descriptionField;
 
         ProductsViewHolder(@NonNull View itemView) {
             super(itemView);
-            user_image = itemView.findViewById(R.id.user_image);
-            user_name = itemView.findViewById(R.id.user_name);
+            imageHolder = itemView.findViewById(R.id.product_image_holder);
+            nameField = itemView.findViewById(R.id.product_name_field);
+            descriptionField = itemView.findViewById(R.id.product_description_field);
             itemView.setOnClickListener(v -> {
                 if (clickListener == null) return;
                 int position = getAdapterPosition();
@@ -79,6 +80,16 @@ public class ProductsAdapter extends ListAdapter<UserModel, ProductsAdapter.Prod
                 clickListener.onClick(v, getItem(position));
             });
         }
+
+        private void bind(@NonNull UserModel model) {
+            Glide.with(imageHolder.getContext())
+                    .load(MOCK_IMAGE)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .transform(new CenterCrop())
+                    .transition(new DrawableTransitionOptions().crossFade())
+                    .into(imageHolder);
+        }
+
     }
 
 }

@@ -16,9 +16,11 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.nativeboys.eshop.R;
+import com.nativeboys.eshop.models.UserModel;
 import com.nativeboys.eshop.tools.GlobalViewModel;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ProductsFragment extends Fragment {
 
@@ -46,14 +48,24 @@ public class ProductsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
-        ProductsAdapter adapter = new ProductsAdapter(activity.getApplicationContext());
+        ProductsAdapter adapter = new ProductsAdapter();
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(activity));
         viewModel.getUsers().observe(this, users -> {
-            if (users == null) return;
-            adapter.submitList(new ArrayList<>(users));
+            List<UserModel> mock = new ArrayList<>();
+            mock.add(new UserModel("1", "1", "1"));
+            mock.add(new UserModel("2", "2", "2"));
+            mock.add(new UserModel("3", "3", "3"));
+            mock.add(new UserModel("4", "4", "4"));
+            mock.add(new UserModel("5", "5", "5"));
+            mock.add(new UserModel("6", "6", "6"));
+            mock.addAll(users);
+            adapter.submitList(new ArrayList<>(mock));
         });
     }
+
+
+
 
     @Override
     public void onAttach(@NonNull Context context) {
