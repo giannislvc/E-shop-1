@@ -40,7 +40,7 @@
 
     </item>
 
-    <item>
+    <item android:state_checked="false">
         <set>
             <objectAnimator
                 android:duration="@android:integer/config_shortAnimTime"

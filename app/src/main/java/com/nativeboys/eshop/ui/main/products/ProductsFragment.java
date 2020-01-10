@@ -15,6 +15,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.flexbox.FlexDirection;
+import com.google.android.flexbox.FlexboxLayoutManager;
+import com.google.android.flexbox.JustifyContent;
 import com.nativeboys.eshop.R;
 import com.nativeboys.eshop.models.UserModel;
 import com.nativeboys.eshop.tools.GlobalViewModel;
@@ -49,8 +52,13 @@ public class ProductsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
         ProductsAdapter adapter = new ProductsAdapter();
+
+        FlexboxLayoutManager flexManager = new FlexboxLayoutManager(activity);
+        flexManager.setFlexDirection(FlexDirection.ROW);
+        flexManager.setJustifyContent(JustifyContent.FLEX_START);
+
         recyclerView.setAdapter(adapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(activity));
+        recyclerView.setLayoutManager(flexManager);
         viewModel.getUsers().observe(this, users -> {
             List<UserModel> mock = new ArrayList<>();
             mock.add(new UserModel("1", "1", "1"));
@@ -63,9 +71,6 @@ public class ProductsFragment extends Fragment {
             adapter.submitList(new ArrayList<>(mock));
         });
     }
-
-
-
 
     @Override
     public void onAttach(@NonNull Context context) {

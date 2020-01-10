@@ -20,7 +20,7 @@ import com.nativeboys.eshop.models.UserModel;
 
 public class ProductsAdapter extends ListAdapter<UserModel, ProductsAdapter.ProductsViewHolder> {
 
-    private final static String MOCK_IMAGE = "https://image.dhgate.com/0x0s/f2-albu-g6-M00-D2-47-rBVaSFvW0YqAW9FaAAFFXvijKvE574.jpg/superhero-movie-latex-mask-deadpool-2-marvel.jpg";
+    private final static String MOCK_IMAGE = "https://external.webstorage.gr/Product-Images/1190049/ps4slim-1000-1190049.jpg";
 
     private OnUserClickListener clickListener;
 
@@ -71,8 +71,8 @@ public class ProductsAdapter extends ListAdapter<UserModel, ProductsAdapter.Prod
         ProductsViewHolder(@NonNull View itemView) {
             super(itemView);
             imageHolder = itemView.findViewById(R.id.product_image_holder);
-            nameField = itemView.findViewById(R.id.product_name_field);
-            descriptionField = itemView.findViewById(R.id.product_description_field);
+            //nameField = itemView.findViewById(R.id.product_name_field);
+            //descriptionField = itemView.findViewById(R.id.product_description_field);
             itemView.setOnClickListener(v -> {
                 if (clickListener == null) return;
                 int position = getAdapterPosition();
