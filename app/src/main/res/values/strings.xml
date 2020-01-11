@@ -31,17 +31,13 @@
     <string name="friend_sent_photo">%1$s sent a photo</string>
     <string name="you_sent_text">You: %1$s</string>
     <string name="price">$%s</string>
-    <string name="likes">$s like this</string>
+    <string name="likes">%s like this</string>
+    <string name="views">%s views</string>
+    <string name="_views">• %s views</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="test_name">John Doe</string>
     <string name="test_message">Good morning my dear friend!</string>
     <string name="test_timestamp">10-07 19:47</string>
-
-    <string name="test_product_name">Cotton Shirt</string>
-    <string name="test_product_description">This is 100% cotton shirt which is made by Bangladesh</string>
-    <string name="test_product_price">$112</string>
-    <string name="test_product_views">33</string>
-    <string name="test_product_likes">12</string>
 </resources>

@@ -63,18 +63,17 @@ public class ProductsAdapter extends PagedListAdapter<Product, ProductsAdapter.P
 
     class ProductsViewHolder extends RecyclerView.ViewHolder {
 
-        private ImageView productImage;
-        private TextView productNameField, productPriceField ,viewsField, likesField;
+        private ImageView imageHolder, likeImg;
+        private TextView nameField, priceField, likesField, viewsField;
 
         ProductsViewHolder(@NonNull View itemView) {
             super(itemView);
-            productImage = itemView.findViewById(R.id.product_image_holder);
-            productNameField = itemView.findViewById(R.id.product_name_field);
-            productPriceField = itemView.findViewById(R.id.product_price_field);
-            //viewsField = itemView.findViewById(R.id.views_field);
-            //likesField = itemView.findViewById(R.id.likes_field);
-            //productName = itemView.findViewById(R.id.product_name);
-
+            imageHolder = itemView.findViewById(R.id.image_holder);
+            nameField = itemView.findViewById(R.id.name_field);
+            priceField = itemView.findViewById(R.id.price_field);
+            likesField = itemView.findViewById(R.id.likes_field);
+            likeImg = itemView.findViewById(R.id.like_img);
+            viewsField = itemView.findViewById(R.id.views_field);
             itemView.setOnClickListener(v -> {
                 if (clickListener == null) return;
                 int position = getAdapterPosition();
@@ -84,19 +83,41 @@ public class ProductsAdapter extends PagedListAdapter<Product, ProductsAdapter.P
         }
 
         private void bind(@NonNull Product product) {
-            // String text = String.format(user_name.getContext().getResources().getString(R.string.user_name_format), model.getName(), model.getLastName());
-            //productName.setText(product.getName());
-            //likesField.setText(product.getLikesQty());
-            //viewsField.setText(product.getViewsQty());
-            productNameField.setText(product.getName());
-            String price = String.format(productPriceField.getResources().getString(R.string.price), product.getPrice());
-            productPriceField.setText(price);
-            Glide.with(productImage.getContext())
+            nameField.setText(product.getName());
+
+            String likesQuantity = product.getLikesQty();
+            String viewsQuantity = product.getViewsQty();
+
+            boolean zeroLikes = likesQuantity.equals("0");
+            boolean zeroViews = viewsQuantity.equals("0");
+
+            if (!zeroLikes) {
+                String likes = String.format(likesField.getResources().getString(R.string.likes), likesQuantity);
+                likesField.setText(likes);
+                likesField.setVisibility(View.VISIBLE);
+            } else {
+                likesField.setVisibility(View.GONE);
+            }
+
+            if (!zeroViews) {
+                int resource = zeroLikes ? R.string.views : R.string._views;
+                String views = String.format(viewsField.getResources().getString(resource), viewsQuantity);
+                viewsField.setText(views);
+                viewsField.setVisibility(View.VISIBLE);
+            } else {
+                viewsField.setVisibility(View.GONE);
+            }
+
+            likeImg.setVisibility(product.isLiked() ? View.VISIBLE : View.INVISIBLE);
+
+            String price = String.format(priceField.getResources().getString(R.string.price), product.getPrice());
+            priceField.setText(price);
+            Glide.with(imageHolder.getContext())
                     .load(product.getGalleryUrls().get(0))
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .transform(new CenterCrop())
                     .transition(new DrawableTransitionOptions().crossFade())
-                    .into(productImage);
+                    .into(imageHolder);
         }
 
     }

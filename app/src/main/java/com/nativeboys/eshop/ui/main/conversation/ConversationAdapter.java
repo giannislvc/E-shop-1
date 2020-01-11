@@ -1,16 +1,13 @@
 package com.nativeboys.eshop.ui.main.conversation;
 
-import android.content.Context;
-import android.util.DisplayMetrics;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
@@ -21,6 +18,7 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.nativeboys.eshop.R;
 import com.nativeboys.eshop.models.firebase.MessageModel;
+import com.nativeboys.eshop.tools.ScreenManager;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -102,36 +100,19 @@ public class ConversationAdapter extends ListAdapter<MessageModel, ConversationA
     @Override
     public void onBindViewHolder(@NonNull ConversationAdapter.MessageViewHolder holder, int position) {
         int viewType = getItemViewType(position);
-        MessageModel model = getItem(position);
+        MessageModel message = getItem(position);
 
         // TODO: deserialization date format
         SimpleDateFormat sdf = new SimpleDateFormat("MM-dd HH:mm", Locale.US);
-        holder.timeStamp.setText(sdf.format(model.getTimestamp()));
+        holder.timeStamp.setText(sdf.format(message.getTimestamp()));
 
         if (viewType == 1 || viewType == 3) {
             TextMessageViewHolder textHolder = (TextMessageViewHolder) holder;
-            textHolder.textMessage.setText(model.getText());
-            Integer width = calculateWidth(textHolder.textMessage.getContext());
-            if (width != null) textHolder.textMessage.setMaxWidth(width);
+            textHolder.bind(message);
         } else if(viewType == 2 || viewType == 4) {
             ImageMessageViewHolder imageHolder = (ImageMessageViewHolder) holder;
-            Glide.with(imageHolder.imageMessage.getContext())
-                    .load(model.getText())
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .transform(new CenterCrop())
-                    .transition(new DrawableTransitionOptions().crossFade())
-                    .into(imageHolder.imageMessage);
+            imageHolder.bind(message);
         }
-    }
-
-    // TODO: Remove it
-    private Integer calculateWidth(@NonNull Context context) {
-        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-        if (wm == null) return null;
-        Display display = wm.getDefaultDisplay();
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        display.getMetrics(displayMetrics);
-        return Math.round(displayMetrics.widthPixels / (float) 1.7);
     }
 
     class MessageViewHolder extends RecyclerView.ViewHolder {
@@ -143,6 +124,12 @@ public class ConversationAdapter extends ListAdapter<MessageModel, ConversationA
             timeStamp = itemView.findViewById(R.id.time_stamp);
         }
 
+        public void bind(@NonNull MessageModel message) {
+            // TODO: deserialization date format
+            SimpleDateFormat sdf = new SimpleDateFormat("MM-dd HH:mm", Locale.US);
+            timeStamp.setText(sdf.format(message.getTimestamp()));
+        }
+
     }
 
     class TextMessageViewHolder extends MessageViewHolder {
@@ -152,7 +139,15 @@ public class ConversationAdapter extends ListAdapter<MessageModel, ConversationA
         TextMessageViewHolder(@NonNull View itemView) {
             super(itemView);
             textMessage = itemView.findViewById(R.id.text_message);
+            textMessage.setMaxWidth(Math.round(ScreenManager.getWidth() / (float) 1.7));
         }
+
+        @Override
+        public void bind(@NonNull MessageModel message) {
+            super.bind(message);
+            textMessage.setText(message.getText());
+        }
+
     }
 
     class ImageMessageViewHolder extends MessageViewHolder {
@@ -169,6 +164,17 @@ public class ConversationAdapter extends ListAdapter<MessageModel, ConversationA
                 if (position == RecyclerView.NO_POSITION) return;
                 imageClickListener.onClick(v, getItem(position).getText());
             });
+        }
+
+        @Override
+        public void bind(@NonNull MessageModel message) {
+            super.bind(message);
+            Glide.with(imageMessage.getContext())
+                    .load(message.getText())
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .transform(new CenterCrop())
+                    .transition(new DrawableTransitionOptions().crossFade())
+                    .into(imageMessage);
         }
 
     }
