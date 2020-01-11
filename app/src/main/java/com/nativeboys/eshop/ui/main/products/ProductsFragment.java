@@ -13,6 +13,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
@@ -25,6 +27,7 @@ import com.nativeboys.eshop.tools.GlobalViewModel;
 public class ProductsFragment extends Fragment {
 
     private FragmentActivity activity;
+    private NavController navController;
     private GlobalViewModel viewModel;
 
     public ProductsFragment() {
@@ -47,6 +50,7 @@ public class ProductsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        navController = Navigation.findNavController(view);
         RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
         LinearLayout searchBar = view.findViewById(R.id.search_bar);
         SwipeRefreshLayout swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout);
@@ -60,6 +64,10 @@ public class ProductsFragment extends Fragment {
         recyclerView.setLayoutManager(flexManager);
         recyclerView.setHasFixedSize(true);
         viewModel.getProductPagedList().observe(this, adapter::submitList);
+
+        searchBar.setOnClickListener(v ->
+                navController.navigate(R.id.action_main_to_search));
+
         /*viewModel.getUsers().observe(this, users -> {
             if (users == null) return;
             adapter.submitList(new ArrayList<>(users));
