@@ -1,4 +1,4 @@
-package com.nativeboys.eshop.models;
+package com.nativeboys.eshop.models.firebase;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;

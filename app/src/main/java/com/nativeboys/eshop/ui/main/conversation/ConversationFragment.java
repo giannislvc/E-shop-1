@@ -28,9 +28,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.nativeboys.eshop.Completion;
 import com.nativeboys.eshop.R;
-import com.nativeboys.eshop.models.UserModel;
 import com.nativeboys.eshop.tools.UsersCache;
 import com.nativeboys.eshop.ui.main.conversation.imageDisplay.ImageDisplayFragment;
 import com.nativeboys.eshop.tools.ConversationViewModel;

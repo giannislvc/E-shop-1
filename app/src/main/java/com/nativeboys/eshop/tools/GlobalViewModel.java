@@ -7,6 +7,9 @@ import androidx.annotation.Nullable;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.paging.LivePagedListBuilder;
+import androidx.paging.PageKeyedDataSource;
+import androidx.paging.PagedList;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -15,10 +18,15 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.nativeboys.eshop.AuthCompleteListener;
-import com.nativeboys.eshop.Completion;
-import com.nativeboys.eshop.models.MetaDataModel;
-import com.nativeboys.eshop.models.UserModel;
+import com.nativeboys.eshop.callbacks.AuthCompleteListener;
+import com.nativeboys.eshop.callbacks.Completion;
+import com.nativeboys.eshop.http.Repository;
+import com.nativeboys.eshop.models.firebase.MetaDataModel;
+import com.nativeboys.eshop.models.firebase.UserModel;
+import com.nativeboys.eshop.models.node.Product;
+import com.nativeboys.eshop.models.query.Filter;
+import com.nativeboys.eshop.models.query.Sort;
+import com.nativeboys.eshop.paging.ProductDataSourceFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +43,7 @@ public class GlobalViewModel extends AndroidViewModel {
     final static String METADATA = "metadata";
     final static String CONVERSATIONS = "conversations";
 
+    private Repository repository;
     private FirebaseAuth mAuth;
     private DatabaseReference usersRef, metadataRef, conversationsRef;
 
@@ -44,11 +53,15 @@ public class GlobalViewModel extends AndroidViewModel {
 
     private MutableLiveData<List<UserModel>> users;
 
+    private LiveData<PagedList<Product>> productPagedList;
+    private LiveData<PageKeyedDataSource<Integer, Product>> liveDataSource;
+
     {
         user = new MutableLiveData<>();
         metaData = new MutableLiveData<>();
 
         users = new MutableLiveData<>();
+        productPagedList = new MutableLiveData<>();
     }
 
     private ValueEventListener usersListener = new ValueEventListener() {
@@ -95,6 +108,7 @@ public class GlobalViewModel extends AndroidViewModel {
     public GlobalViewModel(@NonNull Application application) {
         super(application);
         mAuth = FirebaseAuth.getInstance();
+        repository = Repository.getInstance();
         usersRef = FirebaseDatabase.getInstance().getReference(USERS);
         metadataRef = FirebaseDatabase.getInstance().getReference(METADATA);
         conversationsRef = FirebaseDatabase.getInstance().getReference(CONVERSATIONS);
@@ -106,8 +120,29 @@ public class GlobalViewModel extends AndroidViewModel {
                 this.user.setValue(user);
                 userId = user.getUid();
                 setListeners(true);
+                setUpPaging(userId);
             }
         });
+
+    }
+
+    private void setUpPaging(String userId) {
+        ProductDataSourceFactory dataSourceFactory = new ProductDataSourceFactory(
+                userId,
+                new Filter(null, "ps3"),
+                new Sort(3, 10, 0, false)
+        );
+        liveDataSource = dataSourceFactory.getProductLiveDataSource();
+        PagedList.Config config =
+                (new PagedList.Config.Builder())
+                    .setEnablePlaceholders(false)
+                    .setPageSize(10)
+                    .build();
+        productPagedList = (new LivePagedListBuilder(dataSourceFactory, config)).build();
+    }
+
+    public LiveData<PagedList<Product>> getProductPagedList() {
+        return productPagedList;
     }
 
     public LiveData<FirebaseUser> getUser() {

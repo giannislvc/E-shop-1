@@ -14,8 +14,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.nativeboys.eshop.R;
-import com.nativeboys.eshop.models.MessageModel;
-import com.nativeboys.eshop.models.MetaDataModel;
+import com.nativeboys.eshop.models.firebase.MessageModel;
+import com.nativeboys.eshop.models.firebase.MetaDataModel;
 import com.nativeboys.eshop.tools.UsersCache;
 
 public class ConversationsAdapter extends ListAdapter<MetaDataModel, ConversationsAdapter.ConversationsViewHolder> {

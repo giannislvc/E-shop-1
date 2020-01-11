@@ -7,8 +7,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.paging.PagedListAdapter;
 import androidx.recyclerview.widget.DiffUtil;
-import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -16,63 +16,65 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.nativeboys.eshop.R;
-import com.nativeboys.eshop.models.UserModel;
+import com.nativeboys.eshop.models.node.Product;
 
-public class ProductsAdapter extends ListAdapter<UserModel, ProductsAdapter.ProductsViewHolder> {
+public class ProductsAdapter extends PagedListAdapter<Product, ProductsAdapter.ProductsViewHolder> {
 
-    private final static String MOCK_IMAGE = "https://external.webstorage.gr/Product-Images/1190049/ps4slim-1000-1190049.jpg";
-
-    private OnUserClickListener clickListener;
-
-    public interface OnUserClickListener {
-        void onClick(View itemView, UserModel user);
+    public interface OnProductClickListener {
+        void onClick(View itemView, Product product);
     }
 
-    void setOnUserClickListener(OnUserClickListener listener) {
-        clickListener = listener;
-    }
-
-    private static final DiffUtil.ItemCallback<UserModel> DIFF_CALLBACK = new DiffUtil.ItemCallback<UserModel>() {
+    private static final DiffUtil.ItemCallback<Product> DIFF_CALLBACK = new DiffUtil.ItemCallback<Product>() {
 
         @Override
-        public boolean areItemsTheSame(@NonNull UserModel model, @NonNull UserModel t1) {
-            return model.getId().equals(t1.getId());
+        public boolean areItemsTheSame(@NonNull Product model, @NonNull Product t1) {
+            return model.getProductId().equals(t1.getProductId());
         }
 
         @Override
-        public boolean areContentsTheSame(@NonNull UserModel model, @NonNull UserModel t1) {
-            return model.getName().equals(t1.getName()) && model.getLastName().equals(t1.getLastName()) && model.getPickPath().equals(t1.getPickPath());
+        public boolean areContentsTheSame(@NonNull Product model, @NonNull Product t1) {
+            return model.equals(t1);
         }
 
     };
+
+    private OnProductClickListener clickListener;
 
     ProductsAdapter() {
         super(DIFF_CALLBACK);
     }
 
+    void setOnProductClickListener(OnProductClickListener listener) {
+        clickListener = listener;
+    }
+
     @NonNull
     @Override
     public ProductsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.user_cell, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.product_cell, parent, false);
         return new ProductsAdapter.ProductsViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ProductsViewHolder holder, int position) {
-        UserModel model = getItem(position);
-        if (model != null) holder.bind(model);
+        Product product = getItem(position);
+        if (product != null) holder.bind(product);
     }
 
     class ProductsViewHolder extends RecyclerView.ViewHolder {
 
-        private ImageView imageHolder;
-        private TextView nameField, descriptionField;
+        private ImageView productImage;
+        private TextView productNameField, productPriceField ,viewsField, likesField;
 
         ProductsViewHolder(@NonNull View itemView) {
             super(itemView);
-            imageHolder = itemView.findViewById(R.id.product_image_holder);
-            //nameField = itemView.findViewById(R.id.product_name_field);
-            //descriptionField = itemView.findViewById(R.id.product_description_field);
+            productImage = itemView.findViewById(R.id.product_image_holder);
+            productNameField = itemView.findViewById(R.id.product_name_field);
+            productPriceField = itemView.findViewById(R.id.product_price_field);
+            //viewsField = itemView.findViewById(R.id.views_field);
+            //likesField = itemView.findViewById(R.id.likes_field);
+            //productName = itemView.findViewById(R.id.product_name);
+
             itemView.setOnClickListener(v -> {
                 if (clickListener == null) return;
                 int position = getAdapterPosition();
@@ -81,13 +83,20 @@ public class ProductsAdapter extends ListAdapter<UserModel, ProductsAdapter.Prod
             });
         }
 
-        private void bind(@NonNull UserModel model) {
-            Glide.with(imageHolder.getContext())
-                    .load(MOCK_IMAGE)
+        private void bind(@NonNull Product product) {
+            // String text = String.format(user_name.getContext().getResources().getString(R.string.user_name_format), model.getName(), model.getLastName());
+            //productName.setText(product.getName());
+            //likesField.setText(product.getLikesQty());
+            //viewsField.setText(product.getViewsQty());
+            productNameField.setText(product.getName());
+            String price = String.format(productPriceField.getResources().getString(R.string.price), product.getPrice());
+            productPriceField.setText(price);
+            Glide.with(productImage.getContext())
+                    .load(product.getGalleryUrls().get(0))
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .transform(new CenterCrop())
                     .transition(new DrawableTransitionOptions().crossFade())
-                    .into(imageHolder);
+                    .into(productImage);
         }
 
     }

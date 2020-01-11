@@ -2,30 +2,26 @@ package com.nativeboys.eshop.ui.main.products;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProviders;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 
 import com.google.android.flexbox.FlexDirection;
 import com.google.android.flexbox.FlexboxLayoutManager;
 import com.google.android.flexbox.JustifyContent;
 import com.nativeboys.eshop.R;
-import com.nativeboys.eshop.models.UserModel;
 import com.nativeboys.eshop.tools.GlobalViewModel;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class ProductsFragment extends Fragment {
+
+    private final String TAG = getClass().getSimpleName();
 
     private FragmentActivity activity;
     private GlobalViewModel viewModel;
@@ -52,24 +48,16 @@ public class ProductsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
         ProductsAdapter adapter = new ProductsAdapter();
-
-        FlexboxLayoutManager flexManager = new FlexboxLayoutManager(activity);
+        recyclerView.setAdapter(adapter);
+        FlexboxLayoutManager flexManager = new FlexboxLayoutManager(recyclerView.getContext());
         flexManager.setFlexDirection(FlexDirection.ROW);
         flexManager.setJustifyContent(JustifyContent.FLEX_START);
-
-        recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(flexManager);
-        viewModel.getUsers().observe(this, users -> {
-            List<UserModel> mock = new ArrayList<>();
-            mock.add(new UserModel("1", "1", "1"));
-            mock.add(new UserModel("2", "2", "2"));
-            mock.add(new UserModel("3", "3", "3"));
-            mock.add(new UserModel("4", "4", "4"));
-            mock.add(new UserModel("5", "5", "5"));
-            mock.add(new UserModel("6", "6", "6"));
-            mock.addAll(users);
-            adapter.submitList(new ArrayList<>(mock));
-        });
+        viewModel.getProductPagedList().observe(this, adapter::submitList);
+        /*viewModel.getUsers().observe(this, users -> {
+            if (users == null) return;
+            adapter.submitList(new ArrayList<>(users));
+        });*/
     }
 
     @Override

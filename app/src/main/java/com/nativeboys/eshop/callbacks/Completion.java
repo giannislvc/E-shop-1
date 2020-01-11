@@ -1,4 +1,4 @@
-package com.nativeboys.eshop;
+package com.nativeboys.eshop.callbacks;
 
 import androidx.annotation.Nullable;
 

@@ -7,7 +7,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
-import com.nativeboys.eshop.models.MessageModel;
+import com.nativeboys.eshop.models.firebase.MessageModel;
 
 import java.util.ArrayList;
 import java.util.List;

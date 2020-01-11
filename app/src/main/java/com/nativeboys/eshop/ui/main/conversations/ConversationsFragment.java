@@ -16,8 +16,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.nativeboys.eshop.R;
-import com.nativeboys.eshop.ui.main.MainFragmentDirections;
 import com.nativeboys.eshop.tools.GlobalViewModel;
+import com.nativeboys.eshop.ui.main.MainFragmentDirections;
 
 import java.util.ArrayList;
 

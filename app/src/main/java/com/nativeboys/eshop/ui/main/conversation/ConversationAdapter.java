@@ -20,7 +20,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.nativeboys.eshop.R;
-import com.nativeboys.eshop.models.MessageModel;
+import com.nativeboys.eshop.models.firebase.MessageModel;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;

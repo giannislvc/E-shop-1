@@ -6,7 +6,7 @@ import androidx.paging.DataSource;
 import androidx.paging.PageKeyedDataSource;
 
 import com.google.firebase.database.DatabaseReference;
-import com.nativeboys.eshop.models.MessageModel;
+import com.nativeboys.eshop.models.firebase.MessageModel;
 
 public class MessageDataSourceFactory extends DataSource.Factory {
 
