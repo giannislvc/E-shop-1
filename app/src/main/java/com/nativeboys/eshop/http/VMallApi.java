@@ -26,4 +26,13 @@ public interface VMallApi {
             @Query("customer_id") String customerId,
             @Query("filter") String filter,
             @Query("sort") String sort);
+
+    @GET("customers/{id}/productsHistory")
+    Call<List<Product>> getProductHistory(
+            @Path("id") String customerId,
+            @Query("sort") String startLimit);
+
+    @GET("customers/{id}/searchHistory")
+    Call<List<String>> getSearchHistory(
+            @Path("id") String customerId);
 }
