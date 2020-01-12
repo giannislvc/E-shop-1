@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
@@ -15,8 +16,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.nativeboys.eshop.R;
+import com.nativeboys.eshop.customViews.NonScrollLayoutManager;
 import com.nativeboys.eshop.models.node.Product;
 import com.nativeboys.eshop.tools.GlobalViewModel;
 
@@ -25,6 +28,8 @@ import java.util.List;
 public class SearchFragment extends Fragment {
 
     private final String TAG = getClass().getSimpleName();
+
+    private RecyclerView searchesRecyclerView;
     private RecentSearchAdapter searchAdapter;
     private RecentViewAdapter viewAdapter;
 
@@ -43,12 +48,22 @@ public class SearchFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         EditText searchField = view.findViewById(R.id.search_field);
-        RecyclerView searchesRecyclerView = view.findViewById(R.id.searches_recycler_view);
+        TextView viewAllField = view.findViewById(R.id.view_all_field);
+        searchesRecyclerView = view.findViewById(R.id.searches_recycler_view);
         RecyclerView viewsRecyclerView = view.findViewById(R.id.views_recycler_view);
 
-        searchesRecyclerView.setLayoutManager(new LinearLayoutManager(searchesRecyclerView.getContext()));
+        viewAllField.setOnClickListener(v -> {
+            ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) searchesRecyclerView.getLayoutParams();
+            params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+            searchesRecyclerView.setLayoutParams(params);
+            v.setVisibility(View.INVISIBLE);
+        });
+
+        searchesRecyclerView.setLayoutManager(new NonScrollLayoutManager(searchesRecyclerView.getContext()));
         searchAdapter = new RecentSearchAdapter();
         searchesRecyclerView.setAdapter(searchAdapter);
+
+        searchesRecyclerView.setNestedScrollingEnabled(false);
 
         viewsRecyclerView.setLayoutManager(new LinearLayoutManager(viewsRecyclerView.getContext(),
                 LinearLayoutManager.HORIZONTAL, false));

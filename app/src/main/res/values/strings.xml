@@ -40,6 +40,8 @@
     <string name="recent_searches">Recent Searches</string>
     <string name="recent_views">Recently Viewed</string>
     <string name="product_image">Product Image</string>
+    <string name="most_popular">Most popular</string>
+    <string name="view_all">View all</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
