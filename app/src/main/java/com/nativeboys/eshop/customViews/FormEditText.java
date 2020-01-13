@@ -1,8 +1,6 @@
 package com.nativeboys.eshop.customViews;
 
 import android.content.Context;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.AttributeSet;
 
 import androidx.annotation.NonNull;
@@ -12,7 +10,7 @@ import com.nativeboys.eshop.R;
 
 import java.util.regex.Pattern;
 
-public class FormEditText extends androidx.appcompat.widget.AppCompatEditText {
+public class FormEditText extends InputEditText {
 
     public static final Pattern PASSWORD_PATTERN =
             Pattern.compile("^" +
@@ -53,17 +51,8 @@ public class FormEditText extends androidx.appcompat.widget.AppCompatEditText {
     }
 
     private void setUpTextListener() {
-        addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) { }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (currentState != null && currentState == State.INVALID) setState(State.NORMAL);
-            }
+        setOnTextChangedListener((editText, text) -> {
+            if (currentState != null && currentState == State.INVALID) setState(State.NORMAL);
         });
     }
 

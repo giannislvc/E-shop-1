@@ -62,6 +62,8 @@ public class GlobalViewModel extends AndroidViewModel {
     private LiveData<List<Product>> productHistory;
     private LiveData<List<String>> searchHistory;
 
+    private MutableLiveData<String> textSearch;
+
     {
         user = new MutableLiveData<>();
         metaData = new MutableLiveData<>();
@@ -74,6 +76,8 @@ public class GlobalViewModel extends AndroidViewModel {
 
         searchHistory = Transformations.switchMap(user, user ->
                 getSearchHistory(user.getUid()));
+
+        textSearch = new MutableLiveData<>();
     }
 
     private ValueEventListener usersListener = new ValueEventListener() {
@@ -136,6 +140,10 @@ public class GlobalViewModel extends AndroidViewModel {
             }
         });
 
+    }
+
+    public MutableLiveData<String> getTextSearch() {
+        return textSearch;
     }
 
     private void setUpPaging(String userId) {

@@ -48,17 +48,26 @@
                 android:tint="@android:color/white"
                 android:contentDescription="@string/search"/>
 
-            <EditText
+            <com.nativeboys.eshop.customViews.InputEditText
                 android:id="@+id/search_field"
-                android:layout_width="match_parent"
+                android:layout_weight="1"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginStart="5dp"
+                android:paddingStart="5dp"
+                android:paddingEnd="5dp"
                 android:fontFamily="@font/breeze_sans_light"
                 android:textColorHint="#98d5ed"
                 android:textColor="@android:color/white"
                 android:textSize="16sp"
                 android:background="@android:color/transparent"
                 android:hint="@string/search_your_product" />
+
+            <ImageView
+                android:id="@+id/clear_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_close_white_24dp"
+                android:contentDescription="@string/search"/>
 
         </LinearLayout>
 

@@ -51,7 +51,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="5dp"
+                android:paddingStart="5dp"
+                android:paddingEnd="5dp"
                 android:fontFamily="@font/breeze_sans_light"
                 android:textColor="#98d5ed"
                 android:textSize="16sp"
