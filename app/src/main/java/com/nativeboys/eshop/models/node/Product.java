@@ -65,21 +65,28 @@ public class Product {
         return liked;
     }
 
+    public boolean areItemsTheSame(@NonNull Product other) {
+        return product_id.equals(other.product_id);
+    }
+
+    public boolean areContentsTheSame(@NonNull Product other) {
+        return liked == other.liked &&
+                name.equals(other.name) &&
+                price.equals(other.price) &&
+                upload_time.equals(other.upload_time) &&
+                gallery_urls.equals(other.gallery_urls) &&
+                uploader_id.equals(other.uploader_id) &&
+                category_id.equals(other.category_id) &&
+                views_qty.equals(other.views_qty) &&
+                likes_qty.equals(other.likes_qty);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Product)) return false;
         Product product = (Product) o;
-        return liked == product.liked &&
-                product_id.equals(product.product_id) &&
-                name.equals(product.name) &&
-                price.equals(product.price) &&
-                upload_time.equals(product.upload_time) &&
-                gallery_urls.equals(product.gallery_urls) &&
-                uploader_id.equals(product.uploader_id) &&
-                category_id.equals(product.category_id) &&
-                views_qty.equals(product.views_qty) &&
-                likes_qty.equals(product.likes_qty);
+        return areItemsTheSame(product) && areContentsTheSame(product);
     }
 
     @Override

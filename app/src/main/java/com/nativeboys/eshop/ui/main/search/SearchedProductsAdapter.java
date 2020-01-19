@@ -17,23 +17,23 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.nativeboys.eshop.R;
 import com.nativeboys.eshop.models.node.Product;
 
-public class RecentViewAdapter extends ListAdapter<Product, RecentViewAdapter.ViewHolder>  {
+public class SearchedProductsAdapter extends ListAdapter<Product, SearchedProductsAdapter.ViewHolder>  {
 
     private static final DiffUtil.ItemCallback<Product> DIFF_CALLBACK = new DiffUtil.ItemCallback<Product>() {
 
         @Override
         public boolean areItemsTheSame(@NonNull Product model, @NonNull Product t1) {
-            return model.getProductId().equals(t1.getProductId());
+            return model.areItemsTheSame(t1);
         }
 
         @Override
         public boolean areContentsTheSame(@NonNull Product model, @NonNull Product t1) {
-            return model.equals(t1);
+            return model.areContentsTheSame(t1);
         }
 
     };
 
-    RecentViewAdapter() {
+    SearchedProductsAdapter() {
         super(DIFF_CALLBACK);
     }
 
@@ -41,7 +41,7 @@ public class RecentViewAdapter extends ListAdapter<Product, RecentViewAdapter.Vi
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recent_views_cell, parent, false);
-        return new RecentViewAdapter.ViewHolder(view);
+        return new SearchedProductsAdapter.ViewHolder(view);
     }
 
     @Override

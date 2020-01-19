@@ -59,6 +59,7 @@ public class GlobalViewModel extends AndroidViewModel {
     private LiveData<PagedList<Product>> productPagedList;
     private LiveData<PageKeyedDataSource<Integer, Product>> liveDataSource;
 
+    private MutableLiveData<List<Product>> popularProducts;
     private LiveData<List<Product>> productHistory;
     private LiveData<List<String>> searchHistory;
 
@@ -72,6 +73,8 @@ public class GlobalViewModel extends AndroidViewModel {
         users = new MutableLiveData<>();
         productPagedList = new MutableLiveData<>();
 
+        popularProducts = new MutableLiveData<>();
+
         productHistory = Transformations.switchMap(user, user ->
                 getProductHistory(user.getUid()));
 
@@ -79,6 +82,7 @@ public class GlobalViewModel extends AndroidViewModel {
                 getSearchHistory(user.getUid()));
 
         textSearch = new MutableLiveData<>();
+
         searches = Transformations.switchMap(textSearch, this::getSearch);
     }
 
@@ -303,6 +307,23 @@ public class GlobalViewModel extends AndroidViewModel {
             }
         });
         return searches;
+    }
+
+    public MutableLiveData<List<Product>> getPopularProducts() {
+        return popularProducts;
+    }
+
+    public void refreshMostPopular() {
+        Sort sort = new Sort(5, 0, 3, false);
+        repository.getProducts(userId, new Filter(), sort, new CompletionHandler<List<Product>>() {
+            @Override
+            public void onSuccess(@NonNull List<Product> model) {
+                popularProducts.setValue(model);
+            }
+
+            @Override
+            public void onFailure(@Nullable String description) { }
+        });
     }
 
     private LiveData<List<String>> getSearch(String text) {

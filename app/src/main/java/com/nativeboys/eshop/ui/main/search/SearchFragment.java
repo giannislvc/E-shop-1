@@ -28,14 +28,13 @@ public class SearchFragment extends Fragment {
 
     private GlobalViewModel globalVM;
 
-    private AutoCompleteInputView searchField;
     private SearchAdapter searchAdapter;
+    private RecentSearchAdapter recentSearchAdapter;
+    private SearchedProductsAdapter recentViewedAdapter, mostPopularAdapter;
 
     private ImageView clearText;
-
     private RecyclerView searchesRecyclerView;
-    private RecentSearchAdapter recentSearchAdapter;
-    private RecentViewAdapter recentViewAdapter;
+    private AutoCompleteInputView searchField;
 
     public SearchFragment() {
         // Required empty public constructor
@@ -59,11 +58,17 @@ public class SearchFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        ImageView backArrow = view.findViewById(R.id.back_arrow);
         TextView viewAllField = view.findViewById(R.id.view_all_field);
         RecyclerView viewsRecyclerView = view.findViewById(R.id.views_recycler_view);
+        RecyclerView popularRecyclerView = view.findViewById(R.id.popular_recycler_view);
         searchField = view.findViewById(R.id.search_field);
         searchesRecyclerView = view.findViewById(R.id.searches_recycler_view);
         clearText = view.findViewById(R.id.clear_text);
+
+        backArrow.setOnClickListener(v -> {
+            if (getActivity() != null) getActivity().onBackPressed();
+        });
 
         viewAllField.setOnClickListener(v -> {
             ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) searchesRecyclerView.getLayoutParams();
@@ -74,9 +79,8 @@ public class SearchFragment extends Fragment {
 
         searchAdapter = new SearchAdapter(view.getContext());
         searchField.setAdapter(searchAdapter);
-        searchAdapter.setOnItemSelectedListener(searchField, model -> {
-            Log.i(TAG, "onViewCreated: " + model);
-        });
+        searchAdapter.setOnItemClickListener(searchField, model ->
+                Log.i(TAG, "onClickListener: " + model));
 
         searchesRecyclerView.setLayoutManager(new NonScrollLayoutManager(searchesRecyclerView.getContext()));
         recentSearchAdapter = new RecentSearchAdapter();
@@ -84,12 +88,19 @@ public class SearchFragment extends Fragment {
 
         viewsRecyclerView.setLayoutManager(new LinearLayoutManager(viewsRecyclerView.getContext(),
                 LinearLayoutManager.HORIZONTAL, false));
-        recentViewAdapter = new RecentViewAdapter();
-        viewsRecyclerView.setAdapter(recentViewAdapter);
+        recentViewedAdapter = new SearchedProductsAdapter();
+        viewsRecyclerView.setAdapter(recentViewedAdapter);
+
+        popularRecyclerView.setLayoutManager(new LinearLayoutManager(viewsRecyclerView.getContext(),
+                LinearLayoutManager.HORIZONTAL, false));
+        mostPopularAdapter = new SearchedProductsAdapter();
+        popularRecyclerView.setAdapter(mostPopularAdapter);
 
         clearText.setOnClickListener(v -> searchField.setText(null));
 
         if (globalVM == null) return;
+
+        globalVM.refreshMostPopular();
 
         globalVM.getSearches().observe(this, strings -> searchAdapter.setDataSet(strings));
 
@@ -100,8 +111,11 @@ public class SearchFragment extends Fragment {
             clearText.setVisibility(enabled ? View.VISIBLE : View.INVISIBLE);
         });
 
+        globalVM.getPopularProducts().observe(this, products -> mostPopularAdapter.submitList(products));
+
         globalVM.getSearchHistory().observe(this, strings -> recentSearchAdapter.setDataSet(strings));
 
-        globalVM.getProductHistory().observe(this, products -> recentViewAdapter.submitList(products));
+        globalVM.getProductHistory().observe(this, products -> recentViewedAdapter.submitList(products));
     }
+
 }

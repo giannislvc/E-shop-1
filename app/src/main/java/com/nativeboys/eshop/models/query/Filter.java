@@ -12,6 +12,8 @@ public class Filter {
         this.text = text;
     }
 
+    public Filter() {}
+
     public String getCategoryId() {
         return categoryId;
     }

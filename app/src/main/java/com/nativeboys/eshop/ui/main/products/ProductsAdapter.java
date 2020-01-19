@@ -28,12 +28,12 @@ public class ProductsAdapter extends PagedListAdapter<Product, ProductsAdapter.P
 
         @Override
         public boolean areItemsTheSame(@NonNull Product model, @NonNull Product t1) {
-            return model.getProductId().equals(t1.getProductId());
+            return model.areItemsTheSame(t1);
         }
 
         @Override
         public boolean areContentsTheSame(@NonNull Product model, @NonNull Product t1) {
-            return model.equals(t1);
+            return model.areContentsTheSame(t1);
         }
 
     };

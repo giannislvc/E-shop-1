@@ -15,14 +15,14 @@ import androidx.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class AutoCompleteAdapter<T> extends ArrayAdapter<T> implements AdapterView.OnItemSelectedListener {
+public abstract class AutoCompleteAdapter<T> extends ArrayAdapter<T> implements AdapterView.OnItemClickListener {
 
-    public interface OnItemSelectedListener<T> {
+    public interface OnItemClickListener<T> {
         void onItemSelected(@Nullable T model);
     }
 
     private final int resource;
-    private OnItemSelectedListener<T> onItemSelectedListener;
+    private OnItemClickListener<T> onItemClickListener;
 
     public AutoCompleteAdapter(@NonNull Context context, @LayoutRes int resource) {
         super(context, 0);
@@ -41,18 +41,6 @@ public abstract class AutoCompleteAdapter<T> extends ArrayAdapter<T> implements 
 
     public abstract void onBindView(@Nullable T model, @NonNull View viewHolder);
 
-    @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        if (onItemSelectedListener != null) {
-            onItemSelectedListener.onItemSelected(getItem(position));
-        }
-    }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> parent) {
-        onItemSelectedListener.onItemSelected(null);
-    }
-
     public List<T> getDataSet() {
         List<T> list = new ArrayList<>();
         for (int i = 0; i < getCount(); i ++) {
@@ -70,9 +58,16 @@ public abstract class AutoCompleteAdapter<T> extends ArrayAdapter<T> implements 
         notifyDataSetChanged();
     }
 
-    public void setOnItemSelectedListener(@NonNull AutoCompleteTextView tv, OnItemSelectedListener<T> onItemSelectedListener) {
-        tv.setOnItemSelectedListener(this);
-        this.onItemSelectedListener = onItemSelectedListener;
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        if (onItemClickListener != null) {
+            onItemClickListener.onItemSelected(getItem(position));
+        }
+    }
+
+    public void setOnItemClickListener(@NonNull AutoCompleteTextView tv, @NonNull OnItemClickListener<T> onItemClickListener) {
+        tv.setOnItemClickListener(this);
+        this.onItemClickListener = onItemClickListener;
     }
 
 }
