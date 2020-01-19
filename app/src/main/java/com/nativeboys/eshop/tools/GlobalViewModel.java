@@ -63,6 +63,7 @@ public class GlobalViewModel extends AndroidViewModel {
     private LiveData<List<String>> searchHistory;
 
     private MutableLiveData<String> textSearch;
+    private LiveData<List<String>> searches;
 
     {
         user = new MutableLiveData<>();
@@ -78,6 +79,7 @@ public class GlobalViewModel extends AndroidViewModel {
                 getSearchHistory(user.getUid()));
 
         textSearch = new MutableLiveData<>();
+        searches = Transformations.switchMap(textSearch, this::getSearch);
     }
 
     private ValueEventListener usersListener = new ValueEventListener() {
@@ -267,6 +269,10 @@ public class GlobalViewModel extends AndroidViewModel {
         return searchHistory;
     }
 
+    public LiveData<List<String>> getSearches() {
+        return searches;
+    }
+
     private LiveData<List<Product>> getProductHistory(String customerId) {
         MutableLiveData<List<Product>> products = new MutableLiveData<>();
         repository.getProductHistory(customerId, new StartLimit(20, 0), new CompletionHandler<List<Product>>() {
@@ -286,6 +292,22 @@ public class GlobalViewModel extends AndroidViewModel {
     private LiveData<List<String>> getSearchHistory(String customerId) {
         MutableLiveData<List<String>> searches = new MutableLiveData<>();
         repository.getSearchHistory(customerId, new CompletionHandler<List<String>>() {
+            @Override
+            public void onSuccess(@NonNull List<String> model) {
+                searches.setValue(model);
+            }
+
+            @Override
+            public void onFailure(@Nullable String description) {
+                searches.setValue(new ArrayList<>());
+            }
+        });
+        return searches;
+    }
+
+    private LiveData<List<String>> getSearch(String text) {
+        MutableLiveData<List<String>> searches = new MutableLiveData<>();
+        repository.getSearches(text, new CompletionHandler<List<String>>() {
             @Override
             public void onSuccess(@NonNull List<String> model) {
                 searches.setValue(model);

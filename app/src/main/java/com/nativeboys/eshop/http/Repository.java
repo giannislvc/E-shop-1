@@ -129,6 +129,23 @@ public class Repository {
         });
     }
 
+    @EverythingIsNonNull
+    public void getSearches(String text, CompletionHandler<List<String>> completion) {
+        Call<List<String>> call = api.getSearches(text);
+        call.enqueue(new Callback<List<String>>() {
+            @Override
+            public void onResponse(Call<List<String>> call, Response<List<String>> response) {
+                Log.i(TAG, "onResponse: " + response.body());
+                responseHandler(response, completion);
+            }
+
+            @Override
+            public void onFailure(Call<List<String>> call, Throwable t) {
+                completion.onFailure(t.getMessage());
+            }
+        });
+    }
+
     private <T> void responseHandler(@NonNull Response<T> response, CompletionHandler<T> completion) {
         if (response.isSuccessful() && response.body() != null) {
             completion.onSuccess(response.body());

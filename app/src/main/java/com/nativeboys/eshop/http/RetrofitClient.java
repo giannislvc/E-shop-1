@@ -5,7 +5,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 class RetrofitClient {
 
-    private static final String DEVELOPMENT_HOST = "http://192.168.1.5:5000/api/";
+    private static final String DEVELOPMENT_HOST = "http://192.168.1.4:5000/api/";
     private static volatile RetrofitClient INSTANCE = null;
     private final Retrofit client;
 

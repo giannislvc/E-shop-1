@@ -48,7 +48,7 @@
                 android:tint="@android:color/white"
                 android:contentDescription="@string/search"/>
 
-            <com.nativeboys.eshop.customViews.InputEditText
+            <com.nativeboys.eshop.customViews.AutoCompleteInputView
                 android:id="@+id/search_field"
                 android:layout_weight="1"
                 android:layout_width="0dp"
@@ -59,6 +59,8 @@
                 android:textColorHint="#98d5ed"
                 android:textColor="@android:color/white"
                 android:textSize="16sp"
+                android:completionThreshold="1"
+                android:maxLines="1"
                 android:background="@android:color/transparent"
                 android:hint="@string/search_your_product" />
 

@@ -5,21 +5,21 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 
-public class InputEditText extends androidx.appcompat.widget.AppCompatEditText {
+public class AutoCompleteInputView extends androidx.appcompat.widget.AppCompatAutoCompleteTextView {
 
     private OnTextChangedListener onTextChangedListener;
 
-    public InputEditText(Context context) {
+    public AutoCompleteInputView(Context context) {
         super(context);
         addTextListener();
     }
 
-    public InputEditText(Context context, AttributeSet attrs) {
+    public AutoCompleteInputView(Context context, AttributeSet attrs) {
         super(context, attrs);
         addTextListener();
     }
 
-    public InputEditText(Context context, AttributeSet attrs, int defStyleAttr) {
+    public AutoCompleteInputView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         addTextListener();
     }
@@ -34,9 +34,8 @@ public class InputEditText extends androidx.appcompat.widget.AppCompatEditText {
 
             @Override
             public void afterTextChanged(Editable s) {
-                if (onTextChangedListener != null) {
-                    onTextChangedListener.onTextChanged(InputEditText.this, s.toString());
-                }
+                if (onTextChangedListener == null) return;
+                onTextChangedListener.onTextChanged(AutoCompleteInputView.this, s.toString());
             }
         });
     }

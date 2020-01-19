@@ -35,4 +35,9 @@ public interface VMallApi {
     @GET("customers/{id}/searchHistory")
     Call<List<String>> getSearchHistory(
             @Path("id") String customerId);
+
+    @GET("searches/")
+        Call<List<String>> getSearches(
+                @Query("text") String text);
+
 }

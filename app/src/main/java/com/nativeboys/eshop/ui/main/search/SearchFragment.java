@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,20 +18,24 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.nativeboys.eshop.R;
-import com.nativeboys.eshop.customViews.InputEditText;
+import com.nativeboys.eshop.customViews.AutoCompleteInputView;
 import com.nativeboys.eshop.customViews.NonScrollLayoutManager;
 import com.nativeboys.eshop.tools.GlobalViewModel;
 
 public class SearchFragment extends Fragment {
 
+    private final String TAG = getClass().getSimpleName();
+
     private GlobalViewModel globalVM;
 
-    private RecyclerView searchesRecyclerView;
-    private InputEditText searchField;
+    private AutoCompleteInputView searchField;
+    private SearchAdapter searchAdapter;
+
     private ImageView clearText;
 
-    private RecentSearchAdapter searchAdapter;
-    private RecentViewAdapter viewAdapter;
+    private RecyclerView searchesRecyclerView;
+    private RecentSearchAdapter recentSearchAdapter;
+    private RecentViewAdapter recentViewAdapter;
 
     public SearchFragment() {
         // Required empty public constructor
@@ -54,10 +59,10 @@ public class SearchFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        searchField = view.findViewById(R.id.search_field);
         TextView viewAllField = view.findViewById(R.id.view_all_field);
-        searchesRecyclerView = view.findViewById(R.id.searches_recycler_view);
         RecyclerView viewsRecyclerView = view.findViewById(R.id.views_recycler_view);
+        searchField = view.findViewById(R.id.search_field);
+        searchesRecyclerView = view.findViewById(R.id.searches_recycler_view);
         clearText = view.findViewById(R.id.clear_text);
 
         viewAllField.setOnClickListener(v -> {
@@ -67,33 +72,36 @@ public class SearchFragment extends Fragment {
             v.setVisibility(View.INVISIBLE);
         });
 
-        searchesRecyclerView.setLayoutManager(new NonScrollLayoutManager(searchesRecyclerView.getContext()));
-        searchAdapter = new RecentSearchAdapter();
-        searchesRecyclerView.setAdapter(searchAdapter);
+        searchAdapter = new SearchAdapter(view.getContext());
+        searchField.setAdapter(searchAdapter);
+        searchAdapter.setOnItemSelectedListener(searchField, model -> {
+            Log.i(TAG, "onViewCreated: " + model);
+        });
 
-        searchesRecyclerView.setNestedScrollingEnabled(false);
+        searchesRecyclerView.setLayoutManager(new NonScrollLayoutManager(searchesRecyclerView.getContext()));
+        recentSearchAdapter = new RecentSearchAdapter();
+        searchesRecyclerView.setAdapter(recentSearchAdapter);
 
         viewsRecyclerView.setLayoutManager(new LinearLayoutManager(viewsRecyclerView.getContext(),
                 LinearLayoutManager.HORIZONTAL, false));
-        viewAdapter = new RecentViewAdapter();
-        viewsRecyclerView.setAdapter(viewAdapter);
+        recentViewAdapter = new RecentViewAdapter();
+        viewsRecyclerView.setAdapter(recentViewAdapter);
 
         clearText.setOnClickListener(v -> searchField.setText(null));
 
-        if (globalVM != null) {
-            searchField.setOnTextChangedListener((editText, text) ->
-                    globalVM.getTextSearch().setValue(text));
+        if (globalVM == null) return;
 
-            globalVM.getTextSearch().observe(this, s -> {
-                boolean enabled = (s != null && !s.isEmpty());
-                clearText.setVisibility(enabled ? View.VISIBLE : View.INVISIBLE);
-            });
+        globalVM.getSearches().observe(this, strings -> searchAdapter.setDataSet(strings));
 
-            globalVM.getSearchHistory().observe(this, strings ->
-                    searchAdapter.setDataSet(strings));
+        searchField.setOnTextChangedListener((editText, text) -> globalVM.getTextSearch().setValue(text));
 
-            globalVM.getProductHistory().observe(this, products ->
-                    viewAdapter.submitList(products));
-        }
+        globalVM.getTextSearch().observe(this, s -> {
+            boolean enabled = (s != null && !s.isEmpty());
+            clearText.setVisibility(enabled ? View.VISIBLE : View.INVISIBLE);
+        });
+
+        globalVM.getSearchHistory().observe(this, strings -> recentSearchAdapter.setDataSet(strings));
+
+        globalVM.getProductHistory().observe(this, products -> recentViewAdapter.submitList(products));
     }
 }
