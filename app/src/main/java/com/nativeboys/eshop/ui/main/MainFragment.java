@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.nativeboys.eshop.R;
 import com.nativeboys.eshop.ui.main.conversations.ConversationsFragment;
+import com.nativeboys.eshop.ui.main.product.ProductFragment;
 import com.nativeboys.eshop.ui.main.products.ProductsFragment;
 import com.nativeboys.eshop.ui.main.profile.ProfileFragment;
 
@@ -53,6 +54,8 @@ public class MainFragment extends Fragment {
         adapter = new MainPagerAdapter(getChildFragmentManager());
         view_pager.setAdapter(adapter);
         setUpListeners();
+        new ProductFragment().show(getChildFragmentManager(),
+                ProductFragment.class.getSimpleName());
     }
 
     private void setUpListeners() {
