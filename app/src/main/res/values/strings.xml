@@ -43,6 +43,18 @@
     <string name="most_popular">Most popular</string>
     <string name="view_all">View all</string>
     <string name="product_details">Product Details</string>
+    <string name="product_specifications">Product specifications</string>
+    <string name="product_description">Product description</string>
+    <string name="message">Message</string>
+    <string name="like">Like</string>
+    <string name="liked">Liked</string>
+    <string name="views_format">(%s)</string>
+    <string name="add_image">Add Image</string>
+    <string name="delete">Delete</string>
+    <string name="apply_specifications">Apply Specifications</string>
+    <string name="apply_details">Apply Details</string>
+    <string name="product_name">Product Name</string>
+    <string name="price_">Price</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

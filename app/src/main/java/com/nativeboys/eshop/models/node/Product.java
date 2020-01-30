@@ -65,6 +65,22 @@ public class Product {
         return liked;
     }
 
+    public float getRating() {
+        int likes, views;
+        if (likes_qty != null && !likes_qty.isEmpty()) {
+            likes = Integer.valueOf(likes_qty);
+        } else {
+            likes = 0;
+        }
+        if (views_qty != null && !views_qty.isEmpty()) {
+            views = Integer.valueOf(views_qty);
+        } else {
+            views = 0;
+        }
+        float num = 5 * ((float) likes / views);
+        return (views == 0) ? 0 : num;
+    }
+
     public boolean areItemsTheSame(@NonNull Product other) {
         return product_id.equals(other.product_id);
     }

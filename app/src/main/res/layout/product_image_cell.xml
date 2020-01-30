@@ -9,15 +9,15 @@
         android:layout_height="match_parent"
         android:contentDescription="@string/product_image"/>
 
-<!--    <View
-        android:id="@+id/rect"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="@drawable/transparent_rect"
-        android:elevation="1dp"
-        app:layout_constraintTop_toTopOf="@id/image_holder"
-        app:layout_constraintBottom_toBottomOf="@id/image_holder"
-        app:layout_constraintStart_toStartOf="@id/image_holder"
-        app:layout_constraintEnd_toEndOf="@id/image_holder"/>-->
+    <ImageView
+        android:id="@+id/delete_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="10dp"
+        android:layout_alignStart="@id/image_holder"
+        android:layout_alignTop="@id/image_holder"
+        android:src="@drawable/ic_cancel_black_24dp"
+        android:contentDescription="@string/delete"/>
 
 </RelativeLayout>
