@@ -7,7 +7,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,7 +17,7 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.nativeboys.eshop.R;
 import com.nativeboys.eshop.models.firebase.MessageModel;
-import com.nativeboys.eshop.tools.ScreenManager;
+import com.nativeboys.eshop.customViews.ScreenManager;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
