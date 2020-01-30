@@ -6,10 +6,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager2.widget.ViewPager2;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.nativeboys.eshop.R;
 import com.nativeboys.eshop.customViews.FullDialogFragment;
@@ -21,6 +23,7 @@ import java.util.List;
 public class ProductFragment extends FullDialogFragment {
 
     private ProductImageAdapter adapter;
+    private TextView picNumField, description;
 
     public ProductFragment() {
         // Required empty public constructor
@@ -36,11 +39,17 @@ public class ProductFragment extends FullDialogFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
+        ViewPager2 viewPager = view.findViewById(R.id.view_pager);
+        picNumField = view.findViewById(R.id.pic_num_field);
+        description = view.findViewById(R.id.description);
         adapter = new ProductImageAdapter();
+        viewPager.setAdapter(adapter);
+
+        /*RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new ScaleLayoutManager(view.getContext(),
                 LinearLayoutManager.HORIZONTAL, false));
-        recyclerView.setAdapter(adapter);
+        recyclerView.setAdapter(adapter);*/
+
         setDummyData();
     }
 
@@ -54,6 +63,8 @@ public class ProductFragment extends FullDialogFragment {
         list.add("https://images-na.ssl-images-amazon.com/images/I/71CgLmxtR9L._AC_SX215_.jpg");
         list.add("https://b.scdn.gr/images/sku_main_images/003077/3077898/20161021164004_battlefield_4_pc.jpeg");
         adapter.submitList(list);
+        picNumField.setText(String.valueOf(list.size()));
+        description.setText("3.5mm ακουστικά για μπάσο στερεοφωνικών ακουστικών. Ακουστικά ελέγχου ακρίβειας με μικρόφωνο για Samsung IPhone HUAWEI");
     }
 
 }
