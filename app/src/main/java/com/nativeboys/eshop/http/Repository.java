@@ -1,8 +1,11 @@
 package com.nativeboys.eshop.http;
 
+import android.content.Context;
+import android.net.Uri;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.google.gson.Gson;
 import com.nativeboys.eshop.callbacks.CompletionHandler;
@@ -12,9 +15,15 @@ import com.nativeboys.eshop.models.node.Product;
 import com.nativeboys.eshop.models.query.Filter;
 import com.nativeboys.eshop.models.query.Sort;
 import com.nativeboys.eshop.models.query.StartLimit;
+import com.nativeboys.eshop.tools.FileUtils;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -135,13 +144,54 @@ public class Repository {
         call.enqueue(new Callback<List<String>>() {
             @Override
             public void onResponse(Call<List<String>> call, Response<List<String>> response) {
-                Log.i(TAG, "onResponse: " + response.body());
                 responseHandler(response, completion);
             }
 
             @Override
             public void onFailure(Call<List<String>> call, Throwable t) {
                 completion.onFailure(t.getMessage());
+            }
+        });
+    }
+
+    @NonNull
+    private RequestBody createPartFromString(String text) {
+        return RequestBody.create(MultipartBody.FORM, text);
+    }
+
+    @Nullable
+    private MultipartBody.Part prepareFilePart(@NonNull Context context, String partName, Uri fileUri) {
+        // get actual file from uri
+        File file = FileUtils.getFile(context, fileUri);
+        // create RequestBody instance from file
+        String type = context.getContentResolver().getType(fileUri);
+        if (type != null) {
+            RequestBody requestFile = RequestBody.create(
+                    MediaType.parse(type),
+                    file
+            );
+            return MultipartBody.Part.createFormData(partName, file.getName(), requestFile);
+        }
+        return null;
+    }
+
+    @EverythingIsNonNull
+    public void createProduct(Context context, List<Uri> uris, String text) {
+        RequestBody textPart = createPartFromString(text);
+        List<MultipartBody.Part> parts = new ArrayList<>();
+        for(Uri uri : uris) {
+            parts.add(prepareFilePart(context, "gallery", uri));
+        }
+        Call<Product> call = api.creteProduct(textPart, parts);
+        call.enqueue(new Callback<Product>() {
+            @Override
+            public void onResponse(Call<Product> call, Response<Product> response) {
+                Log.i(TAG, "onResponse: " + response.body());
+            }
+
+            @Override
+            public void onFailure(Call<Product> call, Throwable t) {
+                Log.i(TAG, "onFailure: " + t.getMessage());
             }
         });
     }

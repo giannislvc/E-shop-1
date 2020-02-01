@@ -127,7 +127,8 @@ public class ConversationFragment extends Fragment {
         moreOptionsBtn.setOnClickListener(view ->
                 moreOptionsContainer.setVisibility(moreOptionsContainer.getVisibility() == View.VISIBLE ? View.GONE: View.VISIBLE));
 
-        viewModel.getMessages().observe(this, messageModels -> adapter.submitList(new ArrayList<>(messageModels)));
+        viewModel.getMessages().observe(getViewLifecycleOwner(), messageModels ->
+                adapter.submitList(new ArrayList<>(messageModels)));
 
         picturesBtn.setOnClickListener(view -> openGallery());
 

@@ -12,7 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
@@ -37,7 +37,7 @@ public class ProductsFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        viewModel = ViewModelProviders.of(activity).get(GlobalViewModel.class);
+        viewModel = new ViewModelProvider(activity).get(GlobalViewModel.class);
     }
 
     @Override
@@ -63,7 +63,7 @@ public class ProductsFragment extends Fragment {
         flexManager.setJustifyContent(JustifyContent.FLEX_START);
         recyclerView.setLayoutManager(flexManager);
         recyclerView.setHasFixedSize(true);
-        viewModel.getProductPagedList().observe(this, adapter::submitList);
+        viewModel.getProductPagedList().observe(getViewLifecycleOwner(), adapter::submitList);
 
         searchBar.setOnClickListener(v ->
                 navController.navigate(R.id.action_main_to_search));

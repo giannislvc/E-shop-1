@@ -44,6 +44,7 @@
     <string name="view_all">View all</string>
     <string name="product_details">Product Details</string>
     <string name="product_specifications">Product specifications</string>
+    <string name="category">Category</string>
     <string name="product_description">Product description</string>
     <string name="message">Message</string>
     <string name="like">Like</string>

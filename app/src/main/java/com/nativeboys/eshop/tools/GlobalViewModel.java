@@ -1,6 +1,7 @@
 package com.nativeboys.eshop.tools;
 
 import android.app.Application;
+import android.net.Uri;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -25,6 +26,7 @@ import com.nativeboys.eshop.callbacks.CompletionHandler;
 import com.nativeboys.eshop.http.Repository;
 import com.nativeboys.eshop.models.firebase.MetaDataModel;
 import com.nativeboys.eshop.models.firebase.UserModel;
+import com.nativeboys.eshop.models.node.Category;
 import com.nativeboys.eshop.models.node.Product;
 import com.nativeboys.eshop.models.query.Filter;
 import com.nativeboys.eshop.models.query.Sort;
@@ -59,6 +61,8 @@ public class GlobalViewModel extends AndroidViewModel {
     private LiveData<PagedList<Product>> productPagedList;
     private LiveData<PageKeyedDataSource<Integer, Product>> liveDataSource;
 
+    // Server
+
     private MutableLiveData<List<Product>> popularProducts;
     private LiveData<List<Product>> productHistory;
     private LiveData<List<String>> searchHistory;
@@ -66,24 +70,22 @@ public class GlobalViewModel extends AndroidViewModel {
     private MutableLiveData<String> textSearch;
     private LiveData<List<String>> searches;
 
+    private MutableLiveData<List<Category>> categories;
+
     {
         user = new MutableLiveData<>();
         metaData = new MutableLiveData<>();
-
         users = new MutableLiveData<>();
+
         productPagedList = new MutableLiveData<>();
-
         popularProducts = new MutableLiveData<>();
-
         productHistory = Transformations.switchMap(user, user ->
                 getProductHistory(user.getUid()));
-
         searchHistory = Transformations.switchMap(user, user ->
                 getSearchHistory(user.getUid()));
-
         textSearch = new MutableLiveData<>();
-
         searches = Transformations.switchMap(textSearch, this::getSearch);
+        categories = new MutableLiveData<>();
     }
 
     private ValueEventListener usersListener = new ValueEventListener() {
@@ -277,6 +279,14 @@ public class GlobalViewModel extends AndroidViewModel {
         return searches;
     }
 
+    public MutableLiveData<List<Product>> getPopularProducts() {
+        return popularProducts;
+    }
+
+    public LiveData<List<Category>> getCategories() {
+        return categories;
+    }
+
     private LiveData<List<Product>> getProductHistory(String customerId) {
         MutableLiveData<List<Product>> products = new MutableLiveData<>();
         repository.getProductHistory(customerId, new StartLimit(20, 0), new CompletionHandler<List<Product>>() {
@@ -309,10 +319,6 @@ public class GlobalViewModel extends AndroidViewModel {
         return searches;
     }
 
-    public MutableLiveData<List<Product>> getPopularProducts() {
-        return popularProducts;
-    }
-
     public void refreshMostPopular() {
         Sort sort = new Sort(5, 0, 3, false);
         repository.getProducts(userId, new Filter(), sort, new CompletionHandler<List<Product>>() {
@@ -340,6 +346,22 @@ public class GlobalViewModel extends AndroidViewModel {
             }
         });
         return searches;
+    }
+
+    public void refreshGategories() {
+        repository.getCategories(new CompletionHandler<List<Category>>() {
+            @Override
+            public void onSuccess(@NonNull List<Category> model) {
+                categories.setValue(model);
+            }
+
+            @Override
+            public void onFailure(@Nullable String description) { }
+        });
+    }
+
+    public void createProduct(@NonNull List<Uri> uri, @NonNull String text) {
+        repository.createProduct(getApplication(), uri, text);
     }
 
     @Override

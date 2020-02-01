@@ -50,6 +50,7 @@
 
             <com.nativeboys.eshop.customViews.AutoCompleteInputView
                 android:id="@+id/search_field"
+                android:inputType="text"
                 android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
