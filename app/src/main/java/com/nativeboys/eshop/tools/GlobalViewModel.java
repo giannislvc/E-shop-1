@@ -361,7 +361,8 @@ public class GlobalViewModel extends AndroidViewModel {
     }
 
     public void createProduct(@NonNull List<Uri> uri, @NonNull String text) {
-        repository.createProduct(getApplication(), uri, text);
+
+        //repository.createProduct(getApplication(), uri, text);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.nativeboys.eshop.ui.main.product;
 
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,24 +16,41 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class ProductImageAdapter extends ListAdapter<String, ProductImageAdapter.ViewHolder> {
+public class ProductImageAdapter extends ListAdapter<ImageSliderModel, ProductImageAdapter.ViewHolder> {
 
-    private final static DiffUtil.ItemCallback<String> callback = new DiffUtil.ItemCallback<String>() {
+    private final static DiffUtil.ItemCallback<ImageSliderModel> callback = new DiffUtil.ItemCallback<ImageSliderModel>() {
 
         @Override
-        public boolean areItemsTheSame(@NonNull String model, @NonNull String t1) {
+        public boolean areItemsTheSame(@NonNull ImageSliderModel model, @NonNull ImageSliderModel t1) {
             return model.equals(t1);
         }
 
         @Override
-        public boolean areContentsTheSame(@NonNull String model, @NonNull String t1) {
+        public boolean areContentsTheSame(@NonNull ImageSliderModel model, @NonNull ImageSliderModel t1) {
             return model.equals(t1);
         }
 
     };
 
+    interface OnRemoveImageClickListener {
+        void onRemoveClicked(int position);
+    }
+
+    private OnRemoveImageClickListener onRemoveListener;
+    private boolean isUserProduct;
+
     ProductImageAdapter() {
         super(callback);
+        isUserProduct = false;
+    }
+
+    void setIsClientProduct(boolean isUserProduct) {
+        this.isUserProduct = isUserProduct;
+        notifyDataSetChanged();
+    }
+
+    void setOnRemoveListener(OnRemoveImageClickListener onRemoveListener) {
+        this.onRemoveListener = onRemoveListener;
     }
 
     @NonNull
@@ -44,25 +62,37 @@ public class ProductImageAdapter extends ListAdapter<String, ProductImageAdapter
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        String url = getItem(position);
-        if (url != null) holder.bind(url);
+        ImageSliderModel model = getItem(position);
+        if (model != null) holder.bind(model);
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
 
-        private ImageView imageHolder;
+        private ImageView imageHolder, deleteBtn;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
             imageHolder = itemView.findViewById(R.id.image_holder);
+            deleteBtn = itemView.findViewById(R.id.delete_btn);
+            deleteBtn.setOnClickListener(v -> {
+                if (onRemoveListener == null) return;
+                int position = getAdapterPosition();
+                if (position != RecyclerView.NO_POSITION) {
+                    onRemoveListener.onRemoveClicked(position);
+                }
+            });
         }
 
-        private void bind(@NonNull String url) {
+        private void bind(@NonNull ImageSliderModel model) {
+            String url = model.getUrl();
+            Uri uri = model.getUri();
+            if (url == null && uri == null) return;
             Glide.with(imageHolder.getContext())
-                    .load(url)
+                    .load(url != null ? url : uri)
                     .transform(new CenterCrop())
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .into(imageHolder);
+            deleteBtn.setVisibility(isUserProduct ? View.VISIBLE : View.GONE);
         }
 
     }

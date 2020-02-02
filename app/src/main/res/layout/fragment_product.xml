@@ -81,6 +81,7 @@
                 app:layout_constraintEnd_toEndOf="parent" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/add_image_container"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 app:layout_constraintBottom_toBottomOf="@id/view_pager"
@@ -88,6 +89,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 android:background="#80595959"
                 android:paddingTop="5dp"
+                android:visibility="gone"
                 android:paddingBottom="5dp">
 
                 <Button
@@ -338,16 +340,14 @@
         android:padding="15dp">
 
         <Button
-            android:id="@+id/like_btn"
+            android:id="@+id/start_btn"
             android:layout_marginEnd="30dp"
             android:textColor="@android:color/white"
-            android:text="@string/like"
             android:backgroundTint="#F7797A"
             style="@style/CommonButtonStyle"/>
 
         <Button
-            android:id="@+id/contact_btn"
-            android:text="@string/message"
+            android:id="@+id/end_btn"
             android:backgroundTint="#2fb7ec"
             android:textColor="@android:color/white"
             style="@style/CommonButtonStyle"/>

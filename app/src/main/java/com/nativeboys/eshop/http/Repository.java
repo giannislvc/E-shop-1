@@ -10,7 +10,11 @@ import androidx.annotation.Nullable;
 import com.google.gson.Gson;
 import com.nativeboys.eshop.callbacks.CompletionHandler;
 import com.nativeboys.eshop.models.node.Category;
+import com.nativeboys.eshop.models.node.DeleteResponse;
 import com.nativeboys.eshop.models.node.DetailedProduct;
+import com.nativeboys.eshop.models.node.Like;
+import com.nativeboys.eshop.models.node.LikeResponse;
+import com.nativeboys.eshop.models.node.NewProduct;
 import com.nativeboys.eshop.models.node.Product;
 import com.nativeboys.eshop.models.query.Filter;
 import com.nativeboys.eshop.models.query.Sort;
@@ -56,6 +60,7 @@ public class Repository {
             @Override
             public void onResponse(Call<List<Category>> call, Response<List<Category>> response) {
                 if (response.isSuccessful() && response.body() != null) {
+                    Log.i(TAG, "onResponse: " + response.body().toString());
                     completion.onSuccess(response.body());
                 } else {
                     completion.onFailure(null);
@@ -154,6 +159,38 @@ public class Repository {
         });
     }
 
+    @EverythingIsNonNull
+    public void likeProduct(String customerId, String productId, CompletionHandler<LikeResponse> completion) {
+        Call<LikeResponse> call = api.likeProduct(new Like(customerId, productId));
+        call.enqueue(new Callback<LikeResponse>() {
+            @Override
+            public void onResponse(Call<LikeResponse> call, Response<LikeResponse> response) {
+                responseHandler(response, completion);
+            }
+
+            @Override
+            public void onFailure(Call<LikeResponse> call, Throwable t) {
+                completion.onFailure(t.getMessage());
+            }
+        });
+    }
+
+    @EverythingIsNonNull
+    public void deleteProduct(String productId, CompletionHandler<DeleteResponse> completion) {
+        Call<DeleteResponse> call = api.deleteProduct(productId);
+        call.enqueue(new Callback<DeleteResponse>() {
+            @Override
+            public void onResponse(Call<DeleteResponse> call, Response<DeleteResponse> response) {
+                responseHandler(response, completion);
+            }
+
+            @Override
+            public void onFailure(Call<DeleteResponse> call, Throwable t) {
+                completion.onFailure(t.getMessage());
+            }
+        });
+    }
+
     @NonNull
     private RequestBody createPartFromString(String text) {
         return RequestBody.create(MultipartBody.FORM, text);
@@ -176,22 +213,22 @@ public class Repository {
     }
 
     @EverythingIsNonNull
-    public void createProduct(Context context, List<Uri> uris, String text) {
-        RequestBody textPart = createPartFromString(text);
+    public void createProduct(Context context, NewProduct product, List<Uri> uris, CompletionHandler<DetailedProduct> completion) {
+        RequestBody textPart = createPartFromString(gsonHelper.toJson(product));
         List<MultipartBody.Part> parts = new ArrayList<>();
         for(Uri uri : uris) {
             parts.add(prepareFilePart(context, "gallery", uri));
         }
-        Call<Product> call = api.creteProduct(textPart, parts);
-        call.enqueue(new Callback<Product>() {
+        Call<DetailedProduct> call = api.creteProduct(textPart, parts);
+        call.enqueue(new Callback<DetailedProduct>() {
             @Override
-            public void onResponse(Call<Product> call, Response<Product> response) {
-                Log.i(TAG, "onResponse: " + response.body());
+            public void onResponse(Call<DetailedProduct> call, Response<DetailedProduct> response) {
+                responseHandler(response, completion);
             }
 
             @Override
-            public void onFailure(Call<Product> call, Throwable t) {
-                Log.i(TAG, "onFailure: " + t.getMessage());
+            public void onFailure(Call<DetailedProduct> call, Throwable t) {
+                completion.onFailure(t.getMessage());
             }
         });
     }

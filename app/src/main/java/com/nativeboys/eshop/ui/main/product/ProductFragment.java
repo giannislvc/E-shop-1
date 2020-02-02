@@ -1,6 +1,7 @@
 package com.nativeboys.eshop.ui.main.product;
 
 import android.Manifest;
+import android.app.Dialog;
 import android.content.ClipData;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -10,12 +11,14 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,11 +32,11 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.nativeboys.eshop.R;
+import com.nativeboys.eshop.callbacks.CompletionHandler;
 import com.nativeboys.eshop.customViews.FullDialogFragment;
-import com.nativeboys.eshop.models.node.Category;
-import com.nativeboys.eshop.models.node.DetailedProduct;
-import com.nativeboys.eshop.tools.GlobalViewModel;
 import com.nativeboys.eshop.ui.main.adapters.CategoriesAdapter;
+import com.nativeboys.eshop.viewModels.ProductViewModel;
+import com.nativeboys.eshop.viewModels.ProductViewModelFactory;
 
 import net.cachapa.expandablelayout.ExpandableLayout;
 
@@ -44,44 +47,58 @@ import static android.app.Activity.RESULT_OK;
 
 public class ProductFragment extends FullDialogFragment {
 
-    private final static String testProduct = "{\n" +
-            "\t\"name\" : \"Xiaomi Mi A2 - 64GB - Global Version - Black (Unlocked) 10\",\n" +
-            "\t\"price\" : \"104.86\",\n" +
-            "\t\"description\" : \"A phone that works smarter for you Android One phones have the latest AI-powered innovations from Google built in. That means they can auto-adjust to your needs and help get things done more easily throughout your day\",\n" +
-            "\t\"details\" : \"Unlocked\\n4G Ready for ultra fast network speeds\\nUltra-sharp 12 Megapixel + 20 Megapixel dual rear camera & 20 Megapixel selfie camera\\n5.99” FHD+ Corning® Gorilla® Glass 5 Display\\nSuper fast Snapdragon™ 660 Octa Core Processor + 6GB of RAM\\nAndroid One OS\\n64GB Storage\",\n" +
-            "\t\"hash_tags\" : [\n" +
-            "\t\t\"phone\", \"Xiaomi Mi A2\", \"Global Version\", \"Octa Core Processor\", \"64GB Storage\", \"Android One\", \"Gorilla® Glass 5\"\n" +
-            "\t],\n" +
-            "\t\"uploader_id\" : \"VAOyj0DW5wYK2D0lEis1tKcRpSj2\",\n" +
-            "\t\"category_id\" : \"4ac5f84d-aa5d-42bc-a8e2-4cbf55acb03b\"\n" +
-            "}";
-
+    private final String TAG = getClass().getSimpleName();
     private static final int MY_PERMISSIONS_REQUEST = 100;
     private int PICK_IMAGE_FROM_GALLERY_REQUEST = 1;
 
-    private GlobalViewModel globalVM;
-    private DetailedProduct product;
-
-    private ProductImageAdapter adapter;
+    private ProductImageAdapter imageAdapter;
     private EditText nameField, priceField, descriptionField, detailsField;
 
     private ScrollView scrollView;
     private ExpandableLayout detailsLayout, descriptionLayout;
-    private TextView viewsField, picNumField, descriptionLabel, detailsLabel;
+    private TextView viewsField, picNumField, descriptionLabel, detailsLabel, categoriesLabel;
     private RatingBar ratingBar;
-    private Button likeBtn;
+    private Button startBtn, endBtn;
     private CategoriesAdapter categoriesAdapter;
     private Button addImageButton;
+    private RecyclerView categoriesRV;
+    private ConstraintLayout addImageContainer;
+
+    private Dialog successDialog, failureDialog;
 
     public ProductFragment() {
         // Required empty public constructor
     }
 
+    private ProductViewModel productVM;
+
+    public static ProductFragment newInstance(@NonNull String clientId, @Nullable String productId) {
+        Bundle args = new Bundle();
+        args.putString("CLIENT_ID", clientId);
+        args.putString("PRODUCT_ID", productId);
+        ProductFragment fragment = new ProductFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        globalVM = new ViewModelProvider(getActivity() != null ? getActivity() : this).get(GlobalViewModel.class);
-        product = DetailedProduct.GetDummy();
+        if (getActivity() == null) return;
+        String clientId, productId;
+        if (getArguments() != null) {
+            clientId = getArguments().getString("CLIENT_ID");
+            productId = getArguments().getString("PRODUCT_ID");
+        } else {
+            clientId = null;
+            productId = null;
+        }
+        if (clientId == null) return;
+        ProductViewModelFactory factory = new ProductViewModelFactory(
+                getActivity().getApplication(),
+                clientId,
+                productId);
+        productVM = new ViewModelProvider(this, factory).get(ProductViewModel.class);
     }
 
     @Override
@@ -99,7 +116,7 @@ public class ProductFragment extends FullDialogFragment {
             } else if (uri != null) {
                 fileUris.add(uri);
             }
-            uploadAlbum(fileUris);
+            loadImagesIntoGallery(fileUris);
         }
     }
 
@@ -120,7 +137,7 @@ public class ProductFragment extends FullDialogFragment {
         }
     }
 
-    private void test() {
+    private void requestPermissions() {
         if (getActivity() == null) return;
         if (ContextCompat.checkSelfPermission(getActivity(),
                 Manifest.permission.READ_EXTERNAL_STORAGE)
@@ -128,21 +145,10 @@ public class ProductFragment extends FullDialogFragment {
             requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
                     MY_PERMISSIONS_REQUEST);
         }
-        addImageButton.setOnClickListener(v -> {
-            Intent intent = new Intent();
-            // Show only images, no videos or anything else
-            intent.setType("image/*");
-            intent.setAction(Intent.ACTION_GET_CONTENT);
-            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-            // Always show chooser (if there are multiple options available)
-            startActivityForResult(
-                    Intent.createChooser(intent, "Select Picture"),
-                    PICK_IMAGE_FROM_GALLERY_REQUEST);
-        });
     }
 
-    private void uploadAlbum(List<Uri> fileUri) {
-        globalVM.createProduct(fileUri, testProduct);
+    private void loadImagesIntoGallery(List<Uri> uris) {
+        productVM.addUris(uris);
     }
 
     @Override
@@ -167,46 +173,168 @@ public class ProductFragment extends FullDialogFragment {
         descriptionField = view.findViewById(R.id.description_field);
         detailsField = view.findViewById(R.id.details_field);
         viewsField = view.findViewById(R.id.views_field);
-        likeBtn = view.findViewById(R.id.like_btn);
+        startBtn = view.findViewById(R.id.start_btn);
+        endBtn = view.findViewById(R.id.end_btn);
         priceField = view.findViewById(R.id.price_field);
         addImageButton = view.findViewById(R.id.add_image_button);
+        categoriesLabel = view.findViewById(R.id.categories_label);
+        categoriesRV = view.findViewById(R.id.categories_recycler_view);
+        addImageContainer = view.findViewById(R.id.add_image_container);
 
-        RecyclerView categoriesRV = view.findViewById(R.id.categories_recycler_view);
+        successDialog = new Dialog(view.getContext());
+        successDialog.setContentView(R.layout.dialog_success);
+
+        failureDialog = new Dialog(view.getContext());
+        failureDialog.setContentView(R.layout.dialog_failure);
+
         categoriesAdapter = new CategoriesAdapter();
         categoriesRV.setAdapter(categoriesAdapter);
         categoriesRV.setLayoutManager(new LinearLayoutManager(
                 categoriesRV.getContext(), LinearLayoutManager.HORIZONTAL , false));
 
-        adapter = new ProductImageAdapter();
-        viewPager.setAdapter(adapter);
+        imageAdapter = new ProductImageAdapter();
+        viewPager.setAdapter(imageAdapter);
+        requestPermissions();
         setUpListeners();
-        setUpView();
-        test();
     }
 
-    private void setUpView() {
-        globalVM.refreshGategories();
-        nameField.setEnabled(false);
-        priceField.setEnabled(false);
-        descriptionField.setEnabled(false);
-        detailsField.setEnabled(false);
-        adapter.submitList(product.getGalleryUrls());
-        picNumField.setText(String.valueOf(product.getGalleryUrls().size()));
-        nameField.setText(product.getName());
-        descriptionField.setText(product.getDescription());
-        detailsField.setText(product.getDetails());
-        ratingBar.setRating(product.getRating());
-        viewsField.setText(String.format(getResources().getString(R.string.views_format), product.getViewsQty()));
-        String price = String.format(priceField.getResources().getString(R.string.price), product.getPrice());
-        priceField.setText(price);
+    private void showMessage(boolean success, String message) {
+        if (success) {
+            TextView textView = successDialog.findViewById(R.id.text_view);
+            textView.setText(message);
+            successDialog.show();
+        } else {
+            TextView textView = failureDialog.findViewById(R.id.text_view);
+            textView.setText(message);
+            failureDialog.show();
+        }
+    }
+
+    private void createProduct(@NonNull View view) {
+        String name = nameField.getText().toString();
+        String price = priceField.getText().toString();
+        String description = descriptionField.getText().toString();
+        String details = detailsField.getText().toString();
+        // TODO: Implement HashTags (pass as string separate comma)
+        List<String> hashTags = new ArrayList<>();
+        productVM.createProduct(name, price, description, details, hashTags, new CompletionHandler<String>() {
+            @Override
+            public void onSuccess(@NonNull String model) {
+                view.setEnabled(true);
+                showMessage(true, model);
+            }
+
+            @Override
+            public void onFailure(@Nullable String description) {
+                view.setEnabled(true);
+                showMessage(false, description);
+            }
+        });
+    }
+
+    private void likeProduct(@NonNull View view) {
+        view.setEnabled(false);
+        productVM.likeProduct(new CompletionHandler<Boolean>() {
+            @Override
+            public void onSuccess(@NonNull Boolean liked) {
+                view.setEnabled(true);
+                startBtn.setText(liked ? R.string.liked : R.string.like);
+            }
+
+            @Override
+            public void onFailure(@Nullable String description) {
+                view.setEnabled(true);
+                showMessage(false, description);
+            }
+        });
+    }
+
+    private void deleteProduct(@NonNull View view) {
+        view.setEnabled(false);
+        productVM.deleteProduct(new CompletionHandler<String>() {
+            @Override
+            public void onSuccess(@NonNull String model) {
+                view.setEnabled(true);
+                dismiss();
+            }
+
+            @Override
+            public void onFailure(@Nullable String description) {
+                view.setEnabled(true);
+                showMessage(false, description);
+            }
+        });
+    }
+
+    private void setButtonsListeners(boolean isClientProduct) {
+        if (isClientProduct) {
+            // Delete
+            startBtn.setOnClickListener(this::deleteProduct);
+            // Submit
+            endBtn.setOnClickListener(this::createProduct);
+        } else {
+            // Like
+            startBtn.setOnClickListener(this::likeProduct);
+            // Message
+            endBtn.setOnClickListener(v -> {
+                // TODO: Implement
+            });
+        }
     }
 
     private void setUpListeners() {
 
-        globalVM.getCategories().observe(getViewLifecycleOwner(), categories ->
-                categoriesAdapter.submitList(categories));
+        productVM.isClientProduct().observe(getViewLifecycleOwner(), aBoolean -> {
+            boolean isClientProduct = aBoolean != null && aBoolean;
+            nameField.setEnabled(isClientProduct);
+            priceField.setEnabled(isClientProduct);
+            descriptionField.setEnabled(isClientProduct);
+            detailsField.setEnabled(isClientProduct);
+            startBtn.setText(isClientProduct ? R.string.delete : R.string.like);
+            endBtn.setText(isClientProduct ? R.string.submit : R.string.message);
+            setButtonsListeners(isClientProduct);
+            imageAdapter.setIsClientProduct(isClientProduct);
 
-        likeBtn.setOnClickListener(view -> view.setActivated(!view.isActivated()));
+            int visibility = isClientProduct ? View.VISIBLE : View.GONE;
+            categoriesLabel.setVisibility(visibility);
+            categoriesRV.setVisibility(visibility);
+            addImageContainer.setVisibility(visibility);
+        });
+
+        productVM.getProduct().observe(getViewLifecycleOwner(), product -> {
+            if (product == null) return;
+            picNumField.setText(String.valueOf(product.getGalleryUrls().size()));
+            nameField.setText(product.getName());
+            descriptionField.setText(product.getDescription());
+            detailsField.setText(product.getDetails());
+            ratingBar.setRating(product.getRating());
+            viewsField.setText(String.format(getResources().getString(R.string.views_format), product.getViewsQty()));
+            String price = String.format(priceField.getResources().getString(R.string.price), product.getPrice());
+            priceField.setText(price);
+        });
+
+        productVM.getCategories().observe(getViewLifecycleOwner(), categories ->
+                categoriesAdapter.submitList(categories != null ? categories : new ArrayList<>()));
+
+        productVM.getImageSliderList().observe(getViewLifecycleOwner(), list ->
+                imageAdapter.submitList(list != null ? list : new ArrayList<>()));
+
+        categoriesAdapter.setOnCategoryClickListener(category ->
+                productVM.setSelectedCategory(category));
+
+        imageAdapter.setOnRemoveListener(position -> productVM.removeImage(position));
+
+        addImageButton.setOnClickListener(v -> {
+            Intent intent = new Intent();
+            // Show only images, no videos or anything else
+            intent.setType("image/*");
+            intent.setAction(Intent.ACTION_GET_CONTENT);
+            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+            // Always show chooser (if there are multiple options available)
+            startActivityForResult(
+                    Intent.createChooser(intent, "Select Picture"),
+                    PICK_IMAGE_FROM_GALLERY_REQUEST);
+        });
 
         descriptionLayout.setOnExpansionUpdateListener((expansionFraction, state) -> {
             if (state == ExpandableLayout.State.EXPANDED) {

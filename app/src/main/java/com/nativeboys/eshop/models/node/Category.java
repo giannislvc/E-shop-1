@@ -2,18 +2,30 @@ package com.nativeboys.eshop.models.node;
 
 import androidx.annotation.NonNull;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class Category {
 
     private String category_id, name;
     private String description, image_url;
+    private boolean selected;
 
     public Category(String category_id, String name, String description, String image_url) {
         this.category_id = category_id;
         this.name = name;
         this.description = description;
         this.image_url = image_url;
+        this.selected = false;
+    }
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
     }
 
     public String getCategoryId() {
@@ -40,7 +52,22 @@ public class Category {
         return category_id.equals(other.category_id) &&
                 name.equals(other.name) &&
                 Objects.equals(description, other.description) &&
-                Objects.equals(image_url, other.image_url);
+                Objects.equals(image_url, other.image_url) &&
+                selected == other.selected;
+    }
+
+    private Category getClone() {
+        Category category = new Category(category_id, name, description, image_url);
+        category.setSelected(selected);
+        return category;
+    }
+
+    public static List<Category> getClones(@NonNull List<Category> list) {
+        List<Category> clones = new ArrayList<>();
+        for (Category category : list) {
+            clones.add(category.getClone());
+        }
+        return clones;
     }
 
     @Override
@@ -53,7 +80,7 @@ public class Category {
 
     @Override
     public int hashCode() {
-        return Objects.hash(category_id, name, description, image_url);
+        return Objects.hash(category_id, name, description, image_url, selected);
     }
 
     @NonNull
@@ -64,6 +91,7 @@ public class Category {
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", image_url='" + image_url + '\'' +
+                ", selected=" + selected +
                 '}';
     }
 }

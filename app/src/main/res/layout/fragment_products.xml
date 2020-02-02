@@ -89,4 +89,15 @@
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/add_product_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:borderWidth="0dp"
+        android:backgroundTint="#2fb7ec"
+        android:src="@drawable/ic_add_black_24dp"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

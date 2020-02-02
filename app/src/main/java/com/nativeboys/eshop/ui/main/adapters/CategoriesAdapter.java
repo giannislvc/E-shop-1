@@ -1,12 +1,16 @@
 package com.nativeboys.eshop.ui.main.adapters;
 
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
@@ -32,6 +36,17 @@ public class CategoriesAdapter extends ListAdapter<Category, CategoriesAdapter.V
 
     };
 
+    public interface OnCategoryClickListener {
+        void onCategoryClicked(@NonNull Category category);
+    }
+
+
+    private OnCategoryClickListener onCategoryClickListener;
+
+    public void setOnCategoryClickListener(OnCategoryClickListener onCategoryClickListener) {
+        this.onCategoryClickListener = onCategoryClickListener;
+    }
+
     public CategoriesAdapter() {
         super(callback);
     }
@@ -51,13 +66,23 @@ public class CategoriesAdapter extends ListAdapter<Category, CategoriesAdapter.V
 
     class ViewHolder extends RecyclerView.ViewHolder {
 
+        private CardView imageContainer;
         private ImageView imageHolder;
         private TextView label;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
+            LinearLayout container = itemView.findViewById(R.id.container);
+            imageContainer = itemView.findViewById(R.id.image_container);
             imageHolder = itemView.findViewById(R.id.image_holder);
             label = itemView.findViewById(R.id.label);
+            container.setOnClickListener(v -> {
+                if (onCategoryClickListener == null) return;
+                int position = getAdapterPosition();
+                if (position != RecyclerView.NO_POSITION) {
+                    onCategoryClickListener.onCategoryClicked(getItem(position));
+                }
+            });
         }
 
         private void bind(@NonNull Category category) {
@@ -66,6 +91,14 @@ public class CategoriesAdapter extends ListAdapter<Category, CategoriesAdapter.V
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .into(imageHolder);
             label.setText(category.getName());
+
+            imageContainer.setCardBackgroundColor(category.isSelected() ?
+                    Color.parseColor("#2fb7ec") :
+                    Color.WHITE);
+
+            imageHolder.setImageTintList(ColorStateList.valueOf(category.isSelected() ?
+                    Color.WHITE :
+                    Color.parseColor("#3e4359")));
         }
 
     }

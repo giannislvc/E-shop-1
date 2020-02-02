@@ -1,12 +1,10 @@
 package com.nativeboys.eshop.ui.main;
 
-import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.viewpager.widget.ViewPager;
@@ -18,13 +16,10 @@ import android.view.ViewGroup;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.nativeboys.eshop.R;
 import com.nativeboys.eshop.ui.main.conversations.ConversationsFragment;
-import com.nativeboys.eshop.ui.main.product.ProductFragment;
 import com.nativeboys.eshop.ui.main.products.ProductsFragment;
 import com.nativeboys.eshop.ui.main.profile.ProfileFragment;
 
 public class MainFragment extends Fragment {
-
-    private FragmentActivity activity;
 
     private ViewPager view_pager;
     private BottomNavigationView navigation_bar;
@@ -54,8 +49,6 @@ public class MainFragment extends Fragment {
         adapter = new MainPagerAdapter(getChildFragmentManager());
         view_pager.setAdapter(adapter);
         setUpListeners();
-        new ProductFragment().show(getChildFragmentManager(),
-                ProductFragment.class.getSimpleName());
     }
 
     private void setUpListeners() {
@@ -138,18 +131,6 @@ public class MainFragment extends Fragment {
             return 3;
         }
 
-    }
-
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        activity = (FragmentActivity) context;
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        activity = null;
     }
 
 }

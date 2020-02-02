@@ -29,7 +29,7 @@ public class DetailedProduct extends Product {
         return hash_tags;
     }
 
-    public static DetailedProduct GetDummy() {
+/*    public static DetailedProduct GetDummy() {
         String id = "1";
         String name = "Call of Duty BLACK OPS";
         String description = "Call of Duty is a first-person shooter video game franchise published by Activision. Starting out in 2003, it first focused on games set in World War II, but over time, the series has seen games set in modern times, the midst of the Cold War, futuristic worlds, and outer space. The games were first developed by Infinity Ward, then also by Treyarch and Sledgehammer Games. Several spin-off and handheld games were made by other developers. The most recent title, Call of Duty: Modern Warfare, was released on October 25, 2019.";
@@ -48,7 +48,7 @@ public class DetailedProduct extends Product {
         String likes = "33";
         boolean liked = true;
         return new DetailedProduct(id, name, description, details, hashTags, price, timestamp, gallery, uploaderId, categoryId, views, likes, liked);
-    }
+    }*/
 
     @NonNull
     @Override

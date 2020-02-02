@@ -1,6 +1,5 @@
 package com.nativeboys.eshop.ui.main.products;
 
-import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -11,7 +10,6 @@ import android.widget.LinearLayout;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -21,12 +19,13 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.google.android.flexbox.FlexDirection;
 import com.google.android.flexbox.FlexboxLayoutManager;
 import com.google.android.flexbox.JustifyContent;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.nativeboys.eshop.R;
 import com.nativeboys.eshop.tools.GlobalViewModel;
+import com.nativeboys.eshop.ui.main.product.ProductFragment;
 
 public class ProductsFragment extends Fragment {
 
-    private FragmentActivity activity;
     private NavController navController;
     private GlobalViewModel viewModel;
 
@@ -37,7 +36,7 @@ public class ProductsFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        viewModel = new ViewModelProvider(activity).get(GlobalViewModel.class);
+        viewModel = new ViewModelProvider(getActivity() != null ? getActivity() : this).get(GlobalViewModel.class);
     }
 
     @Override
@@ -51,6 +50,7 @@ public class ProductsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         navController = Navigation.findNavController(view);
+        FloatingActionButton addProductButton = view.findViewById(R.id.add_product_button);
         RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
         LinearLayout searchBar = view.findViewById(R.id.search_bar);
         SwipeRefreshLayout swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout);
@@ -68,21 +68,20 @@ public class ProductsFragment extends Fragment {
         searchBar.setOnClickListener(v ->
                 navController.navigate(R.id.action_main_to_search));
 
-        /*viewModel.getUsers().observe(this, users -> {
-            if (users == null) return;
-            adapter.submitList(new ArrayList<>(users));
-        });*/
-    }
+        addProductButton.setOnClickListener(v -> {
+            String userId = viewModel.getUserId();
+            if (userId != null) {
+                ProductFragment.newInstance(userId, null)
+                        .show(getChildFragmentManager(), ProductFragment.class.getSimpleName());
+            }
+        });
 
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        activity = (FragmentActivity) context;
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        activity = null;
+        adapter.setOnProductClickListener((itemView, product) -> {
+            String userId = viewModel.getUserId();
+            if (userId != null) {
+                ProductFragment.newInstance(userId, product.getProductId())
+                        .show(getChildFragmentManager(), ProductFragment.class.getSimpleName());
+            }
+        });
     }
 }
