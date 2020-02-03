@@ -18,7 +18,7 @@ import com.nativeboys.eshop.models.node.DeleteResponse;
 import com.nativeboys.eshop.models.node.DetailedProduct;
 import com.nativeboys.eshop.models.node.LikeResponse;
 import com.nativeboys.eshop.models.node.NewProduct;
-import com.nativeboys.eshop.ui.main.product.ImageSliderModel;
+import com.nativeboys.eshop.ui.main.product.GalleryModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,14 +34,16 @@ public class ProductViewModel extends AndroidViewModel {
     private LiveData<Boolean> clientProduct;
 
     private MutableLiveData<List<Category>> categories;
-    private MutableLiveData<List<ImageSliderModel>> imageSliderList;
+    private MutableLiveData<List<GalleryModel>> gallery;
+    private LiveData<Integer> galleryNo;
 
     {
         productId = new MutableLiveData<>();
         product = Transformations.switchMap(productId, this::getProduct);
         clientProduct = Transformations.map(product, this::isClientProduct);
         categories = new MutableLiveData<>();
-        imageSliderList = new MutableLiveData<>();
+        gallery = new MutableLiveData<>();
+        galleryNo = Transformations.map(gallery, gallery -> gallery != null ? gallery.size() : 0);
     }
 
     private boolean isClientProduct(@Nullable DetailedProduct product) {
@@ -60,8 +62,12 @@ public class ProductViewModel extends AndroidViewModel {
         return product;
     }
 
-    public LiveData<List<ImageSliderModel>> getImageSliderList() {
-        return imageSliderList;
+    public LiveData<List<GalleryModel>> getGallery() {
+        return gallery;
+    }
+
+    public LiveData<Integer> getGalleryNo() {
+        return galleryNo;
     }
 
     public LiveData<Boolean> isClientProduct() {
@@ -79,6 +85,7 @@ public class ProductViewModel extends AndroidViewModel {
                 @Override
                 public void onSuccess(@NonNull DetailedProduct model) {
                     addUrls(model.getGalleryUrls());
+                    setSelectedCategory(model.getCategoryId());
                     product.setValue(model);
                 }
 
@@ -107,32 +114,32 @@ public class ProductViewModel extends AndroidViewModel {
         });
     }
 
-    private List<ImageSliderModel> getCurrentImages() {
-        return imageSliderList.getValue() != null
-                ? imageSliderList.getValue() : new ArrayList<>();
+    private List<GalleryModel> getCurrentImages() {
+        return gallery.getValue() != null
+                ? gallery.getValue() : new ArrayList<>();
     }
 
-    private void addImages(@NonNull List<ImageSliderModel> newList) {
-        List<ImageSliderModel> currentImages = getCurrentImages();
-        List<ImageSliderModel> clones = ImageSliderModel.getClones(currentImages);
+    private void addImages(@NonNull List<GalleryModel> newList) {
+        List<GalleryModel> currentImages = getCurrentImages();
+        List<GalleryModel> clones = GalleryModel.getClones(currentImages);
         clones.addAll(newList);
-        imageSliderList.setValue(clones);
+        gallery.setValue(clones);
     }
 
     public void addUris(@NonNull List<Uri> uris) {
-        addImages(ImageSliderModel.transformUris(uris));
+        addImages(GalleryModel.transformUris(uris));
     }
 
     private void addUrls(@NonNull List<String> urls) {
-        addImages(ImageSliderModel.transformUrls(urls));
+        addImages(GalleryModel.transformUrls(urls));
     }
 
     public void removeImage(int position) {
-        List<ImageSliderModel> currentImages = getCurrentImages();
+        List<GalleryModel> currentImages = getCurrentImages();
         if (position < currentImages.size() && position >= 0) {
-            List<ImageSliderModel> clones = ImageSliderModel.getClones(currentImages);
+            List<GalleryModel> clones = GalleryModel.getClones(currentImages);
             clones.remove(position);
-            imageSliderList.setValue(clones);
+            gallery.setValue(clones);
         }
     }
 
@@ -145,11 +152,11 @@ public class ProductViewModel extends AndroidViewModel {
         return null;
     }
 
-    public void setSelectedCategory(@NonNull Category category) {
+    private void setSelectedCategory(@NonNull String categoryId) {
         List<Category> list = categories.getValue() != null ? categories.getValue() : new ArrayList<>();
         List<Category> clones = Category.getClones(list);
         for (Category clone : clones) {
-            if (clone.getCategoryId().equals(category.getCategoryId())) {
+            if (clone.getCategoryId().equals(categoryId)) {
                 if (!clone.isSelected()) {
                     clone.setSelected(true);
                 }
@@ -158,6 +165,10 @@ public class ProductViewModel extends AndroidViewModel {
             }
         }
         categories.setValue(clones);
+    }
+
+    public void setSelectedCategory(@NonNull Category category) {
+        setSelectedCategory(category.getCategoryId());
     }
 
     public void likeProduct(@NonNull CompletionHandler<Boolean> completion) {
@@ -208,9 +219,9 @@ public class ProductViewModel extends AndroidViewModel {
         String categoryId = getSelectedCategoryId();
         if (categoryId != null) {
             NewProduct product = new NewProduct(name, price, description, details, hashTags, clientId, categoryId);
-            List<ImageSliderModel> list = getCurrentImages();
+            List<GalleryModel> list = getCurrentImages();
             List<Uri> uris = new ArrayList<>();
-            for(ImageSliderModel model : list) {
+            for(GalleryModel model : list) {
                 Uri uri = model.getUri();
                 if (uri == null) continue;
                 uris.add(uri);
@@ -234,7 +245,7 @@ public class ProductViewModel extends AndroidViewModel {
 
     public void updateProduct() {
         // + productId,
-        // From ImageSliderModel list find uris and urls and send them back
+        // From GalleryModel list find uris and urls and send them back
     }
 
 }

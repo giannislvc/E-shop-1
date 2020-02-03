@@ -9,21 +9,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class ImageSliderModel {
+public class GalleryModel {
 
     private String url;
     private Uri uri;
 
-    private ImageSliderModel(String url, Uri uri) {
+    private GalleryModel(String url, Uri uri) {
         this.url = url;
         this.uri = uri;
     }
 
-    public ImageSliderModel(String url) {
+    public GalleryModel(String url) {
         this.url = url;
     }
 
-    public ImageSliderModel(Uri uri) {
+    public GalleryModel(Uri uri) {
         this.uri = uri;
     }
 
@@ -43,49 +43,49 @@ public class ImageSliderModel {
         this.uri = uri;
     }
 
-    private ImageSliderModel getClone() {
-        return new ImageSliderModel(url, uri);
+    private GalleryModel getClone() {
+        return new GalleryModel(url, uri);
     }
 
-    public static List<ImageSliderModel> getClones(@NonNull List<ImageSliderModel> list) {
-        List<ImageSliderModel> clones = new ArrayList<>();
-        for(ImageSliderModel model : list) {
+    public static List<GalleryModel> getClones(@NonNull List<GalleryModel> list) {
+        List<GalleryModel> clones = new ArrayList<>();
+        for(GalleryModel model : list) {
             clones.add(model.getClone());
         }
         return clones;
     }
 
     @NonNull
-    public static List<ImageSliderModel> transform(@Nullable List<Uri> uris, @Nullable List<String> urls) {
-        List<ImageSliderModel> list = new ArrayList<>();
+    public static List<GalleryModel> transform(@Nullable List<Uri> uris, @Nullable List<String> urls) {
+        List<GalleryModel> list = new ArrayList<>();
         if (uris != null) {
             for (Uri uri : uris) {
-                list.add(new ImageSliderModel(uri));
+                list.add(new GalleryModel(uri));
             }
         }
         if (urls != null) {
             for (String url : urls) {
-                list.add(new ImageSliderModel(url));
+                list.add(new GalleryModel(url));
             }
         }
         return list;
     }
 
     @NonNull
-    public static List<ImageSliderModel> transformUris(@Nullable List<Uri> uris) {
+    public static List<GalleryModel> transformUris(@Nullable List<Uri> uris) {
         return transform(uris, null);
     }
 
     @NonNull
-    public static List<ImageSliderModel> transformUrls(@Nullable List<String> urls) {
+    public static List<GalleryModel> transformUrls(@Nullable List<String> urls) {
         return transform(null, urls);
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof ImageSliderModel)) return false;
-        ImageSliderModel that = (ImageSliderModel) o;
+        if (!(o instanceof GalleryModel)) return false;
+        GalleryModel that = (GalleryModel) o;
         return Objects.equals(url, that.url) &&
                 Objects.equals(uri, that.uri);
     }

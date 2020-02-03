@@ -157,7 +157,7 @@ public class GlobalViewModel extends AndroidViewModel {
     private void setUpPaging(String userId) {
         ProductDataSourceFactory dataSourceFactory = new ProductDataSourceFactory(
                 userId,
-                new Filter(null, "ps3"),
+                new Filter(null, "ps"),
                 new Sort(10, 0, 3, false)
         );
         liveDataSource = dataSourceFactory.getProductLiveDataSource();

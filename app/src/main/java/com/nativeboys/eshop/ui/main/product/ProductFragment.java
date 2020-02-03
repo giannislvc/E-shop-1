@@ -18,7 +18,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,10 +47,13 @@ import static android.app.Activity.RESULT_OK;
 public class ProductFragment extends FullDialogFragment {
 
     private final String TAG = getClass().getSimpleName();
+
     private static final int MY_PERMISSIONS_REQUEST = 100;
     private int PICK_IMAGE_FROM_GALLERY_REQUEST = 1;
 
-    private ProductImageAdapter imageAdapter;
+    private ProductViewModel productVM;
+
+    private GalleryAdapter galleryAdapter;
     private EditText nameField, priceField, descriptionField, detailsField;
 
     private ScrollView scrollView;
@@ -64,13 +66,11 @@ public class ProductFragment extends FullDialogFragment {
     private RecyclerView categoriesRV;
     private ConstraintLayout addImageContainer;
 
-    private Dialog successDialog, failureDialog;
+    private Dialog successDialog, failureDialog, questionDialog;
 
     public ProductFragment() {
         // Required empty public constructor
     }
-
-    private ProductViewModel productVM;
 
     public static ProductFragment newInstance(@NonNull String clientId, @Nullable String productId) {
         Bundle args = new Bundle();
@@ -181,21 +181,32 @@ public class ProductFragment extends FullDialogFragment {
         categoriesRV = view.findViewById(R.id.categories_recycler_view);
         addImageContainer = view.findViewById(R.id.add_image_container);
 
+        categoriesAdapter = new CategoriesAdapter();
+        categoriesRV.setAdapter(categoriesAdapter);
+        categoriesRV.setLayoutManager(new LinearLayoutManager(
+                categoriesRV.getContext(), LinearLayoutManager.HORIZONTAL , false));
+
+        galleryAdapter = new GalleryAdapter();
+        viewPager.setAdapter(galleryAdapter);
+        requestPermissions();
+        setUpListeners();
+        setUpDialogs(view);
+    }
+
+    private void setUpDialogs(@NonNull View view) {
         successDialog = new Dialog(view.getContext());
         successDialog.setContentView(R.layout.dialog_success);
 
         failureDialog = new Dialog(view.getContext());
         failureDialog.setContentView(R.layout.dialog_failure);
 
-        categoriesAdapter = new CategoriesAdapter();
-        categoriesRV.setAdapter(categoriesAdapter);
-        categoriesRV.setLayoutManager(new LinearLayoutManager(
-                categoriesRV.getContext(), LinearLayoutManager.HORIZONTAL , false));
+        questionDialog = new Dialog(view.getContext());
+        questionDialog.setContentView(R.layout.dialog_question);
+        Button cancelBtn = questionDialog.findViewById(R.id.cancel_btn);
+        cancelBtn.setOnClickListener(v -> questionDialog.dismiss());
 
-        imageAdapter = new ProductImageAdapter();
-        viewPager.setAdapter(imageAdapter);
-        requestPermissions();
-        setUpListeners();
+        Button deleteBtn = questionDialog.findViewById(R.id.delete_btn);
+        deleteBtn.setOnClickListener(this::deleteProduct);
     }
 
     private void showMessage(boolean success, String message) {
@@ -269,7 +280,7 @@ public class ProductFragment extends FullDialogFragment {
     private void setButtonsListeners(boolean isClientProduct) {
         if (isClientProduct) {
             // Delete
-            startBtn.setOnClickListener(this::deleteProduct);
+            startBtn.setOnClickListener(v -> questionDialog.show());
             // Submit
             endBtn.setOnClickListener(this::createProduct);
         } else {
@@ -284,6 +295,9 @@ public class ProductFragment extends FullDialogFragment {
 
     private void setUpListeners() {
 
+        productVM.getGalleryNo().observe(getViewLifecycleOwner(), no ->
+                picNumField.setText(String.valueOf(no != null ? no : 0)));
+
         productVM.isClientProduct().observe(getViewLifecycleOwner(), aBoolean -> {
             boolean isClientProduct = aBoolean != null && aBoolean;
             nameField.setEnabled(isClientProduct);
@@ -293,7 +307,7 @@ public class ProductFragment extends FullDialogFragment {
             startBtn.setText(isClientProduct ? R.string.delete : R.string.like);
             endBtn.setText(isClientProduct ? R.string.submit : R.string.message);
             setButtonsListeners(isClientProduct);
-            imageAdapter.setIsClientProduct(isClientProduct);
+            galleryAdapter.setIsClientProduct(isClientProduct);
 
             int visibility = isClientProduct ? View.VISIBLE : View.GONE;
             categoriesLabel.setVisibility(visibility);
@@ -303,7 +317,6 @@ public class ProductFragment extends FullDialogFragment {
 
         productVM.getProduct().observe(getViewLifecycleOwner(), product -> {
             if (product == null) return;
-            picNumField.setText(String.valueOf(product.getGalleryUrls().size()));
             nameField.setText(product.getName());
             descriptionField.setText(product.getDescription());
             detailsField.setText(product.getDetails());
@@ -316,13 +329,13 @@ public class ProductFragment extends FullDialogFragment {
         productVM.getCategories().observe(getViewLifecycleOwner(), categories ->
                 categoriesAdapter.submitList(categories != null ? categories : new ArrayList<>()));
 
-        productVM.getImageSliderList().observe(getViewLifecycleOwner(), list ->
-                imageAdapter.submitList(list != null ? list : new ArrayList<>()));
+        productVM.getGallery().observe(getViewLifecycleOwner(), list ->
+                galleryAdapter.submitList(list != null ? list : new ArrayList<>()));
 
         categoriesAdapter.setOnCategoryClickListener(category ->
                 productVM.setSelectedCategory(category));
 
-        imageAdapter.setOnRemoveListener(position -> productVM.removeImage(position));
+        galleryAdapter.setOnRemoveListener(position -> productVM.removeImage(position));
 
         addImageButton.setOnClickListener(v -> {
             Intent intent = new Intent();

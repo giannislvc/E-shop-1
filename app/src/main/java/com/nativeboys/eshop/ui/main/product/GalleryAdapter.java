@@ -16,17 +16,17 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class ProductImageAdapter extends ListAdapter<ImageSliderModel, ProductImageAdapter.ViewHolder> {
+public class GalleryAdapter extends ListAdapter<GalleryModel, GalleryAdapter.ViewHolder> {
 
-    private final static DiffUtil.ItemCallback<ImageSliderModel> callback = new DiffUtil.ItemCallback<ImageSliderModel>() {
+    private final static DiffUtil.ItemCallback<GalleryModel> callback = new DiffUtil.ItemCallback<GalleryModel>() {
 
         @Override
-        public boolean areItemsTheSame(@NonNull ImageSliderModel model, @NonNull ImageSliderModel t1) {
+        public boolean areItemsTheSame(@NonNull GalleryModel model, @NonNull GalleryModel t1) {
             return model.equals(t1);
         }
 
         @Override
-        public boolean areContentsTheSame(@NonNull ImageSliderModel model, @NonNull ImageSliderModel t1) {
+        public boolean areContentsTheSame(@NonNull GalleryModel model, @NonNull GalleryModel t1) {
             return model.equals(t1);
         }
 
@@ -39,7 +39,7 @@ public class ProductImageAdapter extends ListAdapter<ImageSliderModel, ProductIm
     private OnRemoveImageClickListener onRemoveListener;
     private boolean isUserProduct;
 
-    ProductImageAdapter() {
+    GalleryAdapter() {
         super(callback);
         isUserProduct = false;
     }
@@ -62,7 +62,7 @@ public class ProductImageAdapter extends ListAdapter<ImageSliderModel, ProductIm
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        ImageSliderModel model = getItem(position);
+        GalleryModel model = getItem(position);
         if (model != null) holder.bind(model);
     }
 
@@ -83,7 +83,7 @@ public class ProductImageAdapter extends ListAdapter<ImageSliderModel, ProductIm
             });
         }
 
-        private void bind(@NonNull ImageSliderModel model) {
+        private void bind(@NonNull GalleryModel model) {
             String url = model.getUrl();
             Uri uri = model.getUri();
             if (url == null && uri == null) return;

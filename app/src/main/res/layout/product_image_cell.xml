@@ -17,7 +17,10 @@
         android:layout_marginStart="10dp"
         android:layout_alignStart="@id/image_holder"
         android:layout_alignTop="@id/image_holder"
-        android:src="@drawable/ic_cancel_black_24dp"
+        android:background="@drawable/circle_shape"
+        android:backgroundTint="#80000000"
+        android:padding="2dp"
+        android:src="@drawable/ic_close_white_24dp"
         android:contentDescription="@string/delete"/>
 
 </RelativeLayout>
