@@ -22,6 +22,18 @@ public class Filter {
         return text;
     }
 
+    public void setCategoryId(String categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    public Filter getClone() {
+        return new Filter(categoryId, text);
+    }
+
     @NonNull
     @Override
     public String toString() {

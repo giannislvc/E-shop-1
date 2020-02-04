@@ -2,6 +2,7 @@ package com.nativeboys.eshop.tools;
 
 import android.app.Application;
 import android.net.Uri;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -10,7 +11,6 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 import androidx.paging.LivePagedListBuilder;
-import androidx.paging.PageKeyedDataSource;
 import androidx.paging.PagedList;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -24,6 +24,7 @@ import com.nativeboys.eshop.callbacks.AuthCompleteListener;
 import com.nativeboys.eshop.callbacks.Completion;
 import com.nativeboys.eshop.callbacks.CompletionHandler;
 import com.nativeboys.eshop.http.Repository;
+import com.nativeboys.eshop.models.adapter.SearchModel;
 import com.nativeboys.eshop.models.firebase.MetaDataModel;
 import com.nativeboys.eshop.models.firebase.UserModel;
 import com.nativeboys.eshop.models.node.Category;
@@ -59,7 +60,7 @@ public class GlobalViewModel extends AndroidViewModel {
     private MutableLiveData<List<UserModel>> users;
 
     private LiveData<PagedList<Product>> productPagedList;
-    private LiveData<PageKeyedDataSource<Integer, Product>> liveDataSource;
+    //private LiveData<PageKeyedDataSource<Integer, Product>> liveDataSource;
 
     // Server
 
@@ -71,13 +72,16 @@ public class GlobalViewModel extends AndroidViewModel {
     private LiveData<List<String>> searches;
 
     private MutableLiveData<List<Category>> categories;
+    private MutableLiveData<SearchModel> searchModel;
 
     {
         user = new MutableLiveData<>();
         metaData = new MutableLiveData<>();
         users = new MutableLiveData<>();
 
-        productPagedList = new MutableLiveData<>();
+        searchModel = new MutableLiveData<>();
+        productPagedList = Transformations.switchMap(searchModel, this::getLiveProducts);
+
         popularProducts = new MutableLiveData<>();
         productHistory = Transformations.switchMap(user, user ->
                 getProductHistory(user.getUid()));
@@ -144,7 +148,7 @@ public class GlobalViewModel extends AndroidViewModel {
                 this.user.setValue(user);
                 userId = user.getUid();
                 setListeners(true);
-                setUpPaging(userId);
+                searchModel.setValue(defaultSearch);
             }
         });
 
@@ -154,20 +158,53 @@ public class GlobalViewModel extends AndroidViewModel {
         return textSearch;
     }
 
-    private void setUpPaging(String userId) {
+    public MutableLiveData<SearchModel> getSearchModel() {
+        return searchModel;
+    }
+
+    public final SearchModel defaultSearch = new SearchModel(
+            new Filter(null, "ps"),
+            new Sort(10, 0, 3, false));
+
+    private LiveData<PagedList<Product>> getLiveProducts(@Nullable SearchModel model) {
+        SearchModel search = model != null ? model : defaultSearch;
+        Log.i("Hello", "getLiveProducts: " + search);
+        ProductDataSourceFactory dataSourceFactory =
+                new ProductDataSourceFactory(
+                        userId,
+                        search.getFilter(),
+                        search.getSort()
+        );
+        PagedList.Config config =
+                (new PagedList.Config.Builder())
+                        .setEnablePlaceholders(false)
+                        .setPageSize(search.getSort().getLimit())
+                        .build();
+        return (LiveData<PagedList<Product>>) (new LivePagedListBuilder(dataSourceFactory, config)).build();
+    }
+
+    public void updateSearch(String categoryId, int order) {
+        SearchModel search = searchModel.getValue();
+        if (search != null) {
+            searchModel.setValue(search.init(categoryId, order));
+        }
+    }
+
+
+/*    private void setUpPaging(String userId) {
         ProductDataSourceFactory dataSourceFactory = new ProductDataSourceFactory(
                 userId,
                 new Filter(null, "ps"),
                 new Sort(10, 0, 3, false)
         );
-        liveDataSource = dataSourceFactory.getProductLiveDataSource();
+        //liveDataSource = dataSourceFactory.getProductLiveDataSource();
         PagedList.Config config =
                 (new PagedList.Config.Builder())
                     .setEnablePlaceholders(false)
                     .setPageSize(10)
                     .build();
         productPagedList = (new LivePagedListBuilder(dataSourceFactory, config)).build();
-    }
+    }*/
 
     public LiveData<PagedList<Product>> getProductPagedList() {
         return productPagedList;

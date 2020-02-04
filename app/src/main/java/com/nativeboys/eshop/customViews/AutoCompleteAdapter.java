@@ -18,7 +18,7 @@ import java.util.List;
 public abstract class AutoCompleteAdapter<T> extends ArrayAdapter<T> implements AdapterView.OnItemClickListener {
 
     public interface OnItemClickListener<T> {
-        void onItemSelected(@Nullable T model);
+        void onItemClick(@Nullable T model);
     }
 
     private final int resource;
@@ -61,7 +61,7 @@ public abstract class AutoCompleteAdapter<T> extends ArrayAdapter<T> implements 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         if (onItemClickListener != null) {
-            onItemClickListener.onItemSelected(getItem(position));
+            onItemClickListener.onItemClick(getItem(position));
         }
     }
 

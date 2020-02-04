@@ -21,12 +21,16 @@ public class Sort extends StartLimit {
         return asc;
     }
 
-    public void setOrder_by(int order_by) {
+    public void setOrderBy(int order_by) {
         this.order_by = order_by;
     }
 
     public void setAsc(boolean asc) {
         this.asc = asc;
+    }
+
+    public Sort getClone() {
+        return new Sort(limit, start, order_by, asc);
     }
 
     @NonNull

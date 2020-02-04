@@ -11,7 +11,7 @@ import com.nativeboys.eshop.models.query.Sort;
 
 public class ProductDataSourceFactory extends DataSource.Factory {
 
-    private MutableLiveData<PageKeyedDataSource<Integer, Product>> productLiveDataSource;
+    //private MutableLiveData<PageKeyedDataSource<Integer, Product>> productLiveDataSource;
 
     private Sort sort;
     private Filter filter;
@@ -21,18 +21,18 @@ public class ProductDataSourceFactory extends DataSource.Factory {
         this.filter = filter;
         this.customerId = customerId;
         this.sort = sort;
-        productLiveDataSource = new MutableLiveData<>();
+        //productLiveDataSource = new MutableLiveData<>();
     }
 
     @NonNull
     @Override
     public DataSource create() {
-        ProductsDataSource productDataSource = new ProductsDataSource(customerId, filter, sort);
-        productLiveDataSource.postValue(productDataSource);
-        return productDataSource;
+        //ProductsDataSource productDataSource = new ProductsDataSource(customerId, filter, sort);
+        //productLiveDataSource.postValue(productDataSource);
+        return new ProductsDataSource(customerId, filter, sort);
     }
 
-    public MutableLiveData<PageKeyedDataSource<Integer, Product>> getProductLiveDataSource() {
+/*    public MutableLiveData<PageKeyedDataSource<Integer, Product>> getProductLiveDataSource() {
         return productLiveDataSource;
-    }
+    }*/
 }
