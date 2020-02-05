@@ -4,38 +4,35 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.viewpager.widget.ViewPager;
+import androidx.navigation.NavController;
+import androidx.navigation.NavDestination;
+import androidx.navigation.NavOptions;
+import androidx.navigation.Navigation;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.navigation.NavigationView;
 import com.nativeboys.eshop.R;
-import com.nativeboys.eshop.models.adapter.SortModel;
-import com.nativeboys.eshop.models.node.Category;
 import com.nativeboys.eshop.tools.GlobalViewModel;
-import com.nativeboys.eshop.ui.main.conversations.ConversationsFragment;
-import com.nativeboys.eshop.ui.main.products.ProductsFragment;
-import com.nativeboys.eshop.ui.main.profile.ProfileFragment;
-import com.nativeboys.eshop.ui.main.settings.SettingsFragment;
 
-public class MainFragment extends Fragment implements SettingsFragment.OnUserInteractionListener {
+import java.util.HashMap;
+import java.util.Map;
+
+public class MainFragment extends Fragment {
 
     private GlobalViewModel globalVM;
-
-    private ViewPager viewPager;
-    private DrawerLayout drawerLayout;
-    private NavigationView navigationView;
+    private NavController nestedNavController, parentNavController;
     private BottomNavigationView navigationBar;
-    private MainPagerAdapter adapter;
+
+    private Map<Integer, Integer> map = new HashMap<Integer, Integer>() {{
+        put(R.id.productsFragment, R.id.products);
+        put(R.id.conversationsFragment, R.id.chat);
+        put(R.id.profileFragment, R.id.profile);
+    }};
 
     public MainFragment() {
         // Required empty public constructor
@@ -52,127 +49,44 @@ public class MainFragment extends Fragment implements SettingsFragment.OnUserInt
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_main_layout, container, false);
+        return inflater.inflate(R.layout.fragment_main, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        drawerLayout = view.findViewById(R.id.drawer_layout);
-        viewPager = view.findViewById(R.id.view_pager);
-        navigationView = view.findViewById(R.id.navigation_view);
+        nestedNavController = Navigation.findNavController(view.findViewById(R.id.nested_nav_host));
+        parentNavController = Navigation.findNavController(view);
         navigationBar = view.findViewById(R.id.navigation_bar);
-        adapter = new MainPagerAdapter(getChildFragmentManager());
-        viewPager.setAdapter(adapter);
         setUpListeners();
     }
 
+    private int getFragmentIdByMenu(int menuId) {
+        Integer index = null;
+        for (Map.Entry<Integer, Integer> entry : map.entrySet()) {
+            if (entry.getValue() == menuId) {
+                index = entry.getKey();
+                break;
+            }
+        }
+        return index != null ? index : -1;
+    }
+
+    private void navigate(int currentFragId, int destinationFragId) {
+        NavOptions navOptions = new NavOptions.Builder().setPopUpTo(currentFragId, true).build();
+        nestedNavController.navigate(destinationFragId, null, navOptions);
+    }
+
     private void setUpListeners() {
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int i, float v, int i1) { }
-
-            @Override
-            public void onPageSelected(int i) {
-                switch (i) {
-                    case 0 : {
-                        navigationBar.setSelectedItemId(R.id.products);
-                        break;
-                    }
-                    case 1 : {
-                        navigationBar.setSelectedItemId(R.id.chat);
-                        break;
-                    }
-                    case 2 : {
-                        navigationBar.setSelectedItemId(R.id.profile);
-                        break;
-                    }
-                    default: break;
-                }
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int i) { }
-        });
-
         navigationBar.setOnNavigationItemSelectedListener(menuItem -> {
-            int index = viewPager.getCurrentItem();
-            switch (menuItem.getItemId()) {
-                case R.id.products: {
-                    if (index != 0 && adapter.getCount() > 0) {
-                        viewPager.setCurrentItem(0);
-                    }
-                    break;
-                }
-                case R.id.chat: {
-                    if (index != 1 && adapter.getCount() > 1) {
-                        viewPager.setCurrentItem(1);
-                    }
-                    break;
-                }
-                case R.id.profile: {
-                    if (index != 2 && adapter.getCount() > 2) {
-                        viewPager.setCurrentItem(2);
-                    }
-                    break;
-                }
-                default: break;
-            }
+            NavDestination currentFragment = nestedNavController.getCurrentDestination();
+            if (currentFragment == null) return false;
+            int currentFragId = currentFragment.getId();
+            int destinationFragId = getFragmentIdByMenu(menuItem.getItemId());
+            if (destinationFragId == -1 || destinationFragId == currentFragId) return false;
+            navigate(currentFragId, destinationFragId);
             return true;
         });
     }
 
-    private class MainPagerAdapter extends FragmentStatePagerAdapter {
-
-        MainPagerAdapter(@NonNull FragmentManager fm) {
-            super(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
-        }
-
-        @NonNull
-        @Override
-        public Fragment getItem(int position) {
-            switch (position) {
-                case 1 : {
-                    return new ConversationsFragment();
-                }
-                case 2 : {
-                    return new ProfileFragment();
-                }
-                default: return new ProductsFragment();
-            }
-        }
-
-        @Override
-        public int getCount() {
-            return 3;
-        }
-
-    }
-
-    @Override
-    public void onSubmit(@Nullable Category category, @Nullable SortModel sort) {
-        updateAndClose(category, sort);
-    }
-
-    @Override
-    public void onClear() {
-        updateAndClose(null, null);
-    }
-
-    private void updateAndClose(@Nullable Category category, @Nullable SortModel sort) {
-        globalVM.updateSearch(
-                category != null ? category.getCategoryId() : null,
-                sort != null ? sort.getNumericId() : -1
-        );
-        drawerLayout.closeDrawer(GravityCompat.START);
-    }
-
-    @Override
-    public void onAttachFragment(@NonNull Fragment childFragment) {
-        super.onAttachFragment(childFragment);
-        if (childFragment instanceof SettingsFragment) {
-            SettingsFragment fragment = (SettingsFragment) childFragment;
-            fragment.setOnUserInteraction(this);
-        }
-    }
 }

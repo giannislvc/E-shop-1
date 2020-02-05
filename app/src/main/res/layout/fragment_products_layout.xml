@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:openDrawer="end">
 
-    <include layout="@layout/fragment_main"/>
+    <include layout="@layout/fragment_products"/>
 
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/navigation_view"

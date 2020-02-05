@@ -5,7 +5,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -25,9 +25,17 @@ public class ConversationsFragment extends Fragment {
 
     private NavController navController;
     private ConversationsAdapter adapter;
+    private GlobalViewModel globalVM;
 
     public ConversationsFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        globalVM = new ViewModelProvider(getActivity() != null ? getActivity() : this)
+                .get(GlobalViewModel.class);
     }
 
     @Override
@@ -46,9 +54,6 @@ public class ConversationsFragment extends Fragment {
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
 
-        if (getActivity() == null) return;
-        GlobalViewModel globalVM = ViewModelProviders.of(getActivity()).get(GlobalViewModel.class);
-
         adapter.setConversationClickListener((itemView, meta) -> {
             String userId = globalVM.getUserId();
             String conId = meta.getConversationId();
@@ -58,7 +63,7 @@ public class ConversationsFragment extends Fragment {
             }
         });
 
-        globalVM.getMetaData().observe(this, metaData -> {
+        globalVM.getMetaData().observe(getViewLifecycleOwner(), metaData -> {
             if (metaData == null) return;
             adapter.submitList(new ArrayList<>(metaData));
         });
