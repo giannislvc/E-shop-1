@@ -11,7 +11,6 @@ import androidx.navigation.NavController;
 import androidx.navigation.NavDestination;
 import androidx.navigation.Navigation;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -66,6 +65,12 @@ public class SettingsFragment extends Fragment implements NavController.OnDestin
         nestedNavController.removeOnDestinationChangedListener(this);
     }
 
+    @Override
+    public void onDestinationChanged(@NonNull NavController controller, @NonNull NavDestination destination, @Nullable Bundle arguments) {
+        boolean visible = R.id.detailsFragment == destination.getId();
+        backBtn.setVisibility(visible ? View.VISIBLE : View.GONE);
+    }
+
     private void setUpListeners() {
         clearBtn.setOnClickListener(view -> {
             // TODO: Implement
@@ -75,12 +80,6 @@ public class SettingsFragment extends Fragment implements NavController.OnDestin
         });
         backBtn.setOnClickListener(view ->
                 nestedNavController.navigate(R.id.action_details_to_options));
-    }
-
-    @Override
-    public void onDestinationChanged(@NonNull NavController controller, @NonNull NavDestination destination, @Nullable Bundle arguments) {
-        boolean visible = R.id.detailsFragment == destination.getId();
-        backBtn.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
 }

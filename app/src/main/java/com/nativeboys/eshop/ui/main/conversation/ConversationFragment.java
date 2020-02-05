@@ -12,6 +12,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -75,7 +76,7 @@ public class ConversationFragment extends Fragment {
             conversationId = args.getConversationId();
         }
         ConversationViewModelFactory factory = new ConversationViewModelFactory(activity.getApplication(), conversationId, userId, friendId);
-        viewModel = ViewModelProviders.of(this, factory).get(ConversationViewModel.class);
+        viewModel = new ViewModelProvider(this, factory).get(ConversationViewModel.class);
     }
 
     @Override

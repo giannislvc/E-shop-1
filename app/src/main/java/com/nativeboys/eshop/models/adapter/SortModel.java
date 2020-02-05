@@ -11,7 +11,7 @@ public class SortModel implements SettingsModel {
 
     private final static List<SortModel> types = new ArrayList<SortModel>() {{
         add(new SortModel(0, "Rate"));
-        add(new SortModel(1, "Upload TIme"));
+        add(new SortModel(1, "Upload Time"));
         add(new SortModel(2, "Price"));
         add(new SortModel(3, "Popularity"));
     }};
@@ -35,21 +35,22 @@ public class SortModel implements SettingsModel {
         return String.valueOf(id);
     }
 
-    public String getDescription() {
-        return description;
-    }
-
     @Override
     public boolean isSelected() {
         return selected;
     }
 
-    public int getNumericId() {
-        return id;
-    }
-
+    @Override
     public void setSelected(boolean selected) {
         this.selected = selected;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public int getNumericId() {
+        return id;
     }
 
     @NonNull

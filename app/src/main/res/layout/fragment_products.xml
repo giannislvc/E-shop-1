@@ -18,15 +18,15 @@
         android:padding="15dp">
 
         <ImageView
-            android:id="@+id/back_arrow"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:id="@+id/settings_button"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
+            android:src="@drawable/adjust"
             android:tint="@android:color/white"
-            android:src="@drawable/ic_menu_black_24dp"
-            android:contentDescription="@string/go_back"/>
+            android:contentDescription="@string/settings"/>
 
         <LinearLayout
             android:id="@+id/search_bar"
@@ -38,8 +38,8 @@
             android:layout_marginEnd="15dp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/back_arrow"
-            app:layout_constraintEnd_toStartOf="@id/settings_button"
+            app:layout_constraintStart_toEndOf="@id/settings_button"
+            app:layout_constraintEnd_toEndOf="parent"
             android:background="@drawable/search_bar_shape">
 
             <ImageView
@@ -59,17 +59,6 @@
                 android:text="@string/search_your_product" />
 
         </LinearLayout>
-
-        <ImageView
-            android:id="@+id/settings_button"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:src="@drawable/adjust"
-            android:tint="@android:color/white"
-            android:contentDescription="@string/settings"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

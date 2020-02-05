@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavBackStackEntry;
@@ -18,14 +19,17 @@ import android.widget.TextView;
 import com.nativeboys.eshop.R;
 import com.nativeboys.eshop.viewModels.SettingsViewModel;
 
-public class OptionsFragment extends Fragment {
+import static com.nativeboys.eshop.viewModels.SettingsViewModel.CATEGORIES;
+import static com.nativeboys.eshop.viewModels.SettingsViewModel.SORT;
 
-    private final String TAG = getClass().getSimpleName();
+public class OptionsFragment extends Fragment {
 
     private SettingsViewModel settingsVM;
     private NavController parentNavController;
 
-    private TextView sortByCell, categoryCell;
+    private ConstraintLayout sbContainer, cContainer;
+    private TextView selectedSbField, selectedCfield;
+
 
     public OptionsFragment() {
         // Required empty public constructor
@@ -41,8 +45,10 @@ public class OptionsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        sortByCell = view.findViewById(R.id.sort_by_cell);
-        categoryCell = view.findViewById(R.id.category_cell);
+        sbContainer = view.findViewById(R.id.sb_container);
+        cContainer = view.findViewById(R.id.c_container);
+        selectedSbField = view.findViewById(R.id.selected_sb_field);
+        selectedCfield = view.findViewById(R.id.selected_c_field);
 
         parentNavController = Navigation.findNavController(view);
         NavBackStackEntry backStackEntry = parentNavController.getBackStackEntry(R.id.settings_nav_graph);
@@ -51,11 +57,21 @@ public class OptionsFragment extends Fragment {
     }
 
     private void setUpListeners() {
-        sortByCell.setOnClickListener(view ->
-                parentNavController.navigate(OptionsFragmentDirections.actionOptionsToDetails(settingsVM.SORT)));
+        sbContainer.setOnClickListener(view ->
+                parentNavController.navigate(OptionsFragmentDirections.actionOptionsToDetails(SORT)));
 
-        categoryCell.setOnClickListener(view ->
-                parentNavController.navigate(OptionsFragmentDirections.actionOptionsToDetails(settingsVM.CATEGORIES)));
+        cContainer.setOnClickListener(view ->
+                parentNavController.navigate(OptionsFragmentDirections.actionOptionsToDetails(CATEGORIES)));
+
+        settingsVM.getSelectedCategory().observe(getViewLifecycleOwner(), category -> {
+            String description = category != null ? category.getName() : null;
+            selectedCfield.setText(description);
+        });
+
+        settingsVM.getSelectedSort().observe(getViewLifecycleOwner(), sort -> {
+            String description = sort != null ? sort.getDescription() : null;
+            selectedSbField.setText(description);
+        });
     }
 
 }

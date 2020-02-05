@@ -38,16 +38,17 @@ public class Category implements SettingsModel {
         return description;
     }
 
+    @Override
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
+
     public String getName() {
         return name;
     }
 
     public String getImageUrl() {
         return image_url;
-    }
-
-    public void setSelected(boolean selected) {
-        this.selected = selected;
     }
 
     public String getCategoryId() {
