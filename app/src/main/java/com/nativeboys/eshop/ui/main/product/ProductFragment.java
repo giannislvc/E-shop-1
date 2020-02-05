@@ -23,6 +23,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -62,6 +63,7 @@ public class ProductFragment extends FullDialogFragment {
             categoriesLabel, hashTagsLabel;
     private RatingBar ratingBar;
     private Button startBtn, endBtn;
+    private ImageView backBtn;
     private CategoriesAdapter categoriesAdapter;
     private Button addImageButton;
     private RecyclerView categoriesRV;
@@ -183,6 +185,7 @@ public class ProductFragment extends FullDialogFragment {
         addImageContainer = view.findViewById(R.id.add_image_container);
         hashTagsLabel = view.findViewById(R.id.hash_tags_label);
         hashTagsField = view.findViewById(R.id.hash_tags_field);
+        backBtn = view.findViewById(R.id.back_btn);
 
         categoriesAdapter = new CategoriesAdapter();
         categoriesRV.setAdapter(categoriesAdapter);
@@ -212,7 +215,8 @@ public class ProductFragment extends FullDialogFragment {
         deleteBtn.setOnClickListener(this::deleteProduct);
     }
 
-    private void showMessage(boolean success, String message) {
+    private void applyResponse(@NonNull View view, String message, boolean success) {
+        view.setEnabled(true);
         if (success) {
             TextView textView = successDialog.findViewById(R.id.text_view);
             textView.setText(message);
@@ -233,14 +237,12 @@ public class ProductFragment extends FullDialogFragment {
         productVM.createProduct(name, price, description, details, hashTags, new CompletionHandler<String>() {
             @Override
             public void onSuccess(@NonNull String model) {
-                view.setEnabled(true);
-                showMessage(true, model);
+                applyResponse(view, model, true);
             }
 
             @Override
             public void onFailure(@Nullable String description) {
-                view.setEnabled(true);
-                showMessage(false, description);
+                applyResponse(view, description, false);
             }
         });
     }
@@ -256,8 +258,7 @@ public class ProductFragment extends FullDialogFragment {
 
             @Override
             public void onFailure(@Nullable String description) {
-                view.setEnabled(true);
-                showMessage(false, description);
+                applyResponse(view, description, false);
             }
         });
     }
@@ -269,13 +270,12 @@ public class ProductFragment extends FullDialogFragment {
             public void onSuccess(@NonNull String model) {
                 view.setEnabled(true);
                 questionDialog.dismiss();
-                dismiss();
+                // TODO: Move Back
             }
 
             @Override
             public void onFailure(@Nullable String description) {
-                view.setEnabled(true);
-                showMessage(false, description);
+                applyResponse(view, description, false);
             }
         });
     }
@@ -340,6 +340,10 @@ public class ProductFragment extends FullDialogFragment {
         categoriesAdapter.setOnCategoryClickListener(category ->
                 productVM.setSelectedCategory(category));
 
+        backBtn.setOnClickListener(v -> {
+            if (getActivity() != null) getActivity().onBackPressed();
+        });
+
         galleryAdapter.setOnRemoveListener(position -> productVM.removeImage(position));
 
         addImageButton.setOnClickListener(v -> {
@@ -350,7 +354,7 @@ public class ProductFragment extends FullDialogFragment {
             intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
             // Always show chooser (if there are multiple options available)
             startActivityForResult(
-                    Intent.createChooser(intent, "Select Picture"),
+                    Intent.createChooser(intent, getResources().getString(R.string.select_picture)),
                     PICK_IMAGE_FROM_GALLERY_REQUEST);
         });
 

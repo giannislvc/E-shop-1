@@ -107,19 +107,15 @@ public class ProductsFragment extends Fragment implements SettingsFragment.OnUse
     }
 
     private void setUpListeners() {
+        globalVM.refreshProducts();
         swipeRefresh.setOnRefreshListener(() -> globalVM.refreshProducts());
-
         settingsButton.setOnClickListener(view -> drawerLayout.openDrawer(GravityCompat.START));
-
         searchBar.setOnClickListener(v -> navigateToSearchFragment());
-
         addProductButton.setOnClickListener(v -> showProduct(null));
-
         globalVM.getProductPagedList().observe(getViewLifecycleOwner(), products -> {
             if (swipeRefresh.isRefreshing()) swipeRefresh.setRefreshing(false);
             adapter.submitList(products);
         });
-
         adapter.setOnProductClickListener((itemView, product) ->
                 showProduct(product.getProductId()));
     }
@@ -155,6 +151,8 @@ public class ProductsFragment extends Fragment implements SettingsFragment.OnUse
         if (childFragment instanceof SettingsFragment) {
             SettingsFragment fragment = (SettingsFragment) childFragment;
             fragment.setOnUserInteraction(this);
+        } else if (childFragment instanceof ProductFragment) {
+
         }
     }
 }
