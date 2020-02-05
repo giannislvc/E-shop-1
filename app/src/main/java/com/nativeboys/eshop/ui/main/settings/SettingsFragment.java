@@ -18,13 +18,19 @@ import android.widget.Button;
 import android.widget.ImageView;
 
 import com.nativeboys.eshop.R;
+import com.nativeboys.eshop.models.adapter.SortModel;
+import com.nativeboys.eshop.models.node.Category;
 import com.nativeboys.eshop.viewModels.SettingsViewModel;
 
 public class SettingsFragment extends Fragment implements NavController.OnDestinationChangedListener {
 
-    private final String TAG = getClass().getSimpleName();
+    public interface OnUserInteractionListener {
+        void onSubmit(@Nullable Category category, @Nullable SortModel sort);
+        void onClear();
+    }
 
     private SettingsViewModel settingsVM;
+    private OnUserInteractionListener onUserInteraction;
     private NavController nestedNavController;
 
     private ImageView backBtn;
@@ -71,12 +77,24 @@ public class SettingsFragment extends Fragment implements NavController.OnDestin
         backBtn.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
+    public void setOnUserInteraction(OnUserInteractionListener onUserInteraction) {
+        this.onUserInteraction = onUserInteraction;
+    }
+
     private void setUpListeners() {
         clearBtn.setOnClickListener(view -> {
-            // TODO: Implement
+            if (onUserInteraction != null) {
+                settingsVM.clearSelectedSettings();
+                onUserInteraction.onClear();
+            }
         });
         submitBtn.setOnClickListener(view -> {
-            // TODO: Implement
+            if (onUserInteraction != null) {
+                onUserInteraction.onSubmit(
+                        settingsVM.getSelectedCategory().getValue(),
+                        settingsVM.getSelectedSort().getValue()
+                );
+            }
         });
         backBtn.setOnClickListener(view ->
                 nestedNavController.navigate(R.id.action_details_to_options));

@@ -6,20 +6,18 @@
     android:layout_height="match_parent"
     tools:openDrawer="end">
 
-    <!-- The main content view -->
-    <include layout="@layout/fragment_main"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+    <include layout="@layout/fragment_main"/>
 
     <com.google.android.material.navigation.NavigationView
+        android:id="@+id/navigation_view"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:fitsSystemWindows="true">
 
-        <!-- The navigation drawer -->
-        <fragment android:name="com.nativeboys.eshop.ui.main.settings.SettingsFragment"
-            android:id="@+id/left_drawer"
+        <fragment
+            android:id="@+id/settings_fragment"
+            android:name="com.nativeboys.eshop.ui.main.settings.SettingsFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 

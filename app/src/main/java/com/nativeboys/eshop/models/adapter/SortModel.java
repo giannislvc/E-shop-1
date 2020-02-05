@@ -1,6 +1,7 @@
 package com.nativeboys.eshop.models.adapter;
 
 import com.nativeboys.eshop.models.SettingsModel;
+import com.nativeboys.eshop.models.query.Sort;
 
 import java.util.ArrayList;
 import java.util.List;

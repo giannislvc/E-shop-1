@@ -1,6 +1,7 @@
 package com.nativeboys.eshop.models;
 
 import java.util.List;
+import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -12,9 +13,9 @@ public interface SettingsModel {
     boolean isSelected();
     void setSelected(boolean selected);
 
-    static <T extends SettingsModel> List<T> setSelectedItem(@NonNull List<T> list, @NonNull String id) {
+    static <T extends SettingsModel> List<T> setSelectedItem(@NonNull List<T> list, @Nullable String id) {
         for (T t : list) {
-            if (t.getId().equals(id)) {
+            if (Objects.equals(t.getId(), id)) {
                 t.setSelected(!t.isSelected());
             } else {
                 t.setSelected(false);

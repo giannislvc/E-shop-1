@@ -11,7 +11,6 @@ import android.widget.LinearLayout;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -23,10 +22,8 @@ import com.google.android.flexbox.FlexboxLayoutManager;
 import com.google.android.flexbox.JustifyContent;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.nativeboys.eshop.R;
-import com.nativeboys.eshop.models.adapter.SearchModel;
 import com.nativeboys.eshop.tools.GlobalViewModel;
 import com.nativeboys.eshop.ui.main.product.ProductFragment;
-import com.nativeboys.eshop.ui.main.searchSettings.SearchSettingsFragment;
 
 public class ProductsFragment extends Fragment {
 
@@ -78,9 +75,9 @@ public class ProductsFragment extends Fragment {
     }
 
     private void setUpListeners() {
-        settingsButton.setOnClickListener(v ->
+        /*settingsButton.setOnClickListener(v ->
                 new SearchSettingsFragment().show(getChildFragmentManager(),
-                        SearchSettingsFragment.class.getSimpleName()));
+                        SearchSettingsFragment.class.getSimpleName()));*/
 
         searchBar.setOnClickListener(v ->
                 navController.navigate(R.id.action_main_to_search));
@@ -105,10 +102,10 @@ public class ProductsFragment extends Fragment {
     @Override
     public void onAttachFragment(@NonNull Fragment childFragment) {
         super.onAttachFragment(childFragment);
-        if (childFragment instanceof SearchSettingsFragment) {
+        /*if (childFragment instanceof SearchSettingsFragment) {
             SearchSettingsFragment fragment = (SearchSettingsFragment) childFragment;
             fragment.setOnUserApplyListener((categoryId, order) ->
                     viewModel.updateSearch(categoryId, order));
-        }
+        }*/
     }
 }

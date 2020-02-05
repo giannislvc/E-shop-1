@@ -27,8 +27,6 @@ public class SearchModel {
         return sort;
     }
 
-
-
     public void setSort(Sort sort) {
         this.sort = sort;
     }

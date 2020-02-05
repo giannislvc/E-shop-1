@@ -68,18 +68,24 @@ public class SettingsViewModel extends AndroidViewModel {
         });
     }
 
-    public <T extends SettingsModel> void setSelectedSetting(int type, @NonNull T model) {
+    public <T extends SettingsModel> void setSelectedSetting(int type, @Nullable T model) {
+        String id = model != null ? model.getId() : null;
         if (type == CATEGORIES) {
             List<Category> categories = getCategories().getValue();
             if (categories != null) {
-                this.categories.setValue(SettingsModel.setSelectedItem(categories, model.getId()));
+                this.categories.setValue(SettingsModel.setSelectedItem(categories, id));
             }
         } else if (type == SORT) {
             List<SortModel> sort = getSort().getValue();
             if (sort != null) {
-                this.sort.setValue(SettingsModel.setSelectedItem(sort, model.getId()));
+                this.sort.setValue(SettingsModel.setSelectedItem(sort, id));
             }
         }
+    }
+
+    public void clearSelectedSettings() {
+        setSelectedSetting(CATEGORIES, null);
+        setSelectedSetting(SORT, null);
     }
 
     public MutableLiveData<List<Category>> getCategories() {

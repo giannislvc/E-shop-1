@@ -183,7 +183,7 @@ public class GlobalViewModel extends AndroidViewModel {
         return (LiveData<PagedList<Product>>) (new LivePagedListBuilder(dataSourceFactory, config)).build();
     }
 
-    public void updateSearch(String categoryId, int order) {
+    public void updateSearch(@Nullable String categoryId, int order) {
         SearchModel search = searchModel.getValue();
         if (search != null) {
             searchModel.setValue(search.init(categoryId, order));

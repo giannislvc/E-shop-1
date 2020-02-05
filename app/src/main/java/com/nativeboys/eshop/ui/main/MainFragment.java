@@ -4,9 +4,12 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager.widget.ViewPager;
 
 import android.view.LayoutInflater;
@@ -14,19 +17,35 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationView;
 import com.nativeboys.eshop.R;
+import com.nativeboys.eshop.models.adapter.SortModel;
+import com.nativeboys.eshop.models.node.Category;
+import com.nativeboys.eshop.tools.GlobalViewModel;
 import com.nativeboys.eshop.ui.main.conversations.ConversationsFragment;
 import com.nativeboys.eshop.ui.main.products.ProductsFragment;
 import com.nativeboys.eshop.ui.main.profile.ProfileFragment;
+import com.nativeboys.eshop.ui.main.settings.SettingsFragment;
 
-public class MainFragment extends Fragment {
+public class MainFragment extends Fragment implements SettingsFragment.OnUserInteractionListener {
 
-    private ViewPager view_pager;
-    private BottomNavigationView navigation_bar;
+    private GlobalViewModel globalVM;
+
+    private ViewPager viewPager;
+    private DrawerLayout drawerLayout;
+    private NavigationView navigationView;
+    private BottomNavigationView navigationBar;
     private MainPagerAdapter adapter;
 
     public MainFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        globalVM = new ViewModelProvider(getActivity() != null ? getActivity() : this)
+                .get(GlobalViewModel.class);
     }
 
     @Override
@@ -39,15 +58,17 @@ public class MainFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        view_pager = view.findViewById(R.id.view_pager);
-        navigation_bar = view.findViewById(R.id.navigation_bar);
+        drawerLayout = view.findViewById(R.id.drawer_layout);
+        viewPager = view.findViewById(R.id.view_pager);
+        navigationView = view.findViewById(R.id.navigation_view);
+        navigationBar = view.findViewById(R.id.navigation_bar);
         adapter = new MainPagerAdapter(getChildFragmentManager());
-        view_pager.setAdapter(adapter);
+        viewPager.setAdapter(adapter);
         setUpListeners();
     }
 
     private void setUpListeners() {
-        view_pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int i, float v, int i1) { }
 
@@ -55,15 +76,15 @@ public class MainFragment extends Fragment {
             public void onPageSelected(int i) {
                 switch (i) {
                     case 0 : {
-                        navigation_bar.setSelectedItemId(R.id.products);
+                        navigationBar.setSelectedItemId(R.id.products);
                         break;
                     }
                     case 1 : {
-                        navigation_bar.setSelectedItemId(R.id.chat);
+                        navigationBar.setSelectedItemId(R.id.chat);
                         break;
                     }
                     case 2 : {
-                        navigation_bar.setSelectedItemId(R.id.profile);
+                        navigationBar.setSelectedItemId(R.id.profile);
                         break;
                     }
                     default: break;
@@ -74,24 +95,24 @@ public class MainFragment extends Fragment {
             public void onPageScrollStateChanged(int i) { }
         });
 
-        navigation_bar.setOnNavigationItemSelectedListener(menuItem -> {
-            int index = view_pager.getCurrentItem();
+        navigationBar.setOnNavigationItemSelectedListener(menuItem -> {
+            int index = viewPager.getCurrentItem();
             switch (menuItem.getItemId()) {
                 case R.id.products: {
                     if (index != 0 && adapter.getCount() > 0) {
-                        view_pager.setCurrentItem(0);
+                        viewPager.setCurrentItem(0);
                     }
                     break;
                 }
                 case R.id.chat: {
                     if (index != 1 && adapter.getCount() > 1) {
-                        view_pager.setCurrentItem(1);
+                        viewPager.setCurrentItem(1);
                     }
                     break;
                 }
                 case R.id.profile: {
                     if (index != 2 && adapter.getCount() > 2) {
-                        view_pager.setCurrentItem(2);
+                        viewPager.setCurrentItem(2);
                     }
                     break;
                 }
@@ -128,4 +149,30 @@ public class MainFragment extends Fragment {
 
     }
 
+    @Override
+    public void onSubmit(@Nullable Category category, @Nullable SortModel sort) {
+        updateAndClose(category, sort);
+    }
+
+    @Override
+    public void onClear() {
+        updateAndClose(null, null);
+    }
+
+    private void updateAndClose(@Nullable Category category, @Nullable SortModel sort) {
+        globalVM.updateSearch(
+                category != null ? category.getCategoryId() : null,
+                sort != null ? sort.getNumericId() : -1
+        );
+        drawerLayout.closeDrawer(GravityCompat.START);
+    }
+
+    @Override
+    public void onAttachFragment(@NonNull Fragment childFragment) {
+        super.onAttachFragment(childFragment);
+        if (childFragment instanceof SettingsFragment) {
+            SettingsFragment fragment = (SettingsFragment) childFragment;
+            fragment.setOnUserInteraction(this);
+        }
+    }
 }
