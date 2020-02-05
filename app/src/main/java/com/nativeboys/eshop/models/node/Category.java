@@ -30,17 +30,21 @@ public class Category implements SettingsModel {
 
     @Override
     public String getId() {
-        return null;
+        return category_id;
     }
 
     @Override
     public String getDescription() {
-        return description;
+        return name;
     }
 
     @Override
     public void setSelected(boolean selected) {
         this.selected = selected;
+    }
+
+    public String getDescr() {
+        return description;
     }
 
     public String getName() {

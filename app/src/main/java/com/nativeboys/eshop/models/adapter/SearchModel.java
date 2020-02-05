@@ -31,16 +31,10 @@ public class SearchModel {
         this.sort = sort;
     }
 
-    public SearchModel getClone() {
-        return new SearchModel(filter.getClone(), sort.getClone());
-    }
-
     public SearchModel init(String categoryId, int order) {
-        SearchModel clone = getClone();
-        clone.getFilter().setCategoryId(categoryId);
-        clone.getSort().setOrderBy(order);
-        clone.getSort().setStart(0);
-        return clone;
+        Filter filter = new Filter(categoryId, null);
+        Sort sort = new Sort(10, 0, order, false);
+        return new SearchModel(filter, sort);
     }
 
     @NonNull

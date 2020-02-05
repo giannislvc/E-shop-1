@@ -4,18 +4,18 @@ import androidx.annotation.NonNull;
 
 public class Filter {
 
-    private String categoryId;
+    private String category_id;
     private String text;
 
     public Filter(String categoryId, String text) {
-        this.categoryId = categoryId;
+        this.category_id = categoryId;
         this.text = text;
     }
 
     public Filter() {}
 
     public String getCategoryId() {
-        return categoryId;
+        return category_id;
     }
 
     public String getText() {
@@ -23,7 +23,7 @@ public class Filter {
     }
 
     public void setCategoryId(String categoryId) {
-        this.categoryId = categoryId;
+        this.category_id = categoryId;
     }
 
     public void setText(String text) {
@@ -31,14 +31,14 @@ public class Filter {
     }
 
     public Filter getClone() {
-        return new Filter(categoryId, text);
+        return new Filter(category_id, text);
     }
 
     @NonNull
     @Override
     public String toString() {
         return "Filter{" +
-                "categoryId='" + categoryId + '\'' +
+                "categoryId='" + category_id + '\'' +
                 ", text='" + text + '\'' +
                 '}';
     }

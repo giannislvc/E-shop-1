@@ -82,6 +82,15 @@ public class SettingsFragment extends Fragment implements NavController.OnDestin
     }
 
     private void setUpListeners() {
+
+        settingsVM.getSelectedCategory().observe(getViewLifecycleOwner(), category -> {
+            // TODO: Replace workaround
+        });
+
+        settingsVM.getSelectedSort().observe(getViewLifecycleOwner(), sort -> {
+            // TODO: Replace workaround
+        });
+
         clearBtn.setOnClickListener(view -> {
             if (onUserInteraction != null) {
                 settingsVM.clearSelectedSettings();

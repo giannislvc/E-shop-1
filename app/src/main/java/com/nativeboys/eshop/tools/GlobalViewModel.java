@@ -2,7 +2,6 @@ package com.nativeboys.eshop.tools;
 
 import android.app.Application;
 import android.net.Uri;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -168,7 +167,6 @@ public class GlobalViewModel extends AndroidViewModel {
 
     private LiveData<PagedList<Product>> getLiveProducts(@Nullable SearchModel model) {
         SearchModel search = model != null ? model : defaultSearch;
-        Log.i("Hello", "getLiveProducts: " + search);
         ProductDataSourceFactory dataSourceFactory =
                 new ProductDataSourceFactory(
                         userId,
