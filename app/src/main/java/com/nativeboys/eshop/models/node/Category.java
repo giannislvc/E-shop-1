@@ -1,15 +1,18 @@
 package com.nativeboys.eshop.models.node;
 
+import com.nativeboys.eshop.models.SettingsModel;
+
 import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class Category {
+public class Category implements SettingsModel {
 
-    private String category_id, name;
-    private String description, image_url;
+    private final String category_id, name;
+    private final String description, image_url;
+
     private boolean selected;
 
     public Category(String category_id, String name, String description, String image_url) {
@@ -20,8 +23,27 @@ public class Category {
         this.selected = false;
     }
 
+    @Override
     public boolean isSelected() {
         return selected;
+    }
+
+    @Override
+    public String getId() {
+        return null;
+    }
+
+    @Override
+    public String getDescription() {
+        return description;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getImageUrl() {
+        return image_url;
     }
 
     public void setSelected(boolean selected) {
@@ -30,18 +52,6 @@ public class Category {
 
     public String getCategoryId() {
         return category_id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public String getImageUrl() {
-        return image_url;
     }
 
     public boolean areItemsTheSame(@NonNull Category other) {

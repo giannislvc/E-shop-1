@@ -20,7 +20,7 @@ import android.widget.Button;
 import android.widget.Spinner;
 
 import com.nativeboys.eshop.R;
-import com.nativeboys.eshop.models.adapter.SortByModel;
+import com.nativeboys.eshop.models.adapter.SortModel;
 import com.nativeboys.eshop.models.node.Category;
 import com.nativeboys.eshop.tools.GlobalViewModel;
 
@@ -86,9 +86,9 @@ public class SearchSettingsFragment extends DialogFragment {
     @Nullable
     private Integer getSelectedOrder() {
         Object selectedItem = sSpinner.getSelectedItem();
-        if (selectedItem instanceof SortByModel) {
-            SortByModel sortByModel = (SortByModel) selectedItem;
-            return sortByModel.getId();
+        if (selectedItem instanceof SortModel) {
+            SortModel sortByModel = (SortModel) selectedItem;
+            return sortByModel.getNumericId();
         }
         return null;
     }
@@ -96,7 +96,7 @@ public class SearchSettingsFragment extends DialogFragment {
 
     private void setUpListeners() {
         globalVM.refreshGategories();
-        sAdapter.setDataSet(SortByModel.SearchTypes());
+        sAdapter.setDataSet(SortModel.getTypes());
         globalVM.getCategories().observe(getViewLifecycleOwner(), categories ->
                 cAdapter.setDataSet(categories));
         cancelBtn.setOnClickListener(v -> dismiss());

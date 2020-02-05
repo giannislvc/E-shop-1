@@ -18,14 +18,11 @@
         android:fitsSystemWindows="true">
 
         <!-- The navigation drawer -->
-        <fragment android:name="com.nativeboys.eshop.ui.main.test.TestFragment"
+        <fragment android:name="com.nativeboys.eshop.ui.main.settings.SettingsFragment"
             android:id="@+id/left_drawer"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-
     </com.google.android.material.navigation.NavigationView>
-
-
 
 </androidx.drawerlayout.widget.DrawerLayout>
