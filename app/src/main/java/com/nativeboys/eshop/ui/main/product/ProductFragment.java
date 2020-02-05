@@ -268,6 +268,7 @@ public class ProductFragment extends FullDialogFragment {
             @Override
             public void onSuccess(@NonNull String model) {
                 view.setEnabled(true);
+                questionDialog.dismiss();
                 dismiss();
             }
 

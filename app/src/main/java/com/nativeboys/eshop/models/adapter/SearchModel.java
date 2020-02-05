@@ -15,6 +15,12 @@ public class SearchModel {
         this.sort = sort;
     }
 
+    public static SearchModel Create(String categoryId, int order) {
+        Filter filter = new Filter(categoryId, null);
+        Sort sort = new Sort(10, 0, order, false);
+        return new SearchModel(filter, sort);
+    }
+
     public Filter getFilter() {
         return filter;
     }
@@ -29,12 +35,6 @@ public class SearchModel {
 
     public void setSort(Sort sort) {
         this.sort = sort;
-    }
-
-    public SearchModel init(String categoryId, int order) {
-        Filter filter = new Filter(categoryId, null);
-        Sort sort = new Sort(10, 0, order, false);
-        return new SearchModel(filter, sort);
     }
 
     @NonNull

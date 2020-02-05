@@ -182,10 +182,14 @@ public class GlobalViewModel extends AndroidViewModel {
     }
 
     public void updateSearch(@Nullable String categoryId, int order) {
-        SearchModel search = searchModel.getValue();
-        if (search != null) {
-            searchModel.setValue(search.init(categoryId, order));
-        }
+        searchModel.setValue(SearchModel.Create(categoryId, order));
+    }
+
+    public void refreshProducts() {
+        SearchModel model = searchModel.getValue();
+        if (model == null) return;
+        model.getSort().setStart(0);
+        searchModel.setValue(model);
     }
 
 

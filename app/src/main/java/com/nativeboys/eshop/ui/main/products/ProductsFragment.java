@@ -37,6 +37,7 @@ public class ProductsFragment extends Fragment implements SettingsFragment.OnUse
     private GlobalViewModel globalVM;
     private NavController parentNavController;
 
+    private SwipeRefreshLayout swipeRefresh;
     private DrawerLayout drawerLayout;
     private ProductsAdapter adapter;
 
@@ -67,14 +68,14 @@ public class ProductsFragment extends Fragment implements SettingsFragment.OnUse
         super.onViewCreated(view, savedInstanceState);
         parentNavController = getParentNavController();
 
+        swipeRefresh = view.findViewById(R.id.swipe_refresh_layout);
         drawerLayout = view.findViewById(R.id.drawer_layout);
         addProductButton = view.findViewById(R.id.add_product_button);
         settingsButton = view.findViewById(R.id.settings_button);
         searchBar = view.findViewById(R.id.search_bar);
         RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
-        SwipeRefreshLayout swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout);
 
-        swipeRefreshLayout.setColorSchemeColors(Color.parseColor("#2fb7ec"));
+        swipeRefresh.setColorSchemeColors(Color.parseColor("#2fb7ec"));
 
         adapter = new ProductsAdapter();
         recyclerView.setAdapter(adapter);
@@ -106,37 +107,36 @@ public class ProductsFragment extends Fragment implements SettingsFragment.OnUse
     }
 
     private void setUpListeners() {
+        swipeRefresh.setOnRefreshListener(() -> globalVM.refreshProducts());
 
-        settingsButton.setOnClickListener(view ->
-                drawerLayout.openDrawer(GravityCompat.START));
-
-        globalVM.getProductPagedList().observe(getViewLifecycleOwner(), adapter::submitList);
+        settingsButton.setOnClickListener(view -> drawerLayout.openDrawer(GravityCompat.START));
 
         searchBar.setOnClickListener(v -> navigateToSearchFragment());
 
-        addProductButton.setOnClickListener(v -> {
-            String userId = globalVM.getUserId();
-            if (userId != null) {
-                ProductFragment.newInstance(userId, null)
-                        .show(getChildFragmentManager(), ProductFragment.class.getSimpleName());
-            }
+        addProductButton.setOnClickListener(v -> showProduct(null));
+
+        globalVM.getProductPagedList().observe(getViewLifecycleOwner(), products -> {
+            if (swipeRefresh.isRefreshing()) swipeRefresh.setRefreshing(false);
+            adapter.submitList(products);
         });
 
-        adapter.setOnProductClickListener((itemView, product) -> {
-            String userId = globalVM.getUserId();
-            if (userId != null) {
-                ProductFragment.newInstance(userId, product.getProductId())
-                        .show(getChildFragmentManager(), ProductFragment.class.getSimpleName());
-            }
-        });
+        adapter.setOnProductClickListener((itemView, product) ->
+                showProduct(product.getProductId()));
+    }
+
+    private void showProduct(@Nullable String productId) {
+        String userId = globalVM.getUserId();
+        if (userId == null) return;
+        ProductFragment.newInstance(userId, productId)
+                .show(getChildFragmentManager(), ProductFragment.class.getSimpleName());
     }
 
     private void updateAndClose(@Nullable Category category, @Nullable SortModel sort) {
+        drawerLayout.closeDrawer(GravityCompat.START);
         globalVM.updateSearch(
                 category != null ? category.getCategoryId() : null,
                 sort != null ? sort.getNumericId() : -1
         );
-        drawerLayout.closeDrawer(GravityCompat.START);
     }
 
     @Override
