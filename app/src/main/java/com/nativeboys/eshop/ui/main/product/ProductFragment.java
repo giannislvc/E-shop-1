@@ -54,11 +54,12 @@ public class ProductFragment extends FullDialogFragment {
     private ProductViewModel productVM;
 
     private GalleryAdapter galleryAdapter;
-    private EditText nameField, priceField, descriptionField, detailsField;
+    private EditText nameField, priceField, descriptionField, detailsField, hashTagsField;
 
     private ScrollView scrollView;
     private ExpandableLayout detailsLayout, descriptionLayout;
-    private TextView viewsField, picNumField, descriptionLabel, detailsLabel, categoriesLabel;
+    private TextView viewsField, picNumField, descriptionLabel, detailsLabel,
+            categoriesLabel, hashTagsLabel;
     private RatingBar ratingBar;
     private Button startBtn, endBtn;
     private CategoriesAdapter categoriesAdapter;
@@ -180,6 +181,8 @@ public class ProductFragment extends FullDialogFragment {
         categoriesLabel = view.findViewById(R.id.categories_label);
         categoriesRV = view.findViewById(R.id.categories_recycler_view);
         addImageContainer = view.findViewById(R.id.add_image_container);
+        hashTagsLabel = view.findViewById(R.id.hash_tags_label);
+        hashTagsField = view.findViewById(R.id.hash_tags_field);
 
         categoriesAdapter = new CategoriesAdapter();
         categoriesRV.setAdapter(categoriesAdapter);
@@ -226,8 +229,7 @@ public class ProductFragment extends FullDialogFragment {
         String price = priceField.getText().toString();
         String description = descriptionField.getText().toString();
         String details = detailsField.getText().toString();
-        // TODO: Implement HashTags (pass as string separate comma)
-        List<String> hashTags = new ArrayList<>();
+        String hashTags = hashTagsField.getText().toString();
         productVM.createProduct(name, price, description, details, hashTags, new CompletionHandler<String>() {
             @Override
             public void onSuccess(@NonNull String model) {
@@ -310,8 +312,10 @@ public class ProductFragment extends FullDialogFragment {
             galleryAdapter.setIsClientProduct(isClientProduct);
 
             int visibility = isClientProduct ? View.VISIBLE : View.GONE;
+            hashTagsLabel.setVisibility(visibility);
             categoriesLabel.setVisibility(visibility);
             categoriesRV.setVisibility(visibility);
+            hashTagsField.setVisibility(visibility);
             addImageContainer.setVisibility(visibility);
         });
 

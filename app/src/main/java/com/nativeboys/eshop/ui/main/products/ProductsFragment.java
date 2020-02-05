@@ -28,6 +28,7 @@ import com.nativeboys.eshop.R;
 import com.nativeboys.eshop.models.adapter.SortModel;
 import com.nativeboys.eshop.models.node.Category;
 import com.nativeboys.eshop.tools.GlobalViewModel;
+import com.nativeboys.eshop.ui.main.adapters.ProductsAdapter;
 import com.nativeboys.eshop.ui.main.product.ProductFragment;
 import com.nativeboys.eshop.ui.main.settings.SettingsFragment;
 
@@ -74,6 +75,7 @@ public class ProductsFragment extends Fragment implements SettingsFragment.OnUse
         SwipeRefreshLayout swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout);
 
         swipeRefreshLayout.setColorSchemeColors(Color.parseColor("#2fb7ec"));
+
         adapter = new ProductsAdapter();
         recyclerView.setAdapter(adapter);
         FlexboxLayoutManager flexManager = new FlexboxLayoutManager(recyclerView.getContext());
@@ -81,6 +83,7 @@ public class ProductsFragment extends Fragment implements SettingsFragment.OnUse
         flexManager.setJustifyContent(JustifyContent.FLEX_START);
         recyclerView.setLayoutManager(flexManager);
         recyclerView.setHasFixedSize(true);
+
         setUpListeners();
     }
 

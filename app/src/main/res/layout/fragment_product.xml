@@ -320,9 +320,48 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 app:layout_constraintTop_toBottomOf="@id/categories_label"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
+
+            <TextView
+                android:id="@+id/hash_tags_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:paddingStart="15dp"
+                android:paddingEnd="15dp"
+                android:paddingTop="15dp"
+                android:paddingBottom="5dp"
+                android:textSize="17sp"
+                android:background="@android:color/white"
+                android:fontFamily="@font/breeze_sans_regular"
+                android:textColor="@android:color/black"
+                android:text="@string/hash_tags"
+                app:layout_constraintTop_toBottomOf="@id/categories_recycler_view"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <EditText
+                android:id="@+id/hash_tags_field"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/hash_tags_label"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:paddingTop="5dp"
+                android:paddingBottom="15dp"
+                android:paddingStart="15dp"
+                android:paddingEnd="15dp"
+                android:textSize="15.5sp"
+                android:fontFamily="@font/breeze_sans_light"
+                android:background="@android:color/white"
+                android:textColor="@color/darkGray"
+                android:lineSpacingExtra="2dp"
+                android:hint="@string/separate_hash_tags"
+                android:textColorHint="@color/gray"
+                android:inputType="textMultiLine"
+                android:importantForAutofill="no"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

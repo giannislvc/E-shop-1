@@ -1,4 +1,4 @@
-package com.nativeboys.eshop.ui.main.products;
+package com.nativeboys.eshop.ui.main.adapters;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -40,11 +40,11 @@ public class ProductsAdapter extends PagedListAdapter<Product, ProductsAdapter.P
 
     private OnProductClickListener clickListener;
 
-    ProductsAdapter() {
+    public ProductsAdapter() {
         super(DIFF_CALLBACK);
     }
 
-    void setOnProductClickListener(OnProductClickListener listener) {
+    public void setOnProductClickListener(OnProductClickListener listener) {
         clickListener = listener;
     }
 

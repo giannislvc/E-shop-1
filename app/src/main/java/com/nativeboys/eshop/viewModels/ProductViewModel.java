@@ -21,6 +21,7 @@ import com.nativeboys.eshop.models.node.NewProduct;
 import com.nativeboys.eshop.ui.main.product.GalleryModel;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -213,12 +214,13 @@ public class ProductViewModel extends AndroidViewModel {
                               @NonNull String price,
                               @NonNull String description,
                               @NonNull String details,
-                              @NonNull List<String> hashTags,
+                              @NonNull String hashTags,
                               @NonNull CompletionHandler<String> completion) {
         // TODO: Here implement Update Product logic
         String categoryId = getSelectedCategoryId();
         if (categoryId != null) {
-            NewProduct product = new NewProduct(name, price, description, details, hashTags, clientId, categoryId);
+            List<String> tags = Arrays.asList(hashTags.split(","));
+            NewProduct product = new NewProduct(name, price, description, details, tags, clientId, categoryId);
             List<GalleryModel> list = getCurrentImages();
             List<Uri> uris = new ArrayList<>();
             for(GalleryModel model : list) {

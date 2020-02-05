@@ -6,7 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -44,7 +44,7 @@ public class SearchFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getActivity() != null) {
-            globalVM = ViewModelProviders.of(getActivity()).get(GlobalViewModel.class);
+            globalVM = new ViewModelProvider(getActivity()).get(GlobalViewModel.class);
         }
     }
 
@@ -102,20 +102,23 @@ public class SearchFragment extends Fragment {
 
         globalVM.refreshMostPopular();
 
-        globalVM.getSearches().observe(this, strings -> searchAdapter.setDataSet(strings));
+        globalVM.getSearches().observe(getViewLifecycleOwner(), strings -> searchAdapter.setDataSet(strings));
 
         searchField.setOnTextChangedListener((editText, text) -> globalVM.getTextSearch().setValue(text));
 
-        globalVM.getTextSearch().observe(this, s -> {
+        globalVM.getTextSearch().observe(getViewLifecycleOwner(), s -> {
             boolean enabled = (s != null && !s.isEmpty());
             clearText.setVisibility(enabled ? View.VISIBLE : View.INVISIBLE);
         });
 
-        globalVM.getPopularProducts().observe(this, products -> mostPopularAdapter.submitList(products));
+        globalVM.getPopularProducts().observe(getViewLifecycleOwner(),
+                products -> mostPopularAdapter.submitList(products));
 
-        globalVM.getSearchHistory().observe(this, strings -> recentSearchAdapter.setDataSet(strings));
+        globalVM.getSearchHistory().observe(getViewLifecycleOwner(),
+                strings -> recentSearchAdapter.setDataSet(strings));
 
-        globalVM.getProductHistory().observe(this, products -> recentViewedAdapter.submitList(products));
+        globalVM.getProductHistory().observe(getViewLifecycleOwner(),
+                products -> recentViewedAdapter.submitList(products));
     }
 
 }
