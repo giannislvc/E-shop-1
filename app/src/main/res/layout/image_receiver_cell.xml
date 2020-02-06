@@ -17,13 +17,12 @@
         app:cardElevation="0dp"
         app:cardPreventCornerOverlap="false">
 
-        <com.wang.avi.AVLoadingIndicatorView
+        <ProgressBar
             android:id="@+id/progress_widget"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_gravity="center"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
             android:visibility="visible"
-            app:indicatorName="BallClipRotateIndicator"/>
+            android:layout_gravity="center"/>
 
         <ImageView
             android:id="@+id/image_message"
