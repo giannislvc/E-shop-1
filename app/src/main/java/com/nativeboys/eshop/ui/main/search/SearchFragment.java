@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import com.nativeboys.eshop.R;
 import com.nativeboys.eshop.customViews.AutoCompleteInputView;
+import com.nativeboys.eshop.customViews.KeyboardManager;
 import com.nativeboys.eshop.customViews.NonScrollLayoutManager;
 import com.nativeboys.eshop.tools.GlobalViewModel;
 
@@ -68,6 +69,14 @@ public class SearchFragment extends Fragment {
 
         backArrow.setOnClickListener(v -> {
             if (getActivity() != null) getActivity().onBackPressed();
+        });
+
+        searchField.setOnFocusChangeListener((v, focus) -> {
+            if (focus) {
+                KeyboardManager.showKeyboard(v);
+            } else {
+                KeyboardManager.hideKeyboard(v);
+            }
         });
 
         viewAllField.setOnClickListener(v -> {

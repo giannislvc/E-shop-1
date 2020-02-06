@@ -9,7 +9,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.NavOptions;
 import androidx.navigation.Navigation;
@@ -39,7 +39,7 @@ public class LoginFragment extends Fragment implements OnFragmentTransaction {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        globalVM = ViewModelProviders.of(activity).get(GlobalViewModel.class);
+        globalVM = new ViewModelProvider(activity).get(GlobalViewModel.class);
     }
 
     @Override
