@@ -2,10 +2,12 @@ package com.nativeboys.eshop.customViews;
 
 import android.Manifest;
 import android.content.ClipData;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.View;
 
 import com.nativeboys.eshop.R;
@@ -23,7 +25,17 @@ import static android.app.Activity.RESULT_OK;
 public abstract class ImageProviderFragment extends Fragment {
 
     private static final int MY_PERMISSIONS_REQUEST = 100;
-    private final static int PICK_IMAGE_FROM_GALLERY_REQUEST = 1;
+    private static final int PICK_IMAGE_FROM_GALLERY_REQUEST = 1;
+    private static final int IMAGE_FROM_CAMERA = 1001;
+
+    private static final String[] permissions =
+            new String[] {
+                    Manifest.permission.CAMERA,
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+            };
+
+    private Uri imgUri; // Workaround for Camera Intent
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -45,39 +57,65 @@ public abstract class ImageProviderFragment extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if (requestCode == PICK_IMAGE_FROM_GALLERY_REQUEST && resultCode == RESULT_OK
-                && data != null) {
+        if (resultCode != RESULT_OK) return;
+        List<Uri> fileUris = new ArrayList<>();
+        if (requestCode == PICK_IMAGE_FROM_GALLERY_REQUEST && data != null) {
             ClipData clipData = data.getClipData();
             Uri uri = data.getData();
-            List<Uri> fileUris = new ArrayList<>();
-            if (clipData != null) {
+            if (clipData != null) { // Multiple Local Images
                 for(int i = 0; i < clipData.getItemCount(); i++) {
                     ClipData.Item item = clipData.getItemAt(i);
                     fileUris.add(item.getUri());
                 }
-            } else if (uri != null) {
+            } else if (uri != null) { // Single Local Image
                 fileUris.add(uri);
             }
-            onImagesRetrieved(fileUris);
+        } else if (requestCode == IMAGE_FROM_CAMERA) { // Camera Image
+            if (imgUri != null) fileUris.add(imgUri);
         }
+        onImagesRetrieved(fileUris);
+    }
+
+    private boolean permissionsDenied() {
+        if (getActivity() == null) return true;
+        for (String permission : permissions) {
+            if (ContextCompat.checkSelfPermission(getActivity(), permission)
+                    == PackageManager.PERMISSION_DENIED) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void requestPermissions() {
-        if (getActivity() == null) return;
-        if (ContextCompat.checkSelfPermission(getActivity(),
-                Manifest.permission.READ_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{ Manifest.permission.READ_EXTERNAL_STORAGE },
-                    MY_PERMISSIONS_REQUEST);
+        if (permissionsDenied()) {
+            requestPermissions(permissions, MY_PERMISSIONS_REQUEST);
         }
     }
 
+    /**Single Local Image*/
     protected void retrieveImage() {
         retrieveData(true);
     }
 
+    /**Multiple Local Images*/
     protected void retrieveImages() {
         retrieveData(false);
+    }
+
+    /**Camera's Image*/
+    protected void retrieveCameraImage() {
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.Images.Media.TITLE, "New Picture");
+        values.put(MediaStore.Images.Media.DESCRIPTION, "From Camera");
+        if (getActivity() == null) return;
+        imgUri = getActivity().getContentResolver()
+                .insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, imgUri);
+        startActivityForResult(
+                intent
+                , IMAGE_FROM_CAMERA);
     }
 
     private void retrieveData(boolean singleImage) {
@@ -99,3 +137,5 @@ public abstract class ImageProviderFragment extends Fragment {
     protected abstract void onPermissionGranted();
 
 }
+
+// https://android.jlelse.eu/androids-new-image-capture-from-a-camera-using-file-provider-dd178519a954
