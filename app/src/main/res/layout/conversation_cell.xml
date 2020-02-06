@@ -23,8 +23,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:textSize="12sp"
         android:fontFamily="@font/breeze_sans_light"
-        android:textColor="@color/gray"
-        android:text="@string/test_timestamp"/>
+        android:textColor="@color/gray" />
 
     <TextView
         android:id="@+id/user_name"
@@ -36,8 +35,7 @@
         android:layout_marginStart="20dp"
         android:fontFamily="@font/breeze_sans_regular"
         android:textColor="@android:color/black"
-        android:textSize="18sp"
-        android:text="@string/test_name"/>
+        android:textSize="18sp" />
 
     <TextView
         android:id="@+id/last_message"
@@ -52,7 +50,6 @@
         android:gravity="center_vertical"
         android:maxLines="1"
         android:textSize="14sp"
-        android:drawablePadding="5dp"
-        android:text="@string/test_message"/>
+        android:drawablePadding="5dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

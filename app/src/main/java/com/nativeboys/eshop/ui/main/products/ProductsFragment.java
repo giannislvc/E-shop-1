@@ -27,6 +27,7 @@ import com.nativeboys.eshop.customViews.PVCFragment;
 import com.nativeboys.eshop.models.adapter.SortModel;
 import com.nativeboys.eshop.models.node.Category;
 import com.nativeboys.eshop.tools.GlobalViewModel;
+import com.nativeboys.eshop.ui.main.MainFragmentDirections;
 import com.nativeboys.eshop.ui.main.adapters.ProductsAdapter;
 import com.nativeboys.eshop.ui.main.product.ProductFragment;
 import com.nativeboys.eshop.ui.main.settings.SettingsFragment;
@@ -85,32 +86,36 @@ public class ProductsFragment extends PVCFragment implements SettingsFragment.On
         setUpListeners();
     }
 
-    private void navigateToSearchFragment() {
+    private void navigateTo(int resource, String productId) {
         NavController parentController = getParentNavController();
-        if (parentController != null) {
-            parentController.navigate(R.id.action_main_to_search);
+        if (parentController == null) return;
+        if (resource == R.id.productFragment) {
+            String userId = globalVM.getUserId();
+            if (userId != null) {
+                parentController.navigate(MainFragmentDirections.actionMainToProduct(userId, productId));
+            }
+        } else {
+            parentController.navigate(resource);
         }
+    }
+
+    private void navigateTo(int resource) {
+        navigateTo(resource, null);
     }
 
     private void setUpListeners() {
         globalVM.refreshProducts();
         swipeRefresh.setOnRefreshListener(() -> globalVM.refreshProducts());
         settingsButton.setOnClickListener(view -> drawerLayout.openDrawer(GravityCompat.START));
-        searchBar.setOnClickListener(v -> navigateToSearchFragment());
-        addProductButton.setOnClickListener(v -> showProduct(null));
+        searchBar.setOnClickListener(v -> navigateTo(R.id.action_main_to_search));
+        addProductButton.setOnClickListener(v -> navigateTo(R.id.productFragment));
         globalVM.getProductPagedList().observe(getViewLifecycleOwner(), products -> {
             if (swipeRefresh.isRefreshing()) swipeRefresh.setRefreshing(false);
             adapter.submitList(products);
         });
-        adapter.setOnProductClickListener((itemView, product) ->
-                showProduct(product.getProductId()));
-    }
 
-    private void showProduct(@Nullable String productId) {
-        String userId = globalVM.getUserId();
-        if (userId == null) return;
-        ProductFragment.newInstance(userId, productId)
-                .show(getChildFragmentManager(), ProductFragment.class.getSimpleName());
+        adapter.setOnProductClickListener((itemView, product) ->
+                navigateTo(R.id.productFragment, product.getProductId()));
     }
 
     private void updateAndClose(@Nullable Category category, @Nullable SortModel sort) {

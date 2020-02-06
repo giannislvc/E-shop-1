@@ -1,10 +1,6 @@
 package com.nativeboys.eshop.ui.main.product;
 
-import android.Manifest;
 import android.app.Dialog;
-import android.content.ClipData;
-import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -12,7 +8,6 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -33,7 +28,7 @@ import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.nativeboys.eshop.R;
 import com.nativeboys.eshop.callbacks.CompletionHandler;
-import com.nativeboys.eshop.customViews.FullDialogFragment;
+import com.nativeboys.eshop.customViews.ImageProviderFragment;
 import com.nativeboys.eshop.ui.main.adapters.CategoriesAdapter;
 import com.nativeboys.eshop.viewModels.ProductViewModel;
 import com.nativeboys.eshop.viewModels.ProductViewModelFactory;
@@ -43,14 +38,7 @@ import net.cachapa.expandablelayout.ExpandableLayout;
 import java.util.ArrayList;
 import java.util.List;
 
-import static android.app.Activity.RESULT_OK;
-
-public class ProductFragment extends FullDialogFragment {
-
-    private final String TAG = getClass().getSimpleName();
-
-    private static final int MY_PERMISSIONS_REQUEST = 100;
-    private int PICK_IMAGE_FROM_GALLERY_REQUEST = 1;
+public class ProductFragment extends ImageProviderFragment {
 
     private ProductViewModel productVM;
 
@@ -75,83 +63,27 @@ public class ProductFragment extends FullDialogFragment {
         // Required empty public constructor
     }
 
-    public static ProductFragment newInstance(@NonNull String clientId, @Nullable String productId) {
-        Bundle args = new Bundle();
-        args.putString("CLIENT_ID", clientId);
-        args.putString("PRODUCT_ID", productId);
-        ProductFragment fragment = new ProductFragment();
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getActivity() == null) return;
         String clientId, productId;
         if (getArguments() != null) {
-            clientId = getArguments().getString("CLIENT_ID");
-            productId = getArguments().getString("PRODUCT_ID");
+            ProductFragmentArgs args = ProductFragmentArgs.fromBundle(getArguments());
+            clientId = args.getClientId();
+            productId = args.getProductId();
         } else {
-            clientId = null;
+            clientId = "";
             productId = null;
         }
-        if (clientId == null) return;
-        ProductViewModelFactory factory = new ProductViewModelFactory(
-                getActivity().getApplication(),
-                clientId,
-                productId);
-        productVM = new ViewModelProvider(this, factory).get(ProductViewModel.class);
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if (requestCode == PICK_IMAGE_FROM_GALLERY_REQUEST && resultCode == RESULT_OK
-                && data != null) {
-            ClipData clipData = data.getClipData();
-            Uri uri = data.getData();
-            List<Uri> fileUris = new ArrayList<>();
-            if (clipData != null) {
-                for(int i = 0; i < clipData.getItemCount(); i++) {
-                    ClipData.Item item = clipData.getItemAt(i);
-                    fileUris.add(item.getUri());
-                }
-            } else if (uri != null) {
-                fileUris.add(uri);
-            }
-            loadImagesIntoGallery(fileUris);
+        ProductViewModelFactory factory;
+        if (getActivity() != null) {
+            factory = new ProductViewModelFactory(getActivity().getApplication(), clientId, productId);
+        } else {
+            factory = null;
         }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch(requestCode) {
-            case MY_PERMISSIONS_REQUEST: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_DENIED) {
-                    // permission was granted, Do the file
-                    // related task you need to do.
-                } else {
-                    // permission denied Disable the
-                    // functionality that depends on this permission
-                }
-            }
-        }
-    }
-
-    private void requestPermissions() {
-        if (getActivity() == null) return;
-        if (ContextCompat.checkSelfPermission(getActivity(),
-                Manifest.permission.READ_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                    MY_PERMISSIONS_REQUEST);
-        }
-    }
-
-    private void loadImagesIntoGallery(List<Uri> uris) {
-        productVM.addUris(uris);
+        productVM = (factory != null) ?
+                new ViewModelProvider(this, factory).get(ProductViewModel.class) :
+                new ViewModelProvider(this).get(ProductViewModel.class);
     }
 
     @Override
@@ -194,10 +126,22 @@ public class ProductFragment extends FullDialogFragment {
 
         galleryAdapter = new GalleryAdapter();
         viewPager.setAdapter(galleryAdapter);
-        requestPermissions();
         setUpListeners();
         setUpDialogs(view);
     }
+
+    @Override
+    protected void onImagesRetrieved(@NonNull List<Uri> uris) {
+        productVM.addUris(uris);
+    }
+
+    @Override
+    protected void onPermissionDenied() {
+        dismiss();
+    }
+
+    @Override
+    protected void onPermissionGranted() { }
 
     private void setUpDialogs(@NonNull View view) {
         successDialog = new Dialog(view.getContext());
@@ -270,7 +214,7 @@ public class ProductFragment extends FullDialogFragment {
             public void onSuccess(@NonNull String model) {
                 view.setEnabled(true);
                 questionDialog.dismiss();
-                // TODO: Move Back
+                dismiss();
             }
 
             @Override
@@ -294,6 +238,10 @@ public class ProductFragment extends FullDialogFragment {
                 // TODO: Implement
             });
         }
+    }
+
+    private void dismiss() {
+        if(getActivity() != null) getActivity().onBackPressed();
     }
 
     private void setUpListeners() {
@@ -340,24 +288,11 @@ public class ProductFragment extends FullDialogFragment {
         categoriesAdapter.setOnCategoryClickListener(category ->
                 productVM.setSelectedCategory(category));
 
-        backBtn.setOnClickListener(v -> {
-            dismiss();
-            //if (getActivity() != null) getActivity().onBackPressed();
-        });
+        backBtn.setOnClickListener(v -> dismiss());
 
         galleryAdapter.setOnRemoveListener(position -> productVM.removeImage(position));
 
-        addImageButton.setOnClickListener(v -> {
-            Intent intent = new Intent();
-            // Show only images, no videos or anything else
-            intent.setType("image/*");
-            intent.setAction(Intent.ACTION_GET_CONTENT);
-            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-            // Always show chooser (if there are multiple options available)
-            startActivityForResult(
-                    Intent.createChooser(intent, getResources().getString(R.string.select_picture)),
-                    PICK_IMAGE_FROM_GALLERY_REQUEST);
-        });
+        addImageButton.setOnClickListener(v -> retrieveImages());
 
         descriptionLayout.setOnExpansionUpdateListener((expansionFraction, state) -> {
             if (state == ExpandableLayout.State.EXPANDED) {
@@ -371,37 +306,24 @@ public class ProductFragment extends FullDialogFragment {
             }
         });
 
-        descriptionLabel.setOnClickListener(v -> {
-            int drawable = descriptionLayout.isExpanded() ? R.drawable.ic_expand_more_black_24dp : R.drawable.ic_expand_less_black_24dp;
-            Glide.with(v.getContext()).load(drawable).into(new CustomTarget<Drawable>() {
-                @Override
-                public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
-                    descriptionLabel.setCompoundDrawablesWithIntrinsicBounds(null, null, resource, null);
-                }
+        descriptionLabel.setOnClickListener(v -> toggle(descriptionLayout, descriptionLabel));
+        detailsLabel.setOnClickListener(v -> toggle(detailsLayout, detailsLabel));
+    }
 
-                @Override
-                public void onLoadCleared(@Nullable Drawable placeholder) {
-                    descriptionLabel.setCompoundDrawablesWithIntrinsicBounds(null, null, placeholder, null);
-                }
-            });
-            descriptionLayout.toggle();
+    private void toggle(@NonNull ExpandableLayout exLayout, @NonNull TextView tv) {
+        int drawable = exLayout.isExpanded() ? R.drawable.ic_expand_more_black_24dp : R.drawable.ic_expand_less_black_24dp;
+        Glide.with(tv.getContext()).load(drawable).into(new CustomTarget<Drawable>() {
+            @Override
+            public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
+                tv.setCompoundDrawablesWithIntrinsicBounds(null, null, resource, null);
+            }
+
+            @Override
+            public void onLoadCleared(@Nullable Drawable placeholder) {
+                tv.setCompoundDrawablesWithIntrinsicBounds(null, null, placeholder, null);
+            }
         });
-
-        detailsLabel.setOnClickListener(v -> {
-            int drawable = detailsLayout.isExpanded() ? R.drawable.ic_expand_more_black_24dp : R.drawable.ic_expand_less_black_24dp;
-            Glide.with(v.getContext()).load(drawable).into(new CustomTarget<Drawable>() {
-                @Override
-                public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
-                    detailsLabel.setCompoundDrawablesWithIntrinsicBounds(null, null, resource, null);
-                }
-
-                @Override
-                public void onLoadCleared(@Nullable Drawable placeholder) {
-                    detailsLabel.setCompoundDrawablesWithIntrinsicBounds(null, null, placeholder, null);
-                }
-            });
-            detailsLayout.toggle();
-        });
+        exLayout.toggle();
     }
 
 }
