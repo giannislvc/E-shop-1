@@ -94,12 +94,12 @@ public abstract class ImageProviderFragment extends Fragment {
     }
 
     /**Single Local Image*/
-    protected void retrieveImage() {
+    protected void retrieveFileImage() {
         retrieveData(true);
     }
 
     /**Multiple Local Images*/
-    protected void retrieveImages() {
+    protected void retrieveFileImages() {
         retrieveData(false);
     }
 

@@ -15,8 +15,7 @@
         android:background="@drawable/receiver_message_shape"
         android:fontFamily="@font/breeze_sans_regular"
         android:textColor="@android:color/white"
-        android:textSize="15.5sp"
-        android:text="@string/test_message"/>
+        android:textSize="15.5sp" />
 
     <TextView
         android:id="@+id/time_stamp"
@@ -29,7 +28,6 @@
         android:layout_marginTop="2dp"
         android:textSize="12sp"
         android:fontFamily="@font/breeze_sans_light"
-        android:textColor="@color/gray"
-        android:text="@string/test_timestamp"/>
+        android:textColor="@color/gray" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

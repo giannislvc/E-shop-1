@@ -43,7 +43,6 @@
         android:layout_marginTop="2dp"
         android:textSize="12sp"
         android:fontFamily="@font/breeze_sans_light"
-        android:textColor="@color/gray"
-        android:text="@string/test_timestamp"/>
+        android:textColor="@color/gray" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

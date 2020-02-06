@@ -294,7 +294,7 @@ public class ProductFragment extends ImageProviderFragment {
 
         galleryAdapter.setOnRemoveListener(position -> productVM.removeImage(position));
 
-        addImageButton.setOnClickListener(v -> retrieveImages());
+        addImageButton.setOnClickListener(v -> retrieveFileImages());
 
         descriptionLayout.setOnExpansionUpdateListener((expansionFraction, state) -> {
             if (state == ExpandableLayout.State.EXPANDED) {

@@ -67,6 +67,7 @@
     <string name="clear_all">Clear all</string>
     <string name="search_settings">Search Settings</string>
     <string name="select_picture">Select Picture</string>
+    <string name="logout">Logout</string>
 
     <string name="rate">Rate</string>
     <string name="upload_time">Upload time</string>
@@ -75,9 +76,10 @@
     <string name="hash_tags">Hash Tags</string>
     <string name="separate_hash_tags">Separate with comma</string>
 
+    <string name="likes_">233\nLikes</string>
+    <string name="products_">349\nProducts</string>
+    <string name="test_name">Jonny Lulu</string>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="test_name">John Doe</string>
-    <string name="test_message">Good morning my dear friend! </string>
-    <string name="test_timestamp">10-07 19:47</string>
 </resources>
