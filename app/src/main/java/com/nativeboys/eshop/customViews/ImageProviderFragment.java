@@ -76,7 +76,7 @@ public abstract class ImageProviderFragment extends Fragment {
         onImagesRetrieved(fileUris);
     }
 
-    private boolean permissionsDenied() {
+    protected boolean permissionsDenied() {
         if (getActivity() == null) return true;
         for (String permission : permissions) {
             if (ContextCompat.checkSelfPermission(getActivity(), permission)

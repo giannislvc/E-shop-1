@@ -123,9 +123,9 @@ public class ProductFragment extends ImageProviderFragment {
         categoriesRV.setAdapter(categoriesAdapter);
         categoriesRV.setLayoutManager(new LinearLayoutManager(
                 categoriesRV.getContext(), LinearLayoutManager.HORIZONTAL , false));
-
         galleryAdapter = new GalleryAdapter();
         viewPager.setAdapter(galleryAdapter);
+        addImageButton.setEnabled(!permissionsDenied()); // SOS
         setUpListeners();
         setUpDialogs(view);
     }
@@ -141,7 +141,9 @@ public class ProductFragment extends ImageProviderFragment {
     }
 
     @Override
-    protected void onPermissionGranted() { }
+    protected void onPermissionGranted() {
+        addImageButton.setEnabled(true);
+    }
 
     private void setUpDialogs(@NonNull View view) {
         successDialog = new Dialog(view.getContext());
