@@ -48,7 +48,7 @@ public class ConversationFragment extends Fragment {
 
     private FragmentActivity activity;
     private ConversationViewModel viewModel;
-    private String conversationId, userId, friendId;
+    private String userId, friendId;
 
     private ConstraintLayout bottom;
     private LinearLayout moreOptionsContainer;
@@ -73,9 +73,8 @@ public class ConversationFragment extends Fragment {
             ConversationFragmentArgs args = ConversationFragmentArgs.fromBundle(getArguments());
             userId = args.getUserId();
             friendId = args.getFriendId();
-            conversationId = args.getConversationId();
         }
-        ConversationViewModelFactory factory = new ConversationViewModelFactory(activity.getApplication(), conversationId, userId, friendId);
+        ConversationViewModelFactory factory = new ConversationViewModelFactory(activity.getApplication(), userId, friendId);
         viewModel = new ViewModelProvider(this, factory).get(ConversationViewModel.class);
     }
 
@@ -90,7 +89,7 @@ public class ConversationFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         bottom = view.findViewById(R.id.bottom);
-        backBtn = view.findViewById(R.id.back_arrow);
+        backBtn = view.findViewById(R.id.back_btn);
         headline = view.findViewById(R.id.headline);
         recyclerView = view.findViewById(R.id.recycler_view);
         messageField = view.findViewById(R.id.message_field);

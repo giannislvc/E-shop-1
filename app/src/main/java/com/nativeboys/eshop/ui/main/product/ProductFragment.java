@@ -341,7 +341,8 @@ public class ProductFragment extends FullDialogFragment {
                 productVM.setSelectedCategory(category));
 
         backBtn.setOnClickListener(v -> {
-            if (getActivity() != null) getActivity().onBackPressed();
+            dismiss();
+            //if (getActivity() != null) getActivity().onBackPressed();
         });
 
         galleryAdapter.setOnRemoveListener(position -> productVM.removeImage(position));

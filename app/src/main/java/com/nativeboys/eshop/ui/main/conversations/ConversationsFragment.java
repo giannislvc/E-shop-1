@@ -4,7 +4,6 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -16,14 +15,14 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.nativeboys.eshop.R;
+import com.nativeboys.eshop.customViews.PVCFragment;
 import com.nativeboys.eshop.tools.GlobalViewModel;
 import com.nativeboys.eshop.ui.main.MainFragmentDirections;
 
 import java.util.ArrayList;
 
-public class ConversationsFragment extends Fragment {
+public class ConversationsFragment extends PVCFragment {
 
-    private NavController navController;
     private ConversationsAdapter adapter;
     private GlobalViewModel globalVM;
 
@@ -48,7 +47,7 @@ public class ConversationsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        navController = Navigation.findNavController(view);
+        NavController navController = Navigation.findNavController(view);
         RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
         adapter = new ConversationsAdapter();
         recyclerView.setAdapter(adapter);
@@ -56,10 +55,11 @@ public class ConversationsFragment extends Fragment {
 
         adapter.setConversationClickListener((itemView, meta) -> {
             String userId = globalVM.getUserId();
-            String conId = meta.getConversationId();
             String friendId = meta.getId();
-            if (userId != null && conId != null && friendId != null) {
-                navController.navigate(MainFragmentDirections.actionMainToConversation(conId, userId, friendId));
+            if (userId != null && friendId != null) {
+                NavController parentController = getParentNavController();
+                if (parentController == null) return;
+                parentController.navigate(MainFragmentDirections.actionMainToConversation(userId, friendId));
             }
         });
 

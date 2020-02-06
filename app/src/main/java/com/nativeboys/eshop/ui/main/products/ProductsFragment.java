@@ -15,8 +15,6 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
@@ -25,6 +23,7 @@ import com.google.android.flexbox.FlexboxLayoutManager;
 import com.google.android.flexbox.JustifyContent;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.nativeboys.eshop.R;
+import com.nativeboys.eshop.customViews.PVCFragment;
 import com.nativeboys.eshop.models.adapter.SortModel;
 import com.nativeboys.eshop.models.node.Category;
 import com.nativeboys.eshop.tools.GlobalViewModel;
@@ -32,15 +31,13 @@ import com.nativeboys.eshop.ui.main.adapters.ProductsAdapter;
 import com.nativeboys.eshop.ui.main.product.ProductFragment;
 import com.nativeboys.eshop.ui.main.settings.SettingsFragment;
 
-public class ProductsFragment extends Fragment implements SettingsFragment.OnUserInteractionListener {
+public class ProductsFragment extends PVCFragment implements SettingsFragment.OnUserInteractionListener {
 
     private GlobalViewModel globalVM;
-    private NavController parentNavController;
 
     private SwipeRefreshLayout swipeRefresh;
     private DrawerLayout drawerLayout;
     private ProductsAdapter adapter;
-
     private LinearLayout searchBar;
     private ImageView settingsButton;
     private FloatingActionButton addProductButton;
@@ -66,7 +63,7 @@ public class ProductsFragment extends Fragment implements SettingsFragment.OnUse
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        parentNavController = getParentNavController();
+        //parentNavController = getParentNavController();
 
         swipeRefresh = view.findViewById(R.id.swipe_refresh_layout);
         drawerLayout = view.findViewById(R.id.drawer_layout);
@@ -88,21 +85,10 @@ public class ProductsFragment extends Fragment implements SettingsFragment.OnUse
         setUpListeners();
     }
 
-    @Nullable
-    private NavController getParentNavController() {
-        NavHostFragment navHostFragment = (NavHostFragment) getParentFragment();
-        if (navHostFragment != null) {
-            Fragment parent = navHostFragment.getParentFragment();
-            if (parent != null && parent.getView() != null) {
-                return Navigation.findNavController(parent.getView());
-            }
-        }
-        return null;
-    }
-
     private void navigateToSearchFragment() {
-        if (parentNavController != null) {
-            parentNavController.navigate(R.id.action_main_to_search);
+        NavController parentController = getParentNavController();
+        if (parentController != null) {
+            parentController.navigate(R.id.action_main_to_search);
         }
     }
 

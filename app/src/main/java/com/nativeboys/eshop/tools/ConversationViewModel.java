@@ -7,6 +7,7 @@ import android.util.Log;
 import android.webkit.MimeTypeMap;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -19,7 +20,9 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.nativeboys.eshop.callbacks.Completion;
 import com.nativeboys.eshop.models.firebase.MessageModel;
+import com.nativeboys.eshop.models.firebase.MetaDataModel;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -82,18 +85,33 @@ public class ConversationViewModel extends AndroidViewModel {
         }
     };
 
-    ConversationViewModel(@NonNull Application application, @NonNull String conversationId, @NonNull String userId, @NonNull String friendId) {
+    ConversationViewModel(@NonNull Application application, @NonNull String userId, @NonNull String friendId) {
         super(application);
         this.userId = userId;
         this.friendId = friendId;
         contentResolver = application.getContentResolver();
 
-        conversationsRef = FirebaseDatabase.getInstance().getReference(CONVERSATIONS).child(conversationId);
         metadataRef = FirebaseDatabase.getInstance().getReference(METADATA);
         storageRef = FirebaseStorage.getInstance().getReference(UPLOADS);
 
-        conversationsRef.keepSynced(true);
+        getExistingConversationId(friendId, convId -> {
+            if (convId != null) { // conversation does exists
+                initConversation(convId); // init conversation immediately
+            } else { // conversation does not exists
+                boolean connected = NetworkManger.isNetworkAvailable(application);
+                if (connected) { // their is internet connection
+                    String nConvId = createConversation(friendId); // create new conversation id
+                    if (nConvId != null) initConversation(nConvId); // init conversation
+                } else {
+                    // TODO: 1. Show Dialog, 2. Check connection again, 3. init conversation
+                }
+            }
+        });
+    }
 
+    private void initConversation(@NonNull String convId) {
+        conversationsRef = FirebaseDatabase.getInstance().getReference(CONVERSATIONS).child(convId);
+        conversationsRef.keepSynced(true);
         liveQuery = conversationsRef.limitToLast(MESSAGES_PER_FETCH);
         fetchingDataState = true;
         liveQuery.addValueEventListener(valueEventListener);
@@ -115,6 +133,7 @@ public class ConversationViewModel extends AndroidViewModel {
     }
 
     private void sendToServer(@NonNull String text, @NonNull MessageType messageType) {
+        if (conversationsRef == null) return;
         String messageId = conversationsRef.push().getKey();
         if (messageId != null) {
             int type = (messageType == MessageType.TEXT ? 1 : 2);
@@ -145,10 +164,41 @@ public class ConversationViewModel extends AndroidViewModel {
         return mime.getExtensionFromMimeType(contentResolver.getType(uri));
     }
 
+    private void getExistingConversationId(@NonNull String friendId, @NonNull Completion<String> completion) {
+        if (userId != null) {
+            metadataRef.child(userId).child(friendId).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    MetaDataModel model = dataSnapshot.getValue(MetaDataModel.class);
+                    completion.onResponse(model != null ? model.getConversationId() : null);
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    completion.onResponse(null);
+                }
+            });
+        } else {
+            completion.onResponse(null);
+        }
+    }
+
+    @Nullable
+    private String createConversation(String friendId) {
+        if (userId == null) return null;
+        String convId = FirebaseDatabase.getInstance().getReference(CONVERSATIONS).push().getKey();
+        MetaDataModel sharedMeta = new MetaDataModel(convId, null);
+        if (convId != null) {
+            metadataRef.child(userId).child(friendId).setValue(sharedMeta);
+            metadataRef.child(friendId).child(userId).setValue(sharedMeta);
+        }
+        return convId;
+    }
+
     @Override
     protected void onCleared() {
-        liveQuery.removeEventListener(valueEventListener);
-        conversationsRef.keepSynced(false);
+        if (liveQuery != null) liveQuery.removeEventListener(valueEventListener);
+        if (conversationsRef != null) conversationsRef.keepSynced(false);
     }
 }
 

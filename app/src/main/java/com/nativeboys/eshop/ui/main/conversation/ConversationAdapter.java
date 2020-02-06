@@ -19,9 +19,6 @@ import com.nativeboys.eshop.R;
 import com.nativeboys.eshop.models.firebase.MessageModel;
 import com.nativeboys.eshop.customViews.ScreenManager;
 
-import java.text.SimpleDateFormat;
-import java.util.Locale;
-
 public class ConversationAdapter extends ListAdapter<MessageModel, ConversationAdapter.MessageViewHolder> {
 
     public interface OnImageClickListener {
@@ -100,17 +97,14 @@ public class ConversationAdapter extends ListAdapter<MessageModel, ConversationA
     public void onBindViewHolder(@NonNull ConversationAdapter.MessageViewHolder holder, int position) {
         int viewType = getItemViewType(position);
         MessageModel message = getItem(position);
-
-        // TODO: deserialization date format
-        SimpleDateFormat sdf = new SimpleDateFormat("MM-dd HH:mm", Locale.US);
-        holder.timeStamp.setText(sdf.format(message.getTimestamp()));
-
-        if (viewType == 1 || viewType == 3) {
-            TextMessageViewHolder textHolder = (TextMessageViewHolder) holder;
-            textHolder.bind(message);
-        } else if(viewType == 2 || viewType == 4) {
-            ImageMessageViewHolder imageHolder = (ImageMessageViewHolder) holder;
-            imageHolder.bind(message);
+        if (message != null) {
+            if (viewType == 1 || viewType == 3) {
+                TextMessageViewHolder textHolder = (TextMessageViewHolder) holder;
+                textHolder.bind(message);
+            } else if(viewType == 2 || viewType == 4) {
+                ImageMessageViewHolder imageHolder = (ImageMessageViewHolder) holder;
+                imageHolder.bind(message);
+            }
         }
     }
 
@@ -124,9 +118,7 @@ public class ConversationAdapter extends ListAdapter<MessageModel, ConversationA
         }
 
         public void bind(@NonNull MessageModel message) {
-            // TODO: deserialization date format
-            SimpleDateFormat sdf = new SimpleDateFormat("MM-dd HH:mm", Locale.US);
-            timeStamp.setText(sdf.format(message.getTimestamp()));
+            timeStamp.setText(message.getFormattedTimestamp());
         }
 
     }
