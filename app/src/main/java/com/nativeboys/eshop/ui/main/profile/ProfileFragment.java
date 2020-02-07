@@ -68,7 +68,19 @@ public class ProfileFragment extends ImageProviderFragment implements ImageBotto
             dialog.show(getChildFragmentManager(), BottomSheetDialogFragment.class.getSimpleName());
             dialog.setListener(this);
         });
+
+        /*ClientProvider.getInstance().observe(getViewLifecycleOwner(), firebaseUser -> {
+            if (firebaseUser == null) {
+                Log.i(TAG, "Logged Out: ");
+            }
+        });
+        logoutBtn.setOnClickListener(view -> {
+            GlobalViewModel vm = new ViewModelProvider(getActivity()).get(GlobalViewModel.class);
+            vm.signOut();
+        });*/
     }
+
+    private static final String TAG = "ProfileFragment";
 
     private void loadImageIntoHolder(@Nullable String url, @Nullable Uri uri) {
         if (uri == null && url == null) return;

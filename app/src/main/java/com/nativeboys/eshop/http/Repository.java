@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 import com.google.gson.Gson;
 import com.nativeboys.eshop.callbacks.CompletionHandler;
 import com.nativeboys.eshop.models.node.Category;
+import com.nativeboys.eshop.models.node.Customer;
 import com.nativeboys.eshop.models.node.DeleteResponse;
 import com.nativeboys.eshop.models.node.DetailedProduct;
 import com.nativeboys.eshop.models.node.Like;
@@ -51,6 +52,31 @@ public class Repository {
     private Repository() {
         api = RetrofitClient.getInstance().getClient().create(VMallApi.class);
         gsonHelper = new Gson();
+    }
+
+    @EverythingIsNonNull
+    public void createCustomer(String email, String password, String firstName, String lastName, CompletionHandler<Customer> completion) {
+        // TODO: Implement
+    }
+
+    @EverythingIsNonNull
+    public void getCustomer(CompletionHandler<Customer> completion) {
+        Call<Customer> call = api.getCustomer();
+        call.enqueue(new Callback<Customer>() {
+            @Override
+            public void onResponse(Call<Customer> call, Response<Customer> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    completion.onSuccess(response.body());
+                } else {
+                    completion.onFailure(null);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Customer> call, Throwable t) {
+                completion.onFailure(t.getMessage());
+            }
+        });
     }
 
     @EverythingIsNonNull

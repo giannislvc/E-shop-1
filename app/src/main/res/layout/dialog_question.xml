@@ -11,7 +11,7 @@
     <ImageView
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:tint="#F7797A"
+        android:tint="@color/red"
         android:src="@drawable/ic_help_black_24dp"
         android:contentDescription="@string/error"/>
 
@@ -37,13 +37,13 @@
             android:id="@+id/cancel_btn"
             android:layout_marginEnd="10dp"
             android:textColor="@android:color/white"
-            android:backgroundTint="#2fb7ec"
+            android:backgroundTint="@color/colorPrimary"
             style="@style/CommonButtonStyle"
             android:text="@string/cancel"/>
 
         <Button
             android:id="@+id/delete_btn"
-            android:backgroundTint="#F7797A"
+            android:backgroundTint="@color/red"
             android:textColor="@android:color/white"
             style="@style/CommonButtonStyle"
             android:text="@string/delete"/>

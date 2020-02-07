@@ -148,7 +148,6 @@ public class ConversationAdapter extends ListAdapter<MessageModel, ConversationA
         ImageMessageViewHolder(@NonNull View itemView) {
             super(itemView);
             imageMessage = itemView.findViewById(R.id.image_message);
-            // AVLoadingIndicatorView progressWidget = itemView.findViewById(R.id.progress_widget);
             imageMessage.setOnClickListener(v -> {
                 if (imageClickListener == null) return;
                 int position = getAdapterPosition();

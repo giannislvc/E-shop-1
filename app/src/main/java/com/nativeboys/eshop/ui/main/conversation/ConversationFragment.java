@@ -1,17 +1,11 @@
 package com.nativeboys.eshop.ui.main.conversation;
 
-import android.Manifest;
-import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -29,25 +23,21 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.nativeboys.eshop.R;
-import com.nativeboys.eshop.tools.UsersCache;
+import com.nativeboys.eshop.customViews.ImageProviderFragment;
 import com.nativeboys.eshop.ui.main.conversation.imageDisplay.ImageDisplayFragment;
 import com.nativeboys.eshop.tools.ConversationViewModel;
 import com.nativeboys.eshop.tools.ConversationViewModelFactory;
 
 import java.util.ArrayList;
+import java.util.List;
 
-import static android.app.Activity.RESULT_OK;
 import static com.nativeboys.eshop.tools.ConversationViewModel.MESSAGES_PER_FETCH;
 
-public class ConversationFragment extends Fragment {
+public class ConversationFragment extends ImageProviderFragment {
 
     private final String TAG = getClass().getSimpleName();
 
-    private static final int PICK_IMAGE_REQUEST = 1;
-
-    private FragmentActivity activity;
-    private ConversationViewModel viewModel;
-    private String userId, friendId;
+    private ConversationViewModel chatVM;
 
     private ConstraintLayout bottom;
     private LinearLayout moreOptionsContainer;
@@ -68,13 +58,23 @@ public class ConversationFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        String friendId;
         if (getArguments() != null) {
             ConversationFragmentArgs args = ConversationFragmentArgs.fromBundle(getArguments());
-            userId = args.getUserId();
             friendId = args.getFriendId();
+        } else {
+            friendId = null;
         }
-        ConversationViewModelFactory factory = new ConversationViewModelFactory(activity.getApplication(), userId, friendId);
-        viewModel = new ViewModelProvider(this, factory).get(ConversationViewModel.class);
+        ConversationViewModelFactory factory;
+        if (getActivity() != null) {
+            factory = new ConversationViewModelFactory(getActivity().getApplication(),
+                    friendId != null ? friendId : "");
+        } else {
+            factory = null;
+        }
+        chatVM = (factory != null) ?
+                new ViewModelProvider(this, factory).get(ConversationViewModel.class) :
+                new ViewModelProvider(this).get(ConversationViewModel.class);
     }
 
     @Override
@@ -99,11 +99,7 @@ public class ConversationFragment extends Fragment {
         takePhotoBtn = view.findViewById(R.id.take_photo_btn);
         picturesBtn = view.findViewById(R.id.pictures_btn);
 
-        UsersCache.getUser(friendId, user -> {
-            if (user != null) headline.setText(user.getName());
-        });
-
-        adapter = new ConversationAdapter(userId);
+        adapter = new ConversationAdapter(chatVM.getUserId());
         manager = new LinearLayoutManager(recyclerView.getContext());
 
         recyclerView.setAdapter(adapter);
@@ -114,22 +110,30 @@ public class ConversationFragment extends Fragment {
 
     private void setUpListeners() {
 
-        backBtn.setOnClickListener(v -> activity.onBackPressed());
-
-        sendBtn.setOnClickListener(v-> {
-            String message = messageField.getText() != null ? messageField.getText().toString() : "";
-            if (message.isEmpty()) return;
-            viewModel.sendMessage(message.trim());
-            messageField.setText(null);
+        backBtn.setOnClickListener(v -> {
+            if (getActivity() != null) getActivity().onBackPressed();
         });
+
+        picturesBtn.setOnClickListener(view -> retrieveFileImage());
+
+        takePhotoBtn.setOnClickListener(view -> retrieveCameraImage());
 
         moreOptionsBtn.setOnClickListener(view ->
                 moreOptionsContainer.setVisibility(moreOptionsContainer.getVisibility() == View.VISIBLE ? View.GONE: View.VISIBLE));
 
-        viewModel.getMessages().observe(getViewLifecycleOwner(), messageModels ->
-                adapter.submitList(new ArrayList<>(messageModels)));
+        sendBtn.setOnClickListener(v-> {
+            String message = messageField.getText() != null ? messageField.getText().toString() : "";
+            if (message.isEmpty()) return;
+            chatVM.sendMessage(message.trim());
+            messageField.setText(null);
+        });
 
-        picturesBtn.setOnClickListener(view -> openGallery());
+        chatVM.getFriend().observe(getViewLifecycleOwner(), customer -> {
+            if (customer != null) headline.setText(customer.getFirstName());
+        });
+
+        chatVM.getMessages().observe(getViewLifecycleOwner(), messageModels ->
+                adapter.submitList(new ArrayList<>(messageModels)));
 
         bottom.addOnLayoutChangeListener((v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
             if (oldBottom > bottom || top < oldTop) scrollToBottom();
@@ -151,39 +155,9 @@ public class ConversationFragment extends Fragment {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 if (manager.findFirstCompletelyVisibleItemPosition() != 0) return;
-                viewModel.getPreviousMessages();
+                chatVM.getPreviousMessages();
             }
         }), 1500);
-    }
-
-    private void openGallery() {
-        if (ContextCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE)
-                == PackageManager.PERMISSION_DENIED) {
-            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PICK_IMAGE_REQUEST);
-        } else {
-            openFileChooser();
-        }
-    }
-
-    private void openFileChooser() {
-        startActivityForResult(new Intent()
-                .setType("image/*")
-                .setAction(Intent.ACTION_GET_CONTENT), PICK_IMAGE_REQUEST);
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == PICK_IMAGE_REQUEST && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            openFileChooser();
-        }
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK
-                && data != null && data.getData() != null) {
-            viewModel.sendImage(data.getData());
-        }
     }
 
     private void scrollToBottom() {
@@ -192,16 +166,15 @@ public class ConversationFragment extends Fragment {
     }
 
     @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        activity = (FragmentActivity) context;
+    protected void onImagesRetrieved(@NonNull List<Uri> uris) {
+        if (uris.size() > 0) chatVM.sendImage(uris.get(0));
     }
 
     @Override
-    public void onDetach() {
-        super.onDetach();
-        activity = null;
-    }
+    protected void onPermissionDenied() { }
+
+    @Override
+    protected void onPermissionGranted() { }
 
 }
 

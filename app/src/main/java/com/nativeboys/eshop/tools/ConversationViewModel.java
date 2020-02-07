@@ -23,6 +23,8 @@ import com.google.firebase.storage.StorageReference;
 import com.nativeboys.eshop.callbacks.Completion;
 import com.nativeboys.eshop.models.firebase.MessageModel;
 import com.nativeboys.eshop.models.firebase.MetaDataModel;
+import com.nativeboys.eshop.models.node.Customer;
+import com.nativeboys.eshop.viewModels.FirebaseClientProvider;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -51,10 +53,12 @@ public class ConversationViewModel extends AndroidViewModel {
     private final String userId, friendId;
     private int count;
 
+    private MutableLiveData<Customer> friend;
     private MutableLiveData<List<MessageModel>> messages;
     private boolean fetchingDataState;
 
     {
+        friend = new MutableLiveData<>();
         messages = new MutableLiveData<>();
         count = 0;
     }
@@ -85,9 +89,9 @@ public class ConversationViewModel extends AndroidViewModel {
         }
     };
 
-    ConversationViewModel(@NonNull Application application, @NonNull String userId, @NonNull String friendId) {
+    ConversationViewModel(@NonNull Application application, @NonNull String friendId) {
         super(application);
-        this.userId = userId;
+        this.userId = FirebaseClientProvider.getInstance().getFirebaseUserId();
         this.friendId = friendId;
         contentResolver = application.getContentResolver();
 
@@ -107,6 +111,16 @@ public class ConversationViewModel extends AndroidViewModel {
                 }
             }
         });
+
+        CustomersCache.getCustomer(friendId, model -> friend.setValue(model));
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public LiveData<Customer> getFriend() {
+        return friend;
     }
 
     private void initConversation(@NonNull String convId) {

@@ -119,7 +119,7 @@ public class SearchFragment extends Fragment {
 
         if (globalVM == null) return;
 
-        globalVM.refreshMostPopular();
+        globalVM.fetchMostPopular();
 
         globalVM.getSearches().observe(getViewLifecycleOwner(), strings -> searchAdapter.setDataSet(strings));
 

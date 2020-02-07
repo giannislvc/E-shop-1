@@ -13,7 +13,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:background="#2fb7ec"
+        android:background="@color/colorPrimary"
         android:padding="15dp">
 
         <ImageView
@@ -110,7 +110,7 @@
                 android:layout_height="wrap_content"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                android:textColor="#2fb7ec"
+                android:textColor="@color/colorPrimary"
                 android:fontFamily="@font/breeze_sans_regular"
                 android:text="@string/view_all"/>
 

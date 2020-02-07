@@ -34,9 +34,6 @@
         android:label="fragment_conversation"
         tools:layout="@layout/fragment_conversation" >
         <argument
-            android:name="userId"
-            app:argType="string" />
-        <argument
             android:name="friendId"
             app:argType="string" />
     </fragment>
@@ -46,9 +43,6 @@
         android:name="com.nativeboys.eshop.ui.main.product.ProductFragment"
         android:label="fragment_product"
         tools:layout="@layout/fragment_product" >
-        <argument
-            android:name="clientId"
-            app:argType="string" />
         <argument
             android:name="productId"
             app:argType="string"

@@ -14,7 +14,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:background="#2fb7ec"
+        android:background="@color/colorPrimary"
         android:padding="15dp">
 
         <ImageView
@@ -170,7 +170,7 @@
                     android:id="@+id/price_field"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:textColor="#F7797A"
+                    android:textColor="@color/red"
                     android:background="@android:color/white"
                     android:fontFamily="@font/breeze_sans_bold"
                     app:layout_constraintTop_toTopOf="parent"
@@ -205,7 +205,7 @@
                     app:layout_constraintStart_toEndOf="@id/rating_bar"
                     android:layout_marginStart="5dp"
                     android:textSize="12sp"
-                    android:textColor="#2fb7ec"
+                    android:textColor="@color/colorPrimary"
                     android:fontFamily="@font/breeze_sans_medium" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
@@ -382,12 +382,12 @@
             android:id="@+id/start_btn"
             android:layout_marginEnd="30dp"
             android:textColor="@android:color/white"
-            android:backgroundTint="#F7797A"
+            android:backgroundTint="@color/red"
             style="@style/CommonButtonStyle"/>
 
         <Button
             android:id="@+id/end_btn"
-            android:backgroundTint="#2fb7ec"
+            android:backgroundTint="@color/colorPrimary"
             android:textColor="@android:color/white"
             style="@style/CommonButtonStyle"/>
 

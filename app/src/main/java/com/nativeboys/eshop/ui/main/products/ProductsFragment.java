@@ -1,6 +1,5 @@
 package com.nativeboys.eshop.ui.main.products;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -70,7 +69,7 @@ public class ProductsFragment extends PVCFragment implements SettingsFragment.On
         searchBar = view.findViewById(R.id.search_bar);
         RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
 
-        swipeRefresh.setColorSchemeColors(Color.parseColor("#2fb7ec"));
+        swipeRefresh.setColorSchemeColors(view.getResources().getColor(R.color.colorPrimary));
 
         adapter = new ProductsAdapter();
         recyclerView.setAdapter(adapter);
@@ -87,10 +86,7 @@ public class ProductsFragment extends PVCFragment implements SettingsFragment.On
         NavController parentController = getParentNavController();
         if (parentController == null) return;
         if (resource == R.id.productFragment) {
-            String userId = globalVM.getUserId();
-            if (userId != null) {
-                parentController.navigate(MainFragmentDirections.actionMainToProduct(userId, productId));
-            }
+            parentController.navigate(MainFragmentDirections.actionMainToProduct(productId));
         } else {
             parentController.navigate(resource);
         }

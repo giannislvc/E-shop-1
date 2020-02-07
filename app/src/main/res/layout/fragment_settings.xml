@@ -83,7 +83,7 @@
             android:text="@string/submit"
             android:fontFamily="@font/breeze_sans_bold"
             android:textAllCaps="false"
-            android:background="#2fb7ec"
+            android:background="@color/colorPrimary"
             android:textSize="16.5sp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"

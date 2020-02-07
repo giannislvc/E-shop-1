@@ -6,7 +6,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -47,19 +46,17 @@ public class ConversationsFragment extends PVCFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        NavController navController = Navigation.findNavController(view);
         RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
         adapter = new ConversationsAdapter();
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
 
         adapter.setConversationClickListener((itemView, meta) -> {
-            String userId = globalVM.getUserId();
             String friendId = meta.getId();
-            if (userId != null && friendId != null) {
+            if (friendId != null) {
                 NavController parentController = getParentNavController();
                 if (parentController == null) return;
-                parentController.navigate(MainFragmentDirections.actionMainToConversation(userId, friendId));
+                parentController.navigate(MainFragmentDirections.actionMainToConversation(friendId));
             }
         });
 

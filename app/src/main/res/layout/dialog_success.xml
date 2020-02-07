@@ -11,7 +11,7 @@
     <ImageView
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:tint="#2fb7ec"
+        android:tint="@color/colorPrimary"
         android:src="@drawable/ic_check_circle_black_24dp"
         android:contentDescription="@string/error"/>
 

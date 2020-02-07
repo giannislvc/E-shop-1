@@ -1,12 +1,10 @@
 package com.nativeboys.eshop.ui.login;
 
-import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.lifecycle.ViewModelProvider;
@@ -21,14 +19,13 @@ import android.view.ViewGroup;
 
 import com.google.android.material.tabs.TabLayout;
 import com.nativeboys.eshop.R;
-import com.nativeboys.eshop.tools.GlobalViewModel;
+import com.nativeboys.eshop.viewModels.LoginViewModel;
 
 public class LoginFragment extends Fragment implements OnFragmentTransaction {
 
-    private FragmentActivity activity;
-    private NavController navController;
-    private GlobalViewModel globalVM;
+    private LoginViewModel loginVM;
 
+    private NavController navController;
     private ViewPager viewPager;
     private LoginPagerAdapter adapter;
 
@@ -39,7 +36,7 @@ public class LoginFragment extends Fragment implements OnFragmentTransaction {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        globalVM = new ViewModelProvider(activity).get(GlobalViewModel.class);
+        loginVM  = new ViewModelProvider(this).get(LoginViewModel.class);
     }
 
     @Override
@@ -58,7 +55,7 @@ public class LoginFragment extends Fragment implements OnFragmentTransaction {
         adapter = new LoginPagerAdapter(getChildFragmentManager());
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
-        if (globalVM.isUserLoggedIn()) toMainMenu();
+        if (loginVM.isUserLoggedIn()) toMainMenu();
     }
 
     private void toMainMenu() {
@@ -120,18 +117,6 @@ public class LoginFragment extends Fragment implements OnFragmentTransaction {
             return 2;
         }
 
-    }
-
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        activity = (FragmentActivity) context;
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        activity = null;
     }
 
 }

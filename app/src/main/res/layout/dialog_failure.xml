@@ -11,7 +11,7 @@
     <ImageView
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:tint="#F7797A"
+        android:tint="@color/colorAccent"
         android:src="@drawable/ic_cancel_black_24dp"
         android:contentDescription="@string/error"/>
 

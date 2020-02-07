@@ -24,7 +24,7 @@ import com.bumptech.glide.request.transition.Transition;
 import com.nativeboys.eshop.R;
 import com.nativeboys.eshop.models.firebase.MessageModel;
 import com.nativeboys.eshop.models.firebase.MetaDataModel;
-import com.nativeboys.eshop.tools.UsersCache;
+import com.nativeboys.eshop.tools.CustomersCache;
 
 public class ConversationsAdapter extends ListAdapter<MetaDataModel, ConversationsAdapter.ConversationsViewHolder> {
 
@@ -107,7 +107,7 @@ public class ConversationsAdapter extends ListAdapter<MetaDataModel, Conversatio
 
         private void bind(@NonNull MetaDataModel metaData) {
             userName.setText(null);
-            UsersCache.getUser(metaData.getId(), user -> {
+            CustomersCache.getCustomer(metaData.getId(), user -> {
                 if (user == null) return;
                 MessageModel message = metaData.getLastMessage();
                 if (message == null) return;
@@ -119,7 +119,7 @@ public class ConversationsAdapter extends ListAdapter<MetaDataModel, Conversatio
 
                 if (friendMessage) { // Friend Message
                     text = textMessage ? message.getText() :
-                            String.format(context.getResources().getString(R.string.friend_sent_photo), user.getName());
+                            String.format(context.getResources().getString(R.string.friend_sent_photo), user.getFirstName());
                 } else { // Client Message
                     text = textMessage ? String.format(context.getResources().getString(R.string.you_sent_text), message.getText()) :
                             context.getResources().getString(R.string.you_sent_photo);
@@ -132,9 +132,9 @@ public class ConversationsAdapter extends ListAdapter<MetaDataModel, Conversatio
                 int resource = textMessage ? R.drawable.ic_message_black_24dp : R.drawable.ic_image_black_24dp;
                 loadLastMessageDrawable(resource);
 
-                userName.setText(user.getName());
+                userName.setText(user.getFirstName());
                 Glide.with(userImage.getContext())
-                        .load(user.getPickPath())
+                        .load(user.getProfileImageUrl())
                         .transform(new CenterCrop())
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .into(userImage);

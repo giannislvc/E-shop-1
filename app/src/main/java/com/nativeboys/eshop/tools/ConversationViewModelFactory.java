@@ -9,17 +9,16 @@ import androidx.lifecycle.ViewModelProvider;
 public class ConversationViewModelFactory implements ViewModelProvider.Factory {
 
     private Application application;
-    private String userId, friendId;
+    private String friendId;
 
-    public ConversationViewModelFactory(@NonNull Application application, @NonNull String userId, @NonNull String friendId) {
+    public ConversationViewModelFactory(@NonNull Application application, @NonNull String friendId) {
         this.application = application;
-        this.userId = userId;
         this.friendId = friendId;
     }
 
     @NonNull
     @Override
     public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
-        return (T) new ConversationViewModel(application, userId, friendId);
+        return (T) new ConversationViewModel(application, friendId);
     }
 }

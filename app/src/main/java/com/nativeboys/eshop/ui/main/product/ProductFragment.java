@@ -66,18 +66,16 @@ public class ProductFragment extends ImageProviderFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        String clientId, productId;
+        String productId;
         if (getArguments() != null) {
             ProductFragmentArgs args = ProductFragmentArgs.fromBundle(getArguments());
-            clientId = args.getClientId();
             productId = args.getProductId();
         } else {
-            clientId = "";
             productId = null;
         }
         ProductViewModelFactory factory;
         if (getActivity() != null) {
-            factory = new ProductViewModelFactory(getActivity().getApplication(), clientId, productId);
+            factory = new ProductViewModelFactory(getActivity().getApplication(), productId);
         } else {
             factory = null;
         }

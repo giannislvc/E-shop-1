@@ -71,7 +71,7 @@
         app:layout_constraintTop_toTopOf="@id/likes_field"
         app:layout_constraintBottom_toBottomOf="@id/likes_field"
         app:layout_constraintEnd_toEndOf="@id/image_holder"
-        android:tint="#F7797A"
+        android:tint="@color/red"
         android:src="@drawable/ic_favorite_black_18dp" />
 
     <!--<CheckBox

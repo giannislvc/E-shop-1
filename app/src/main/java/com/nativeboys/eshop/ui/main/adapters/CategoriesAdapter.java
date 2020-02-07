@@ -1,6 +1,7 @@
 package com.nativeboys.eshop.ui.main.adapters;
 
 import android.content.res.ColorStateList;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -86,6 +87,8 @@ public class CategoriesAdapter extends ListAdapter<Category, CategoriesAdapter.V
         }
 
         private void bind(@NonNull Category category) {
+            Resources res = imageHolder.getResources();
+
             Glide.with(imageHolder.getContext())
                     .load(category.getImageUrl())
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
@@ -93,12 +96,12 @@ public class CategoriesAdapter extends ListAdapter<Category, CategoriesAdapter.V
             label.setText(category.getName());
 
             imageContainer.setCardBackgroundColor(category.isSelected() ?
-                    Color.parseColor("#2fb7ec") :
+                    res.getColor(R.color.colorPrimary) :
                     Color.WHITE);
 
             imageHolder.setImageTintList(ColorStateList.valueOf(category.isSelected() ?
                     Color.WHITE :
-                    Color.parseColor("#3e4359")));
+                    res.getColor(R.color.purple)));
         }
 
     }

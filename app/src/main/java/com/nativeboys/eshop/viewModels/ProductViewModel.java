@@ -51,11 +51,11 @@ public class ProductViewModel extends AndroidViewModel {
         return product == null || Objects.equals(product.getUploaderId(), this.clientId);
     }
 
-    ProductViewModel(@NonNull Application application, @NonNull String clientId, @Nullable String productId) {
+    ProductViewModel(@NonNull Application application, @Nullable String productId) {
         super(application);
         repository = Repository.getInstance();
         this.productId.setValue(productId);
-        this.clientId = clientId;
+        this.clientId = FirebaseClientProvider.getInstance().getFirebaseUserId();
         fetchCategories();
     }
 
@@ -121,8 +121,7 @@ public class ProductViewModel extends AndroidViewModel {
     }
 
     private void addImages(@NonNull List<GalleryModel> newList) {
-        List<GalleryModel> currentImages = getCurrentImages();
-        List<GalleryModel> clones = GalleryModel.getClones(currentImages);
+        List<GalleryModel> clones = GalleryModel.getClones(getCurrentImages());
         clones.addAll(newList);
         gallery.setValue(clones);
     }

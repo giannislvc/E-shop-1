@@ -36,7 +36,7 @@
             android:textSize="14sp"
             android:gravity="center_vertical|end"
             android:drawablePadding="20dp"
-            android:textColor="#2fb7ec"
+            android:textColor="@color/colorPrimary"
             android:fontFamily="@font/breeze_sans_light"
             android:drawableEnd="@drawable/ic_chevron_right_gray_24dp"
 
@@ -76,7 +76,7 @@
             android:textSize="14sp"
             android:gravity="center_vertical|end"
             android:drawablePadding="20dp"
-            android:textColor="#2fb7ec"
+            android:textColor="@color/colorPrimary"
             android:fontFamily="@font/breeze_sans_light"
             android:drawableEnd="@drawable/ic_chevron_right_gray_24dp"
 

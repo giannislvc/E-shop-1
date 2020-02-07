@@ -4,8 +4,8 @@ import androidx.annotation.NonNull;
 
 public class NewCustomer {
 
-    String first_name, last_name;
-    String email, profile_image_url, phone_number;
+    final String first_name, last_name;
+    final String email, profile_image_url, phone_number;
 
     NewCustomer(String first_name, String last_name, String email, String profile_image_url, String phone_number) {
         this.first_name = first_name;

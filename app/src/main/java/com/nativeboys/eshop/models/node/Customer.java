@@ -4,7 +4,7 @@ import androidx.annotation.NonNull;
 
 public class Customer extends NewCustomer {
 
-    private String customer_id, date_joined;
+    private final String customer_id, date_joined;
 
     public Customer(String customer_id, String first_name, String last_name, String email, String profile_image_url, String phone_number, String date_joined) {
         super(first_name, last_name, email, profile_image_url, phone_number);

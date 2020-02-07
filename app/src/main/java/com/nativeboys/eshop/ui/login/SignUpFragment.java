@@ -1,13 +1,11 @@
 package com.nativeboys.eshop.ui.login;
 
-import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.util.Patterns;
 import android.view.Gravity;
@@ -20,13 +18,12 @@ import android.widget.TextView;
 import com.nativeboys.eshop.R;
 import com.nativeboys.eshop.customViews.FormEditText;
 import com.nativeboys.eshop.customViews.ToastMessage;
-import com.nativeboys.eshop.tools.GlobalViewModel;
+import com.nativeboys.eshop.viewModels.LoginViewModel;
 
 public class SignUpFragment extends Fragment {
 
-    private FragmentActivity activity;
     private OnFragmentTransaction listener;
-    private GlobalViewModel viewModel;
+    private LoginViewModel loginVM;
 
     private ToastMessage tMessage;
     private FormEditText nameField, emailField, passwordField, confirmPassField;
@@ -38,7 +35,8 @@ public class SignUpFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        viewModel = ViewModelProviders.of(activity).get(GlobalViewModel.class);
+        loginVM = new ViewModelProvider(getParentFragment() != null ?
+                getParentFragment() : this).get(LoginViewModel.class);
     }
 
     @Override
@@ -59,7 +57,7 @@ public class SignUpFragment extends Fragment {
         Button registerBtn = view.findViewById(R.id.register_btn);
         TextView loginBtn = view.findViewById(R.id.login_btn);
 
-        tMessage = new ToastMessage(activity);
+        tMessage = new ToastMessage(getActivity());
         tMessage.setGravity(Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL, 0, 45);
 
         nameField.setPattern(FormEditText.USERNAME_PATTERN);
@@ -89,7 +87,9 @@ public class SignUpFragment extends Fragment {
             } else {
                 String email = emailField.getText().toString().trim();
                 String name = nameField.getText().toString().trim();
-                viewModel.registerUser(email, password, name, (success, message) -> {
+                // TODO: Create Last Name Field
+                String lastName = "";
+                loginVM.register(email, password, name, lastName, (success, message) -> {
                     if (success) {
                         if (listener != null) listener.moveToMainMenu();
                     } else {
@@ -103,17 +103,5 @@ public class SignUpFragment extends Fragment {
 
     void setOnFragmentTransactionListener(@NonNull OnFragmentTransaction listener) {
         this.listener = listener;
-    }
-
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        activity = (FragmentActivity) context;
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        activity = null;
     }
 }

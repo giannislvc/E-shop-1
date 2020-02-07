@@ -13,7 +13,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:background="#2fb7ec"
+        android:background="@color/colorPrimary"
         android:padding="15dp">
 
         <ImageView

@@ -1,6 +1,7 @@
 package com.nativeboys.eshop.http;
 
 import com.nativeboys.eshop.models.node.Category;
+import com.nativeboys.eshop.models.node.Customer;
 import com.nativeboys.eshop.models.node.DeleteResponse;
 import com.nativeboys.eshop.models.node.DetailedProduct;
 import com.nativeboys.eshop.models.node.Like;
@@ -31,6 +32,9 @@ public interface VMallApi {
     Call<List<String>> getSearches(
             @Query("text") String text
     );
+
+    @GET("customer/{id}")
+    Call<Customer> getCustomer();
 
     @GET("customers/{id}/productsHistory")
     Call<List<Product>> getProductHistory(
