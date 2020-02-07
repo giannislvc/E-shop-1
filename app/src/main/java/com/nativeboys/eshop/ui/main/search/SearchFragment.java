@@ -23,6 +23,7 @@ import com.nativeboys.eshop.R;
 import com.nativeboys.eshop.customViews.AutoCompleteListener;
 import com.nativeboys.eshop.customViews.AutoCompleteSearchView;
 import com.nativeboys.eshop.customViews.NonScrollLayoutManager;
+import com.nativeboys.eshop.models.node.Product;
 import com.nativeboys.eshop.tools.GlobalViewModel;
 
 public class SearchFragment extends Fragment {
@@ -48,14 +49,6 @@ public class SearchFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getActivity() != null) {
             globalVM = new ViewModelProvider(getActivity()).get(GlobalViewModel.class);
-        }
-    }
-
-    private void navigateTo(int resource, @NonNull String argument) {
-        if (resource == R.id.textSearchFragment) {
-            navController.navigate(SearchFragmentDirections.actionSearchToTextSearch(argument));
-        } else if (resource == R.id.productFragment) {
-            // TODO: Implement
         }
     }
 
@@ -96,6 +89,18 @@ public class SearchFragment extends Fragment {
         popularRecyclerView.setAdapter(mostPopularAdapter);
 
         setUpListeners();
+    }
+
+    private void navigateTo(int resource, @NonNull String argument) {
+        if (resource == R.id.textSearchFragment) {
+            navController.navigate(SearchFragmentDirections.actionSearchToTextSearch(argument));
+        } else if (resource == R.id.productFragment) {
+            navController.navigate(SearchFragmentDirections.actionSearchToProduct(argument));
+        }
+    }
+
+    private void onClick(View itemView, Product product) {
+        navigateTo(R.id.productFragment, product.getProductId());
     }
 
     private void setUpListeners() {
@@ -143,6 +148,9 @@ public class SearchFragment extends Fragment {
 
         globalVM.getPopularProducts().observe(getViewLifecycleOwner(),
                 products -> mostPopularAdapter.submitList(products));
+
+        recentViewedAdapter.setOnProductClickListener(this::onClick);
+        mostPopularAdapter.setOnProductClickListener(this::onClick);
 
         globalVM.getSearchHistory().observe(getViewLifecycleOwner(),
                 strings -> recentSearchAdapter.setDataSet(strings));

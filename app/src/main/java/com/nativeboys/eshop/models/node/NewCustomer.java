@@ -5,14 +5,13 @@ import androidx.annotation.NonNull;
 public class NewCustomer {
 
     final String first_name, last_name;
-    final String email, profile_image_url, phone_number;
+    final String email, customer_id;
 
-    NewCustomer(String first_name, String last_name, String email, String profile_image_url, String phone_number) {
+    public NewCustomer(String first_name, String last_name, String email, String customer_id) {
         this.first_name = first_name;
         this.last_name = last_name;
         this.email = email;
-        this.profile_image_url = profile_image_url;
-        this.phone_number = phone_number;
+        this.customer_id = customer_id;
     }
 
     public String getFirstName() {
@@ -27,12 +26,8 @@ public class NewCustomer {
         return email;
     }
 
-    public String getProfileImageUrl() {
-        return profile_image_url;
-    }
-
-    public String getPhoneNumber() {
-        return phone_number;
+    public String getCustomerId() {
+        return customer_id;
     }
 
     @NonNull
@@ -42,8 +37,7 @@ public class NewCustomer {
                 "first_name='" + first_name + '\'' +
                 ", last_name='" + last_name + '\'' +
                 ", email='" + email + '\'' +
-                ", profile_image_url='" + profile_image_url + '\'' +
-                ", phone_number='" + phone_number + '\'' +
+                ", customer_id='" + customer_id + '\'' +
                 '}';
     }
 }

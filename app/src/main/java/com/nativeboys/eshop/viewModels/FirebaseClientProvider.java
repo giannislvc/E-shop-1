@@ -3,6 +3,7 @@ package com.nativeboys.eshop.viewModels;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.nativeboys.eshop.callbacks.AuthCompleteListener;
+import com.nativeboys.eshop.callbacks.CompletionHandler;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -40,10 +41,17 @@ public class FirebaseClientProvider implements FirebaseAuth.AuthStateListener {
     }
 
     public void register(@NonNull String email, @NonNull String password,
-                         @NonNull AuthCompleteListener completion) {
+                         @NonNull CompletionHandler<String> completion) {
         firebaseAuth.createUserWithEmailAndPassword(email, password)
-                .addOnSuccessListener(authResult -> completion.onComplete(true, null))
-                .addOnFailureListener(e -> completion.onComplete(false, e.getLocalizedMessage()));
+                .addOnSuccessListener(authResult -> {
+                    String id = authResult.getUser() != null ? authResult.getUser().getUid() : null;
+                    if (id != null) {
+                        completion.onSuccess(id);
+                    } else {
+                        completion.onFailure(null);
+                    }
+                })
+                .addOnFailureListener(e -> completion.onFailure(e.getLocalizedMessage()));
     }
 
     public void logout() {

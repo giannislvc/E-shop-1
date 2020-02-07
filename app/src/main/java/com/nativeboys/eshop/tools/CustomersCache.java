@@ -16,9 +16,7 @@ public class CustomersCache {
     private static List<Customer> cachedCustomers = new ArrayList<>();
 
     public static void getCustomer(@NonNull String customerId, @NonNull Completion<Customer> completion) {
-        // TODO: Remove Testing Code
-        // Testing Start
-        completion.onResponse(new Customer(
+        /*completion.onResponse(new Customer(
                 "VAOyj0DW5wYK2D0lEis1tKcRpSj2",
                 "Giannis",
                 "Dougos",
@@ -26,9 +24,8 @@ public class CustomersCache {
                 "https://pbs.twimg.com/profile_images/847025858636328960/9y8qMgLe.jpg",
                 null,
                 null
-        ));
-        // Testing end
-        /*for(Customer customer : cachedCustomers) {
+        ));*/
+        for(Customer customer : cachedCustomers) {
             if (customer.getCustomerId().equals(customerId)) {
                 completion.onResponse(customer);
                 return;
@@ -45,7 +42,7 @@ public class CustomersCache {
             public void onFailure(@Nullable String description) {
                 completion.onResponse(null);
             }
-        });*/
+        });
     }
 
 }

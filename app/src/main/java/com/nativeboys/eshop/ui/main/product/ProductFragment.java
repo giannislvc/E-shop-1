@@ -9,6 +9,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
@@ -29,6 +31,7 @@ import com.bumptech.glide.request.transition.Transition;
 import com.nativeboys.eshop.R;
 import com.nativeboys.eshop.callbacks.CompletionHandler;
 import com.nativeboys.eshop.customViews.ImageProviderFragment;
+import com.nativeboys.eshop.models.node.Product;
 import com.nativeboys.eshop.ui.main.adapters.CategoriesAdapter;
 import com.nativeboys.eshop.viewModels.ProductViewModel;
 import com.nativeboys.eshop.viewModels.ProductViewModelFactory;
@@ -41,6 +44,7 @@ import java.util.List;
 public class ProductFragment extends ImageProviderFragment {
 
     private ProductViewModel productVM;
+    private NavController navController;
 
     private GalleryAdapter galleryAdapter;
     private EditText nameField, priceField, descriptionField, detailsField, hashTagsField;
@@ -94,6 +98,7 @@ public class ProductFragment extends ImageProviderFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        navController = Navigation.findNavController(view);
         scrollView = view.findViewById(R.id.scroll_view);
         ViewPager2 viewPager = view.findViewById(R.id.view_pager);
         picNumField = view.findViewById(R.id.pic_num_field);
@@ -235,7 +240,11 @@ public class ProductFragment extends ImageProviderFragment {
             startBtn.setOnClickListener(this::likeProduct);
             // Message
             endBtn.setOnClickListener(v -> {
-                // TODO: Implement
+                Product product = productVM.getProduct().getValue();
+                if (product != null) {
+                    navController.navigate(ProductFragmentDirections
+                            .actionProductToConversation(product.getUploaderId()));
+                }
             });
         }
     }

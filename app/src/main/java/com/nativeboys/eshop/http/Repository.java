@@ -15,6 +15,7 @@ import com.nativeboys.eshop.models.node.DeleteResponse;
 import com.nativeboys.eshop.models.node.DetailedProduct;
 import com.nativeboys.eshop.models.node.Like;
 import com.nativeboys.eshop.models.node.LikeResponse;
+import com.nativeboys.eshop.models.node.NewCustomer;
 import com.nativeboys.eshop.models.node.NewProduct;
 import com.nativeboys.eshop.models.node.Product;
 import com.nativeboys.eshop.models.query.Filter;
@@ -55,166 +56,89 @@ public class Repository {
     }
 
     @EverythingIsNonNull
-    public void createCustomer(String email, String password, String firstName, String lastName, CompletionHandler<Customer> completion) {
-        // TODO: Implement
-    }
-
-    @EverythingIsNonNull
     public void getCustomer(CompletionHandler<Customer> completion) {
         Call<Customer> call = api.getCustomer();
-        call.enqueue(new Callback<Customer>() {
-            @Override
-            public void onResponse(Call<Customer> call, Response<Customer> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    completion.onSuccess(response.body());
-                } else {
-                    completion.onFailure(null);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Customer> call, Throwable t) {
-                completion.onFailure(t.getMessage());
-            }
-        });
+        request(call, completion);
     }
 
     @EverythingIsNonNull
     public void getCategories(final CompletionHandler<List<Category>> completion) {
         Call<List<Category>> call = api.getCategories();
-        call.enqueue(new Callback<List<Category>>() {
-            @Override
-            public void onResponse(Call<List<Category>> call, Response<List<Category>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    Log.i(TAG, "onResponse: " + response.body().toString());
-                    completion.onSuccess(response.body());
-                } else {
-                    completion.onFailure(null);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<Category>> call, Throwable t) {
-                completion.onFailure(t.getMessage());
-            }
-        });
+        request(call, completion);
     }
 
     @EverythingIsNonNull
     public void getProduct(String productId, String customerId, final CompletionHandler<DetailedProduct> completion) {
         Call<DetailedProduct> call = api.getProduct(productId, customerId);
-        call.enqueue(new Callback<DetailedProduct>() {
-            @Override
-            public void onResponse(Call<DetailedProduct> call, Response<DetailedProduct> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    completion.onSuccess(response.body());
-                } else {
-                    completion.onFailure(null);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<DetailedProduct> call, Throwable t) {
-                completion.onFailure(t.getMessage());
-            }
-        });
+        request(call, completion);
     }
 
     @EverythingIsNonNull
     public void getProducts(String customerId, Filter filter, Sort sort, final CompletionHandler<List<Product>> completion) {
         Log.i(TAG, "Customer: " + customerId + " Filter: " + filter.toString() + " Sort: "+ sort.toString());
         Call<List<Product>> call = api.getProducts(customerId, gsonHelper.toJson(filter), gsonHelper.toJson(sort));
-        call.enqueue(new Callback<List<Product>>() {
-            @Override
-            public void onResponse(Call<List<Product>> call, Response<List<Product>> response) {
-                responseHandler(response, completion);
-            }
-
-            @Override
-            public void onFailure(Call<List<Product>> call, Throwable t) {
-                completion.onFailure(t.getMessage());
-            }
-        });
+        request(call, completion);
     }
 
     @EverythingIsNonNull
     public void getProductHistory(String customerId, StartLimit startLimit, CompletionHandler<List<Product>> completion) {
         Call<List<Product>> call = api.getProductHistory(customerId, gsonHelper.toJson(startLimit));
-        call.enqueue(new Callback<List<Product>>() {
-            @Override
-            public void onResponse(Call<List<Product>> call, Response<List<Product>> response) {
-                responseHandler(response, completion);
-            }
-
-            @Override
-            public void onFailure(Call<List<Product>> call, Throwable t) {
-                completion.onFailure(t.getMessage());
-            }
-        });
+        request(call, completion);
     }
 
     @EverythingIsNonNull
     public void getSearchHistory(String customerId, CompletionHandler<List<String>> completion) {
         Call<List<String>> call = api.getSearchHistory(customerId);
-        call.enqueue(new Callback<List<String>>() {
-            @Override
-            public void onResponse(Call<List<String>> call, Response<List<String>> response) {
-                responseHandler(response, completion);
-            }
-
-            @Override
-            public void onFailure(Call<List<String>> call, Throwable t) {
-                completion.onFailure(t.getMessage());
-            }
-        });
+        request(call, completion);
     }
 
     @EverythingIsNonNull
     public void getSearches(String text, CompletionHandler<List<String>> completion) {
         Call<List<String>> call = api.getSearches(text);
-        call.enqueue(new Callback<List<String>>() {
-            @Override
-            public void onResponse(Call<List<String>> call, Response<List<String>> response) {
-                responseHandler(response, completion);
-            }
-
-            @Override
-            public void onFailure(Call<List<String>> call, Throwable t) {
-                completion.onFailure(t.getMessage());
-            }
-        });
+        request(call, completion);
     }
 
     @EverythingIsNonNull
     public void likeProduct(String customerId, String productId, CompletionHandler<LikeResponse> completion) {
         Call<LikeResponse> call = api.likeProduct(new Like(customerId, productId));
-        call.enqueue(new Callback<LikeResponse>() {
-            @Override
-            public void onResponse(Call<LikeResponse> call, Response<LikeResponse> response) {
-                responseHandler(response, completion);
-            }
-
-            @Override
-            public void onFailure(Call<LikeResponse> call, Throwable t) {
-                completion.onFailure(t.getMessage());
-            }
-        });
+        request(call, completion);
     }
 
     @EverythingIsNonNull
     public void deleteProduct(String productId, CompletionHandler<DeleteResponse> completion) {
         Call<DeleteResponse> call = api.deleteProduct(productId);
-        call.enqueue(new Callback<DeleteResponse>() {
-            @Override
-            public void onResponse(Call<DeleteResponse> call, Response<DeleteResponse> response) {
-                responseHandler(response, completion);
-            }
+        request(call, completion);
+    }
 
-            @Override
-            public void onFailure(Call<DeleteResponse> call, Throwable t) {
-                completion.onFailure(t.getMessage());
-            }
-        });
+    @EverythingIsNonNull
+    public void createProduct(Context context, NewProduct product, List<Uri> uris, CompletionHandler<DetailedProduct> completion) {
+        RequestBody textPart = createPartFromString(gsonHelper.toJson(product));
+        List<MultipartBody.Part> parts = new ArrayList<>();
+        for(Uri uri : uris) {
+            parts.add(prepareFilePart(context, "gallery", uri));
+        }
+        Call<DetailedProduct> call = api.creteProduct(textPart, parts);
+        request(call, completion);
+    }
+
+    @EverythingIsNonNull
+    public void upload(Context context, Uri uri, CompletionHandler<String> completion) {
+        MultipartBody.Part part = prepareFilePart(context, "image", uri);
+        Call<String> call = api.upload(part);
+        request(call, completion);
+    }
+
+    @EverythingIsNonNull
+    public void createCustomer(NewCustomer customer, CompletionHandler<Customer> completion) {
+        Call<Customer> call = api.createCustomer(customer);
+        request(call, completion);
+    }
+
+    @EverythingIsNonNull
+    public void updateCustomer(Context context, Uri uri, String customerId, CompletionHandler<Customer> completion) {
+        MultipartBody.Part part = prepareFilePart(context, "image", uri);
+        Call<Customer> call = api.updateCustomer(customerId, part);
+        request(call, completion);
     }
 
     @NonNull
@@ -239,21 +163,15 @@ public class Repository {
     }
 
     @EverythingIsNonNull
-    public void createProduct(Context context, NewProduct product, List<Uri> uris, CompletionHandler<DetailedProduct> completion) {
-        RequestBody textPart = createPartFromString(gsonHelper.toJson(product));
-        List<MultipartBody.Part> parts = new ArrayList<>();
-        for(Uri uri : uris) {
-            parts.add(prepareFilePart(context, "gallery", uri));
-        }
-        Call<DetailedProduct> call = api.creteProduct(textPart, parts);
-        call.enqueue(new Callback<DetailedProduct>() {
+    private <T> void request(Call<T> call, CompletionHandler<T> completion) {
+        call.enqueue(new Callback<T>() {
             @Override
-            public void onResponse(Call<DetailedProduct> call, Response<DetailedProduct> response) {
+            public void onResponse(Call<T> call, Response<T> response) {
                 responseHandler(response, completion);
             }
 
             @Override
-            public void onFailure(Call<DetailedProduct> call, Throwable t) {
+            public void onFailure(Call<T> call, Throwable t) {
                 completion.onFailure(t.getMessage());
             }
         });

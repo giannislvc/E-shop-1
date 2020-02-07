@@ -5,13 +5,21 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 class RetrofitClient {
 
-    private static final String DEVELOPMENT_HOST = "http://192.168.1.4:5000/api/";
+    private static final String DEVELOPMENT_HOST = "http://192.168.1.4:5000/";
     private static volatile RetrofitClient INSTANCE = null;
     private final Retrofit client;
 
+    private static String getBaseUrl() {
+        return DEVELOPMENT_HOST + "api/";
+    }
+
+    public static String getUploadsUrl() {
+        return DEVELOPMENT_HOST + "uploads/";
+    }
+
     private RetrofitClient() {
         client = new Retrofit.Builder()
-                .baseUrl(DEVELOPMENT_HOST)
+                .baseUrl(getBaseUrl())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
     }

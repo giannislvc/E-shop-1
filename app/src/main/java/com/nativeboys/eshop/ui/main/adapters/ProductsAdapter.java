@@ -16,13 +16,10 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.nativeboys.eshop.R;
+import com.nativeboys.eshop.callbacks.OnProductClickListener;
 import com.nativeboys.eshop.models.node.Product;
 
 public class ProductsAdapter extends PagedListAdapter<Product, ProductsAdapter.ProductsViewHolder> {
-
-    public interface OnProductClickListener {
-        void onClick(View itemView, Product product);
-    }
 
     private static final DiffUtil.ItemCallback<Product> DIFF_CALLBACK = new DiffUtil.ItemCallback<Product>() {
 

@@ -1,10 +1,8 @@
 package com.nativeboys.eshop.tools;
 
 import android.app.Application;
-import android.content.ContentResolver;
 import android.net.Uri;
 import android.util.Log;
-import android.webkit.MimeTypeMap;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,9 +16,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 import com.nativeboys.eshop.callbacks.Completion;
+import com.nativeboys.eshop.callbacks.CompletionHandler;
+import com.nativeboys.eshop.http.Repository;
 import com.nativeboys.eshop.models.firebase.MessageModel;
 import com.nativeboys.eshop.models.firebase.MetaDataModel;
 import com.nativeboys.eshop.models.node.Customer;
@@ -38,17 +36,15 @@ public class ConversationViewModel extends AndroidViewModel {
     private final String TAG = getClass().getSimpleName();
 
     public final static int MESSAGES_PER_FETCH = 10;
-    private final static String UPLOADS = "uploads";
 
     public enum MessageType {
         TEXT,
         IMAGE
     }
 
-    private DatabaseReference conversationsRef, metadataRef;
-
-    private StorageReference storageRef;
-    private final ContentResolver contentResolver;
+    private final Repository repository;
+    private final DatabaseReference metadataRef;
+    private DatabaseReference conversationsRef;
 
     private final String userId, friendId;
     private int count;
@@ -84,19 +80,17 @@ public class ConversationViewModel extends AndroidViewModel {
         @Override
         public void onCancelled(@NonNull DatabaseError databaseError) {
             Log.i(TAG, "onCancelled: ");
-            // TODO: implement
             fetchingDataState = false;
         }
     };
 
     ConversationViewModel(@NonNull Application application, @NonNull String friendId) {
         super(application);
-        this.userId = FirebaseClientProvider.getInstance().getFirebaseUserId();
-        this.friendId = friendId;
-        contentResolver = application.getContentResolver();
-
+        repository = Repository.getInstance();
         metadataRef = FirebaseDatabase.getInstance().getReference(METADATA);
-        storageRef = FirebaseStorage.getInstance().getReference(UPLOADS);
+        userId = FirebaseClientProvider.getInstance().getFirebaseUserId();
+
+        this.friendId = friendId;
 
         getExistingConversationId(friendId, convId -> {
             if (convId != null) { // conversation does exists
@@ -123,6 +117,10 @@ public class ConversationViewModel extends AndroidViewModel {
         return friend;
     }
 
+    public LiveData<List<MessageModel>> getMessages() {
+        return messages;
+    }
+
     private void initConversation(@NonNull String convId) {
         conversationsRef = FirebaseDatabase.getInstance().getReference(CONVERSATIONS).child(convId);
         conversationsRef.keepSynced(true);
@@ -142,11 +140,7 @@ public class ConversationViewModel extends AndroidViewModel {
         liveQuery.addValueEventListener(valueEventListener);
     }
 
-    public LiveData<List<MessageModel>> getMessages() {
-        return messages;
-    }
-
-    private void sendToServer(@NonNull String text, @NonNull MessageType messageType) {
+    private void sendToFirebase(@NonNull String text, @NonNull MessageType messageType) {
         if (conversationsRef == null) return;
         String messageId = conversationsRef.push().getKey();
         if (messageId != null) {
@@ -160,22 +154,19 @@ public class ConversationViewModel extends AndroidViewModel {
     }
 
     public void sendMessage(@NonNull String text) {
-        sendToServer(text, MessageType.TEXT);
+        sendToFirebase(text, MessageType.TEXT);
     }
 
     public void sendImage(@NonNull Uri uri) {
-        StorageReference fileReference = storageRef.child(System.currentTimeMillis() + getFileExtension(uri));
-        fileReference.putFile(uri).continueWithTask(task -> task.isSuccessful() ? fileReference.getDownloadUrl() : null)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful() && task.getResult() != null) {
-                        sendToServer(task.getResult().toString(), MessageType.IMAGE);
-                    }
-                });
-    }
+        repository.upload(getApplication(), uri, new CompletionHandler<String>() {
+            @Override
+            public void onSuccess(@NonNull String model) {
+                sendToFirebase(model, MessageType.IMAGE);
+            }
 
-    private String getFileExtension(@NonNull Uri uri) {
-        MimeTypeMap mime = MimeTypeMap.getSingleton();
-        return mime.getExtensionFromMimeType(contentResolver.getType(uri));
+            @Override
+            public void onFailure(@Nullable String description) { }
+        });
     }
 
     private void getExistingConversationId(@NonNull String friendId, @NonNull Completion<String> completion) {

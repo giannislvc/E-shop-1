@@ -47,6 +47,9 @@
             android:name="productId"
             app:argType="string"
             app:nullable="true" />
+        <action
+            android:id="@+id/action_product_to_conversation"
+            app:destination="@id/conversationFragment" />
     </fragment>
 
     <fragment
@@ -57,6 +60,9 @@
         <action
             android:id="@+id/action_search_to_textSearch"
             app:destination="@id/textSearchFragment" />
+        <action
+            android:id="@+id/action_search_to_product"
+            app:destination="@id/productFragment" />
     </fragment>
     <fragment
         android:id="@+id/textSearchFragment"
@@ -66,6 +72,9 @@
         <argument
             android:name="text"
             app:argType="string" />
+        <action
+            android:id="@+id/action_textSearch_to_product"
+            app:destination="@id/productFragment" />
     </fragment>
 
 </navigation>

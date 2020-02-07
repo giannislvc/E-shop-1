@@ -6,6 +6,7 @@ import com.nativeboys.eshop.callbacks.AuthCompleteListener;
 import com.nativeboys.eshop.callbacks.CompletionHandler;
 import com.nativeboys.eshop.http.Repository;
 import com.nativeboys.eshop.models.node.Customer;
+import com.nativeboys.eshop.models.node.NewCustomer;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -30,9 +31,12 @@ public class LoginViewModel extends AndroidViewModel {
     public void register(@NonNull String email, @NonNull String password,
                          @NonNull String firstName, @NonNull String lastName,
                          @NonNull AuthCompleteListener completion) {
-        clientProvider.register(email, password, (success, message) -> {
-            if (success) {
-                repository.createCustomer(email, password, firstName, lastName, new CompletionHandler<Customer>() {
+
+        clientProvider.register(email, password, new CompletionHandler<String>() {
+            @Override
+            public void onSuccess(@NonNull String id) {
+                NewCustomer customer = new NewCustomer(firstName, lastName, email, id);
+                repository.createCustomer(customer, new CompletionHandler<Customer>() {
                     @Override
                     public void onSuccess(@NonNull Customer model) {
                         completion.onComplete(true, null);
@@ -44,7 +48,11 @@ public class LoginViewModel extends AndroidViewModel {
                     }
                 });
             }
-            completion.onComplete(success, message);
+
+            @Override
+            public void onFailure(@Nullable String description) {
+                completion.onComplete(false, description);
+            }
         });
     }
 

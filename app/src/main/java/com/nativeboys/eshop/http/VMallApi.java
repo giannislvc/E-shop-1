@@ -6,6 +6,7 @@ import com.nativeboys.eshop.models.node.DeleteResponse;
 import com.nativeboys.eshop.models.node.DetailedProduct;
 import com.nativeboys.eshop.models.node.Like;
 import com.nativeboys.eshop.models.node.LikeResponse;
+import com.nativeboys.eshop.models.node.NewCustomer;
 import com.nativeboys.eshop.models.node.Product;
 
 import java.util.List;
@@ -19,6 +20,7 @@ import retrofit2.http.GET;
 import retrofit2.http.Headers;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Part;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
@@ -35,6 +37,8 @@ public interface VMallApi {
 
     @GET("customer/{id}")
     Call<Customer> getCustomer();
+    // In order to fetch more users more frequently we can provide
+    // Api which can fetch multiple users
 
     @GET("customers/{id}/productsHistory")
     Call<List<Product>> getProductHistory(
@@ -77,4 +81,24 @@ public interface VMallApi {
     Call<LikeResponse> likeProduct(
             @Body Like request
     );
+
+    @POST
+    @Headers({"Content-Type: application/json"})
+    Call<Customer> createCustomer(
+            @Body NewCustomer request
+    );
+
+    @Multipart
+    @POST("uploads")
+    Call<String> upload(
+            @Part MultipartBody.Part image
+    );
+
+    @Multipart
+    @PUT("customer/{id}")
+    Call<Customer> updateCustomer(
+            @Path("id") String customerId,
+            @Part MultipartBody.Part image
+    );
+
 }

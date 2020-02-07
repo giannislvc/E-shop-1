@@ -15,6 +15,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.nativeboys.eshop.R;
+import com.nativeboys.eshop.callbacks.OnProductClickListener;
 import com.nativeboys.eshop.models.node.Product;
 
 public class SearchedProductsAdapter extends ListAdapter<Product, SearchedProductsAdapter.ViewHolder>  {
@@ -33,8 +34,14 @@ public class SearchedProductsAdapter extends ListAdapter<Product, SearchedProduc
 
     };
 
+    private OnProductClickListener clickListener;
+
     SearchedProductsAdapter() {
         super(DIFF_CALLBACK);
+    }
+
+    public void setOnProductClickListener(OnProductClickListener listener) {
+        clickListener = listener;
     }
 
     @NonNull
@@ -57,6 +64,12 @@ public class SearchedProductsAdapter extends ListAdapter<Product, SearchedProduc
         ViewHolder(@NonNull View itemView) {
             super(itemView);
             imgHolder = itemView.findViewById(R.id.img_holder);
+            itemView.setOnClickListener(v -> {
+                if (clickListener == null) return;
+                int position = getAdapterPosition();
+                if (position == RecyclerView.NO_POSITION) return;
+                clickListener.onClick(v, getItem(position));
+            });
         }
 
         private void bind(@NonNull Product product) {
