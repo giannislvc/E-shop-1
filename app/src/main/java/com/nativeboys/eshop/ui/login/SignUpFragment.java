@@ -26,7 +26,7 @@ public class SignUpFragment extends Fragment {
     private LoginViewModel loginVM;
 
     private ToastMessage tMessage;
-    private FormEditText nameField, emailField, passwordField, confirmPassField;
+    private FormEditText nameField, lastNameField, emailField, passwordField, confirmPassField;
 
     public SignUpFragment() {
         // Required empty public constructor
@@ -49,8 +49,8 @@ public class SignUpFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         nameField = view.findViewById(R.id.name_field);
+        lastNameField = view.findViewById(R.id.last_name_field);
         emailField = view.findViewById(R.id.email_field);
         passwordField = view.findViewById(R.id.password_field);
         confirmPassField = view.findViewById(R.id.confirm_password_field);
@@ -77,9 +77,10 @@ public class SignUpFragment extends Fragment {
         boolean eValid = emailField.isValid();
         // TODO: Create endpoint in order to validate name (server side)
         boolean nValid = nameField.isValid();
+        boolean lnValid = lastNameField.isValid();
         boolean pValid = passwordField.isValid();
         boolean cValid = confirmPassField.isValid();
-        if (eValid && nValid && pValid && cValid) {
+        if (eValid && nValid && lnValid && pValid && cValid) {
             String password = passwordField.getText().toString().trim();
             String cPassword = confirmPassField.getText().toString().trim();
             if (!password.equals(cPassword)) {
@@ -87,8 +88,7 @@ public class SignUpFragment extends Fragment {
             } else {
                 String email = emailField.getText().toString().trim();
                 String name = nameField.getText().toString().trim();
-                // TODO: Create Last Name Field
-                String lastName = "";
+                String lastName = lastNameField.getText().toString().trim();
                 loginVM.register(email, password, name, lastName, (success, message) -> {
                     if (success) {
                         if (listener != null) listener.moveToMainMenu();
