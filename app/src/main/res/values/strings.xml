@@ -68,6 +68,7 @@
     <string name="search_settings">Search Settings</string>
     <string name="select_picture">Select Picture</string>
     <string name="logout">Logout</string>
+    <string name="last_name">Last Name</string>
 
     <string name="rate">Rate</string>
     <string name="upload_time">Upload time</string>

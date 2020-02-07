@@ -11,8 +11,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingTop="20dp"
-        android:paddingBottom="20dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
         android:paddingStart="40dp"
         android:paddingEnd="40dp">
 
@@ -54,7 +54,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp">
+            android:layout_marginTop="10dp">
 
             <com.nativeboys.eshop.customViews.FormEditText
                 android:id="@+id/password_field"
@@ -91,7 +91,7 @@
             android:id="@+id/login_btn"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="20dp"
             android:background="@drawable/sign_btn_shape"
             android:fontFamily="@font/breeze_sans_regular"
             android:textColor="@android:color/white"
@@ -105,7 +105,7 @@
             android:id="@+id/register_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="30dp"
             android:gravity="center"
             android:text="@string/no_account"
             android:fontFamily="@font/breeze_sans_light"

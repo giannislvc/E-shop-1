@@ -10,53 +10,34 @@
     android:background="@android:color/white"
     tools:context=".ui.login.LoginFragment">
 
-    <LinearLayout
-        android:id="@+id/header"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+    <ImageView
+        android:id="@+id/header_icon"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="10dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:gravity="center"
-        android:orientation="horizontal"
-        tools:ignore="UseCompoundDrawables">
-
-        <ImageView
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:src="@drawable/app_launcher_icon"
-            android:contentDescription="@string/app_name"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginStart="5dp"
-            android:gravity="center_vertical"
-            android:fontFamily="@font/breeze_sans_bold"
-            android:textColor="@color/colorPrimaryDark"
-            android:text="@string/app_name"
-            android:textSize="25sp"/>
-
-    </LinearLayout>
+        android:src="@drawable/speech_bubble"
+        android:contentDescription="@string/app_name"/>
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tab_layout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:minHeight="?actionBarSize"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="5dp"
         android:paddingStart="40dp"
         android:paddingEnd="40dp"
-        app:layout_constraintTop_toBottomOf="@id/header"
+        app:layout_constraintTop_toBottomOf="@id/header_icon"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
 
         app:tabTextColor="@color/gray"
         app:tabIndicatorHeight="1dp"
-        app:tabSelectedTextColor="@color/colorPrimaryDark"
+        app:tabSelectedTextColor="@color/colorPrimary"
         app:tabTextAppearance="@style/NavigationTabTextAppearance"
-        app:tabIndicatorColor="@color/colorPrimaryDark"
+        app:tabIndicatorColor="@color/colorPrimary"
         app:tabBackground="@android:color/white"
         app:tabMode="scrollable"
         app:tabGravity="fill"/>

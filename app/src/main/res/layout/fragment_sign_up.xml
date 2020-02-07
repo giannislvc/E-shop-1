@@ -11,8 +11,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingTop="20dp"
-        android:paddingBottom="20dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
         android:paddingStart="40dp"
         android:paddingEnd="40dp">
 
@@ -29,7 +29,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                android:inputType="textEmailAddress"
+                android:inputType="text"
                 android:background="@drawable/edit_text_normal_shape"
                 android:fontFamily="@font/breeze_sans_regular"
                 android:textSize="16sp"
@@ -51,10 +51,47 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp">
+            android:layout_marginTop="10dp">
+
+            <com.nativeboys.eshop.customViews.FormEditText
+                android:id="@+id/last_name_field"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_marginTop="9dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:inputType="text"
+                android:background="@drawable/edit_text_normal_shape"
+                android:fontFamily="@font/breeze_sans_regular"
+                android:textSize="16sp"
+                android:textColor="@android:color/black" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginStart="20dp"
+                android:paddingStart="4dp"
+                android:paddingEnd="4dp"
+                android:text="@string/last_name"
+                android:textSize="12sp"
+                android:textColor="@color/gray"
+                android:background="@android:color/white"
+                android:fontFamily="@font/breeze_sans_regular" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp">
 
             <com.nativeboys.eshop.customViews.FormEditText
                 android:id="@+id/email_field"
@@ -90,7 +127,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp">
+            android:layout_marginTop="10dp">
 
             <com.nativeboys.eshop.customViews.FormEditText
                 android:id="@+id/password_field"
@@ -137,7 +174,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp">
+            android:layout_marginTop="10dp">
 
             <com.nativeboys.eshop.customViews.FormEditText
                 android:id="@+id/confirm_password_field"
@@ -174,7 +211,7 @@
             android:id="@+id/register_btn"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="20dp"
             android:background="@drawable/sign_btn_shape"
             android:fontFamily="@font/breeze_sans_regular"
             android:textColor="@android:color/white"
@@ -188,7 +225,7 @@
             android:id="@+id/login_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="30dp"
             android:gravity="center"
             android:text="@string/already_account"
             android:fontFamily="@font/breeze_sans_light"
