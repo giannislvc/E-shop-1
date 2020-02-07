@@ -17,7 +17,7 @@
         android:padding="15dp">
 
         <ImageView
-            android:id="@+id/back_arrow"
+            android:id="@+id/back_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
@@ -41,7 +41,7 @@
 
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/back_arrow"
+            app:layout_constraintStart_toEndOf="@id/back_btn"
             app:layout_constraintEnd_toEndOf="parent"
             android:lines="1" />
 

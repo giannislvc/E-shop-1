@@ -29,7 +29,6 @@ import com.nativeboys.eshop.models.node.Category;
 import com.nativeboys.eshop.tools.GlobalViewModel;
 import com.nativeboys.eshop.ui.main.MainFragmentDirections;
 import com.nativeboys.eshop.ui.main.adapters.ProductsAdapter;
-import com.nativeboys.eshop.ui.main.product.ProductFragment;
 import com.nativeboys.eshop.ui.main.settings.SettingsFragment;
 
 public class ProductsFragment extends PVCFragment implements SettingsFragment.OnUserInteractionListener {
@@ -64,8 +63,6 @@ public class ProductsFragment extends PVCFragment implements SettingsFragment.On
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        //parentNavController = getParentNavController();
-
         swipeRefresh = view.findViewById(R.id.swipe_refresh_layout);
         drawerLayout = view.findViewById(R.id.drawer_layout);
         addProductButton = view.findViewById(R.id.add_product_button);
@@ -142,8 +139,6 @@ public class ProductsFragment extends PVCFragment implements SettingsFragment.On
         if (childFragment instanceof SettingsFragment) {
             SettingsFragment fragment = (SettingsFragment) childFragment;
             fragment.setOnUserInteraction(this);
-        } else if (childFragment instanceof ProductFragment) {
-
         }
     }
 }

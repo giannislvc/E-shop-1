@@ -59,6 +59,19 @@
         android:id="@+id/searchFragment"
         android:name="com.nativeboys.eshop.ui.main.search.SearchFragment"
         android:label="fragment_search"
-        tools:layout="@layout/fragment_search" />
+        tools:layout="@layout/fragment_search" >
+        <action
+            android:id="@+id/action_search_to_textSearch"
+            app:destination="@id/textSearchFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/textSearchFragment"
+        android:name="com.nativeboys.eshop.ui.main.textSearch.TextSearchFragment"
+        android:label="fragment_text_search"
+        tools:layout="@layout/fragment_text_search" >
+        <argument
+            android:name="text"
+            app:argType="string" />
+    </fragment>
 
 </navigation>

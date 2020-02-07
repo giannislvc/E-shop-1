@@ -18,17 +18,27 @@ import com.google.android.flexbox.FlexboxLayoutManager;
 import com.google.android.flexbox.JustifyContent;
 import com.nativeboys.eshop.R;
 import com.nativeboys.eshop.ui.main.adapters.ProductsAdapter;
-import com.nativeboys.eshop.ui.main.product.ProductFragment;
 
 public class TextSearchFragment extends Fragment {
 
-    private ImageView backArrow;
+    private String text;
+
+    private ImageView backBtn;
     private TextView headline;
     private RecyclerView recyclerView;
     private ProductsAdapter adapter;
 
     public TextSearchFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            TextSearchFragmentArgs args = TextSearchFragmentArgs.fromBundle(getArguments());
+            text = args.getText();
+        }
     }
 
     @Override
@@ -41,7 +51,7 @@ public class TextSearchFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        backArrow = view.findViewById(R.id.back_arrow);
+        backBtn = view.findViewById(R.id.back_btn);
         headline = view.findViewById(R.id.headline);
         recyclerView = view.findViewById(R.id.recycler_view);
 
@@ -53,10 +63,15 @@ public class TextSearchFragment extends Fragment {
         recyclerView.setLayoutManager(flexManager);
         recyclerView.setHasFixedSize(true);
 
+        headline.setText(text);
         setUpListeners();
     }
 
     private void setUpListeners() {
+        backBtn.setOnClickListener(view -> {
+            if (getActivity() != null) getActivity().onBackPressed();
+        });
+
         adapter.setOnProductClickListener((itemView, product) -> {
             // TODO: Implement
             /*String userId = globalVM.getUserId();

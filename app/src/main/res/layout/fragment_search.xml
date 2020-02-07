@@ -18,8 +18,8 @@
 
         <ImageView
             android:id="@+id/back_arrow"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -48,7 +48,7 @@
                 android:tint="@android:color/white"
                 android:contentDescription="@string/search"/>
 
-            <com.nativeboys.eshop.customViews.AutoCompleteInputView
+            <com.nativeboys.eshop.customViews.AutoCompleteSearchView
                 android:id="@+id/search_field"
                 android:inputType="text"
                 android:layout_weight="1"
@@ -60,10 +60,12 @@
                 android:textColorHint="#98d5ed"
                 android:textColor="@android:color/white"
                 android:textSize="16sp"
+                android:background="@android:color/transparent"
+                android:hint="@string/search_your_product"
+
                 android:completionThreshold="1"
                 android:maxLines="1"
-                android:background="@android:color/transparent"
-                android:hint="@string/search_your_product" />
+                android:imeOptions="actionSearch"/>
 
             <ImageView
                 android:id="@+id/clear_text"
