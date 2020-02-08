@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
@@ -22,10 +23,13 @@ import com.google.android.material.imageview.ShapeableImageView;
 import com.nativeboys.eshop.R;
 import com.nativeboys.eshop.customViews.ImageBottomSheetDialog;
 import com.nativeboys.eshop.customViews.ImageProviderFragment;
+import com.nativeboys.eshop.tools.GlobalViewModel;
 
 import java.util.List;
 
 public class ProfileFragment extends ImageProviderFragment implements ImageBottomSheetDialog.OnUserInteractionListener {
+
+    private GlobalViewModel globalVM;
 
     private ShapeableImageView userImage;
     private ImageView logoutBtn;
@@ -38,6 +42,12 @@ public class ProfileFragment extends ImageProviderFragment implements ImageBotto
 
     public ProfileFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        globalVM = new ViewModelProvider(getActivity() != null ? getActivity() : this).get(GlobalViewModel.class);
     }
 
     @Override
@@ -57,30 +67,38 @@ public class ProfileFragment extends ImageProviderFragment implements ImageBotto
         productsField = view.findViewById(R.id.products_field);
         recyclerView = view.findViewById(R.id.recycler_view);
         changeImageBtn = view.findViewById(R.id.change_image_btn);
+        globalVM.fetchMostPopular();
         setUpListeners();
     }
 
     private void setUpListeners() {
+
+        globalVM.getCustomerDetails().observe(getViewLifecycleOwner(), dCustomer -> {
+            userNameField.setText(dCustomer.getFullName());
+            likesField.setText(dCustomer.getLikes());
+            likesField.setText(String.format(getString(R.string.likes_), dCustomer.getLikes()));
+            productsField.setText(String.format(getString(R.string.products_), dCustomer.getProducts()));
+            if (dCustomer.getProfileImageUrl() == null) {
+                // TODO: Load Default image
+            } else {
+                Glide.with(userImage.getContext())
+                        .load(dCustomer.getProfileImageUrl())
+                        .transform(new CenterCrop())
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .into(userImage);
+            }
+        });
+
         // Observe Client
-        loadImageIntoHolder(URL,null);
+        //loadImageIntoHolder(URL,null);
         changeImageBtn.setOnClickListener(view -> {
             ImageBottomSheetDialog dialog = new ImageBottomSheetDialog();
             dialog.show(getChildFragmentManager(), BottomSheetDialogFragment.class.getSimpleName());
             dialog.setListener(this);
         });
 
-        /*ClientProvider.getInstance().observe(getViewLifecycleOwner(), firebaseUser -> {
-            if (firebaseUser == null) {
-                Log.i(TAG, "Logged Out: ");
-            }
-        });
-        logoutBtn.setOnClickListener(view -> {
-            GlobalViewModel vm = new ViewModelProvider(getActivity()).get(GlobalViewModel.class);
-            vm.signOut();
-        });*/
+        //TODO: Logout
     }
-
-    private static final String TAG = "ProfileFragment";
 
     private void loadImageIntoHolder(@Nullable String url, @Nullable Uri uri) {
         if (uri == null && url == null) return;
@@ -94,6 +112,7 @@ public class ProfileFragment extends ImageProviderFragment implements ImageBotto
     @Override
     protected void onImagesRetrieved(@NonNull List<Uri> uris) {
         if (uris.size() > 0) {
+            // TODO: Update Customer
             loadImageIntoHolder(null, uris.get(0));
         }
     }

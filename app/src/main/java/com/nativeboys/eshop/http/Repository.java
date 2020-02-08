@@ -12,7 +12,9 @@ import com.nativeboys.eshop.callbacks.CompletionHandler;
 import com.nativeboys.eshop.models.node.Category;
 import com.nativeboys.eshop.models.node.Customer;
 import com.nativeboys.eshop.models.node.DeleteResponse;
+import com.nativeboys.eshop.models.node.DetailedCustomer;
 import com.nativeboys.eshop.models.node.DetailedProduct;
+import com.nativeboys.eshop.models.node.ImageResponse;
 import com.nativeboys.eshop.models.node.Like;
 import com.nativeboys.eshop.models.node.LikeResponse;
 import com.nativeboys.eshop.models.node.NewCustomer;
@@ -56,8 +58,8 @@ public class Repository {
     }
 
     @EverythingIsNonNull
-    public void getCustomer(CompletionHandler<Customer> completion) {
-        Call<Customer> call = api.getCustomer();
+    public void getCustomer(@NonNull String customerId, CompletionHandler<Customer> completion) {
+        Call<Customer> call = api.getCustomer(customerId);
         request(call, completion);
     }
 
@@ -122,9 +124,9 @@ public class Repository {
     }
 
     @EverythingIsNonNull
-    public void upload(Context context, Uri uri, CompletionHandler<String> completion) {
+    public void upload(Context context, Uri uri, CompletionHandler<ImageResponse> completion) {
         MultipartBody.Part part = prepareFilePart(context, "image", uri);
-        Call<String> call = api.upload(part);
+        Call<ImageResponse> call = api.upload(part);
         request(call, completion);
     }
 
@@ -135,9 +137,16 @@ public class Repository {
     }
 
     @EverythingIsNonNull
-    public void updateCustomer(Context context, Uri uri, String customerId, CompletionHandler<Customer> completion) {
+    public void updateCustomer(Context context, Uri uri, NewCustomer customer, CompletionHandler<Customer> completion) {
+        RequestBody textPart = createPartFromString(gsonHelper.toJson(customer));
         MultipartBody.Part part = prepareFilePart(context, "image", uri);
-        Call<Customer> call = api.updateCustomer(customerId, part);
+        Call<Customer> call = api.updateCustomer(customer.getCustomerId(), textPart, part);
+        request(call, completion);
+    }
+
+    @EverythingIsNonNull
+    public void getCustomerDetails(String customerId, CompletionHandler<DetailedCustomer> completion) {
+        Call<DetailedCustomer> call = api.getCustomerDetails(customerId);
         request(call, completion);
     }
 
@@ -167,11 +176,13 @@ public class Repository {
         call.enqueue(new Callback<T>() {
             @Override
             public void onResponse(Call<T> call, Response<T> response) {
+                Log.i(TAG, "onResponse: " + response);
                 responseHandler(response, completion);
             }
 
             @Override
             public void onFailure(Call<T> call, Throwable t) {
+                Log.i(TAG, "onFailure: " + t.getMessage());
                 completion.onFailure(t.getMessage());
             }
         });

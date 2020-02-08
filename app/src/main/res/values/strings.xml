@@ -77,9 +77,8 @@
     <string name="hash_tags">Hash Tags</string>
     <string name="separate_hash_tags">Separate with comma</string>
 
-    <string name="likes_">233\nLikes</string>
-    <string name="products_">349\nProducts</string>
-    <string name="test_name">Jonny Lulu</string>
+    <string name="likes_">%s\nLikes</string>
+    <string name="products_">%s\nProducts</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

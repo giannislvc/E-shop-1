@@ -20,7 +20,7 @@ import com.nativeboys.eshop.callbacks.CompletionHandler;
 import com.nativeboys.eshop.http.Repository;
 import com.nativeboys.eshop.models.adapter.SearchModel;
 import com.nativeboys.eshop.models.firebase.MetaDataModel;
-import com.nativeboys.eshop.models.node.Category;
+import com.nativeboys.eshop.models.node.DetailedCustomer;
 import com.nativeboys.eshop.models.node.Product;
 import com.nativeboys.eshop.models.query.Filter;
 import com.nativeboys.eshop.models.query.Sort;
@@ -52,7 +52,6 @@ public class GlobalViewModel extends AndroidViewModel {
     //private LiveData<PageKeyedDataSource<Integer, Product>> liveDataSource;
 
     // Server
-    private MutableLiveData<List<Category>> categories;
     private MutableLiveData<List<Product>> popularProducts;
     private MutableLiveData<List<Product>> productHistory;
     private MutableLiveData<List<String>> searchHistory;
@@ -60,6 +59,7 @@ public class GlobalViewModel extends AndroidViewModel {
     private MutableLiveData<String> textSearch;
     private LiveData<List<String>> searches;
 
+    private MutableLiveData<DetailedCustomer> customerDetails;
     private final String clientId;
 
     {
@@ -67,13 +67,14 @@ public class GlobalViewModel extends AndroidViewModel {
         searchModel = new MutableLiveData<>();
         productPagedList = Transformations.switchMap(searchModel, this::getLiveProducts);
 
-        categories = new MutableLiveData<>();
         popularProducts = new MutableLiveData<>();
         productHistory = new MutableLiveData<>();
         searchHistory = new MutableLiveData<>();
 
         textSearch = new MutableLiveData<>();
         searches = Transformations.switchMap(textSearch, this::getSearch);
+
+        customerDetails = new MutableLiveData<>();
     }
 
     private ValueEventListener metaDataListener = new ValueEventListener() {
@@ -107,6 +108,19 @@ public class GlobalViewModel extends AndroidViewModel {
         clientId = FirebaseClientProvider.getInstance().getFirebaseUserId();
         setListeners(true);
         searchModel.setValue(defaultSearch);
+        fetchCustomerDetails();
+    }
+
+    public void fetchCustomerDetails() {
+        repository.getCustomerDetails(clientId, new CompletionHandler<DetailedCustomer>() {
+            @Override
+            public void onSuccess(@NonNull DetailedCustomer model) {
+                customerDetails.setValue(model);
+            }
+
+            @Override
+            public void onFailure(@Nullable String description) { }
+        });
     }
 
     private LiveData<PagedList<Product>> getLiveProducts(@Nullable SearchModel model) {
@@ -191,8 +205,8 @@ public class GlobalViewModel extends AndroidViewModel {
         return popularProducts;
     }
 
-    public LiveData<List<Category>> getCategories() {
-        return categories;
+    public MutableLiveData<DetailedCustomer> getCustomerDetails() {
+        return customerDetails;
     }
 
     private void fetchProductHistory() {
@@ -233,20 +247,6 @@ public class GlobalViewModel extends AndroidViewModel {
 
             @Override
             public void onFailure(@Nullable String description) { }
-        });
-    }
-
-    public void fetchGategories() {
-        repository.getCategories(new CompletionHandler<List<Category>>() {
-            @Override
-            public void onSuccess(@NonNull List<Category> model) {
-                categories.setValue(model);
-            }
-
-            @Override
-            public void onFailure(@Nullable String description) {
-                categories.setValue(null);
-            }
         });
     }
 

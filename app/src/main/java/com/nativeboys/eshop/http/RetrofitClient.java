@@ -3,15 +3,11 @@ package com.nativeboys.eshop.http;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-class RetrofitClient {
+public class RetrofitClient {
 
-    private static final String DEVELOPMENT_HOST = "http://192.168.1.4:5000/";
+    private static final String DEVELOPMENT_HOST = "http://192.168.1.5:5000/";
     private static volatile RetrofitClient INSTANCE = null;
     private final Retrofit client;
-
-    private static String getBaseUrl() {
-        return DEVELOPMENT_HOST + "api/";
-    }
 
     public static String getUploadsUrl() {
         return DEVELOPMENT_HOST + "uploads/";
@@ -19,7 +15,7 @@ class RetrofitClient {
 
     private RetrofitClient() {
         client = new Retrofit.Builder()
-                .baseUrl(getBaseUrl())
+                .baseUrl(DEVELOPMENT_HOST)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
     }

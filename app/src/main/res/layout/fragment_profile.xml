@@ -63,8 +63,7 @@
             android:fontFamily="@font/breeze_sans_regular"
             android:gravity="center"
             android:textColor="@android:color/white"
-            android:textSize="22sp"
-            android:text="@string/test_name"/>
+            android:textSize="22sp" />
 
         <TextView
             android:id="@+id/likes_field"

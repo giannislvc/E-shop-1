@@ -19,9 +19,11 @@ import com.google.firebase.database.ValueEventListener;
 import com.nativeboys.eshop.callbacks.Completion;
 import com.nativeboys.eshop.callbacks.CompletionHandler;
 import com.nativeboys.eshop.http.Repository;
+import com.nativeboys.eshop.http.RetrofitClient;
 import com.nativeboys.eshop.models.firebase.MessageModel;
 import com.nativeboys.eshop.models.firebase.MetaDataModel;
 import com.nativeboys.eshop.models.node.Customer;
+import com.nativeboys.eshop.models.node.ImageResponse;
 import com.nativeboys.eshop.viewModels.FirebaseClientProvider;
 
 import java.sql.Timestamp;
@@ -71,6 +73,9 @@ public class ConversationViewModel extends AndroidViewModel {
                 String id = userSnapshot.getKey();
                 if (id == null || message == null) continue;
                 message.setId(id);
+                if (message.getType() == 2) {
+                    message.setText(RetrofitClient.getUploadsUrl() + message.getText());
+                }
                 messages.add(message);
             }
             ConversationViewModel.this.messages.setValue(messages);
@@ -158,10 +163,10 @@ public class ConversationViewModel extends AndroidViewModel {
     }
 
     public void sendImage(@NonNull Uri uri) {
-        repository.upload(getApplication(), uri, new CompletionHandler<String>() {
+        repository.upload(getApplication(), uri, new CompletionHandler<ImageResponse>() {
             @Override
-            public void onSuccess(@NonNull String model) {
-                sendToFirebase(model, MessageType.IMAGE);
+            public void onSuccess(@NonNull ImageResponse model) {
+                sendToFirebase(model.getImage(), MessageType.IMAGE);
             }
 
             @Override
