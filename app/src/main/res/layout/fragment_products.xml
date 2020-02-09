@@ -24,7 +24,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            android:src="@drawable/adjust"
+            android:src="@drawable/ic_tune_black_24dp"
             android:tint="@android:color/white"
             android:contentDescription="@string/settings"/>
 

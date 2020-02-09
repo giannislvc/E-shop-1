@@ -13,11 +13,13 @@ import androidx.lifecycle.Transformations;
 import com.nativeboys.eshop.R;
 import com.nativeboys.eshop.callbacks.CompletionHandler;
 import com.nativeboys.eshop.http.Repository;
+import com.nativeboys.eshop.http.RetrofitClient;
 import com.nativeboys.eshop.models.node.Category;
 import com.nativeboys.eshop.models.node.DeleteResponse;
 import com.nativeboys.eshop.models.node.DetailedProduct;
 import com.nativeboys.eshop.models.node.LikeResponse;
 import com.nativeboys.eshop.models.node.NewProduct;
+import com.nativeboys.eshop.models.node.Product;
 import com.nativeboys.eshop.ui.main.product.GalleryModel;
 import com.nativeboys.eshop.viewModels.FirebaseClientProvider;
 
@@ -48,7 +50,7 @@ public class ProductViewModel extends AndroidViewModel {
         galleryNo = Transformations.map(gallery, gallery -> gallery != null ? gallery.size() : 0);
     }
 
-    private boolean isClientProduct(@Nullable DetailedProduct product) {
+    public boolean isClientProduct(@Nullable DetailedProduct product) {
         return product == null || Objects.equals(product.getUploaderId(), this.clientId);
     }
 
@@ -116,6 +118,7 @@ public class ProductViewModel extends AndroidViewModel {
         });
     }
 
+    @NonNull
     private List<GalleryModel> getCurrentImages() {
         return gallery.getValue() != null
                 ? gallery.getValue() : new ArrayList<>();
@@ -210,44 +213,71 @@ public class ProductViewModel extends AndroidViewModel {
         }
     }
 
-    public void createProduct(@NonNull String name,
+    private void createProduct(@NonNull NewProduct product, @NonNull List<Uri> uris,
+                               @NonNull CompletionHandler<String> completion) {
+        repository.createProduct(getApplication(), product, uris,
+                new CompletionHandler<DetailedProduct>() {
+                    @Override
+                    public void onSuccess(@NonNull DetailedProduct model) {
+                        ProductViewModel.this.productId.setValue(model.getProductId());
+                        completion.onSuccess(getApplication().getString(R.string.product_created_successfully));
+                    }
+
+                    @Override
+                    public void onFailure(@Nullable String description) {
+                        completion.onFailure(description);
+                    }
+                });
+    }
+
+    private void updateProduct(@NonNull String productId, @NonNull NewProduct product, @NonNull List<Uri> uris,
+                               @NonNull CompletionHandler<String> completion) {
+        repository.updateProduct(getApplication(), productId, product, uris,
+                new CompletionHandler<DetailedProduct>() {
+                    @Override
+                    public void onSuccess(@NonNull DetailedProduct model) {
+                        ProductViewModel.this.productId.setValue(model.getProductId());
+                        completion.onSuccess(getApplication().getString(R.string.product_updated_successfully));
+                    }
+
+                    @Override
+                    public void onFailure(@Nullable String description) {
+                        completion.onFailure(description);
+                    }
+                });
+    }
+
+    public void submitProduct(@NonNull String name,
                               @NonNull String price,
                               @NonNull String description,
                               @NonNull String details,
                               @NonNull String hashTags,
                               @NonNull CompletionHandler<String> completion) {
-        // TODO: Here implement Update Product logic
+        // TODO: Form Validation
+        String priceWithoutDollar = price.replace("$", "");
         String categoryId = getSelectedCategoryId();
-        if (categoryId != null) {
+        List<GalleryModel> gallery = getCurrentImages();
+        if (categoryId != null && gallery.size() > 0) {
             List<String> tags = Arrays.asList(hashTags.split(","));
-            NewProduct product = new NewProduct(name, price, description, details, tags, clientId, categoryId);
-            List<GalleryModel> list = getCurrentImages();
-            List<Uri> uris = new ArrayList<>();
-            for(GalleryModel model : list) {
-                Uri uri = model.getUri();
-                if (uri == null) continue;
-                uris.add(uri);
+            List<String> remainGallery = new ArrayList<>();
+            List<Uri> newGallery = new ArrayList<>();
+            for (GalleryModel g : gallery) {
+                Uri uri = g.getUri();
+                String url = g.getUrl();
+                if (uri != null) newGallery.add(uri);
+                if (url != null) remainGallery.add(url.replace(RetrofitClient.getUploadsUrl(), ""));
             }
-            repository.createProduct(getApplication(), product, uris, new CompletionHandler<DetailedProduct>() {
-                @Override
-                public void onSuccess(@NonNull DetailedProduct model) {
-                    ProductViewModel.this.productId.setValue(model.getProductId());
-                    completion.onSuccess(getApplication().getString(R.string.product_uploaded_successfully));
-                }
-
-                @Override
-                public void onFailure(@Nullable String description) {
-                    completion.onFailure(description);
-                }
-            });
+            Product existingProduct = this.product.getValue();
+            if (existingProduct != null) { // Update Product
+                NewProduct product = new NewProduct(name, priceWithoutDollar, description, details, categoryId, tags, remainGallery);
+                updateProduct(existingProduct.getProductId(), product, newGallery, completion);
+            } else { // Create Product
+                NewProduct product = new NewProduct(name, priceWithoutDollar, description, details, tags, clientId, categoryId);
+                createProduct(product, newGallery, completion);
+            }
         } else {
             completion.onFailure(getApplication().getString(R.string.select_category));
         }
-    }
-
-    public void updateProduct() {
-        // + productId,
-        // From GalleryModel list find uris and urls and send them back
     }
 
 }

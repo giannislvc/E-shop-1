@@ -127,11 +127,22 @@ public class Repository {
     @EverythingIsNonNull
     public void createProduct(Context context, NewProduct product, List<Uri> uris, CompletionHandler<DetailedProduct> completion) {
         RequestBody textPart = createPartFromString(gsonHelper.toJson(product));
-        List<MultipartBody.Part> parts = new ArrayList<>();
-        for(Uri uri : uris) {
-            parts.add(prepareFilePart(context, "gallery", uri));
+        List<MultipartBody.Part> galleryPart = new ArrayList<>();
+        for (Uri uri : uris) {
+            galleryPart.add(prepareFilePart(context, "gallery", uri));
         }
-        Call<DetailedProduct> call = api.creteProduct(textPart, parts);
+        Call<DetailedProduct> call = api.creteProduct(textPart, galleryPart);
+        request(call, completion);
+    }
+
+    @EverythingIsNonNull
+    public void updateProduct(Context context, String productId,  NewProduct product, List<Uri> uris, CompletionHandler<DetailedProduct> completion) {
+        RequestBody textPart = createPartFromString(gsonHelper.toJson(product));
+        List<MultipartBody.Part> galleryPart = new ArrayList<>();
+        for (Uri uri : uris) {
+            galleryPart.add(prepareFilePart(context, "gallery", uri));
+        }
+        Call<DetailedProduct> call = api.updateProduct(productId, textPart, galleryPart);
         request(call, completion);
     }
 

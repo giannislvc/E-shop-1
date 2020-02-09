@@ -31,6 +31,7 @@ import com.bumptech.glide.request.transition.Transition;
 import com.nativeboys.eshop.R;
 import com.nativeboys.eshop.callbacks.CompletionHandler;
 import com.nativeboys.eshop.customViews.ImageProviderFragment;
+import com.nativeboys.eshop.models.node.DetailedProduct;
 import com.nativeboys.eshop.models.node.Product;
 import com.nativeboys.eshop.ui.main.adapters.CategoriesAdapter;
 import com.nativeboys.eshop.viewModels.product.ProductViewModel;
@@ -173,13 +174,13 @@ public class ProductFragment extends ImageProviderFragment {
         }
     }
 
-    private void createProduct(@NonNull View view) {
+    private void submitProduct(@NonNull View view) {
         String name = nameField.getText().toString();
         String price = priceField.getText().toString();
         String description = descriptionField.getText().toString();
         String details = detailsField.getText().toString();
         String hashTags = hashTagsField.getText().toString();
-        productVM.createProduct(name, price, description, details, hashTags, new CompletionHandler<String>() {
+        productVM.submitProduct(name, price, description, details, hashTags, new CompletionHandler<String>() {
             @Override
             public void onSuccess(@NonNull String model) {
                 applyResponse(view, model, true);
@@ -198,7 +199,7 @@ public class ProductFragment extends ImageProviderFragment {
             @Override
             public void onSuccess(@NonNull Boolean liked) {
                 view.setEnabled(true);
-                startBtn.setText(liked ? R.string.liked : R.string.like);
+                startBtn.setText(liked ? R.string.unlike : R.string.like);
             }
 
             @Override
@@ -230,7 +231,7 @@ public class ProductFragment extends ImageProviderFragment {
             // Delete
             startBtn.setOnClickListener(v -> questionDialog.show());
             // Submit
-            endBtn.setOnClickListener(this::createProduct);
+            endBtn.setOnClickListener(this::submitProduct);
         } else {
             // Like
             startBtn.setOnClickListener(this::likeProduct);
@@ -249,20 +250,16 @@ public class ProductFragment extends ImageProviderFragment {
         if(getActivity() != null) getActivity().onBackPressed();
     }
 
-    private void setUpListeners() {
-
-        productVM.getGalleryNo().observe(getViewLifecycleOwner(), no ->
-                picNumField.setText(String.valueOf(no != null ? no : 0)));
-
-        productVM.isClientProduct().observe(getViewLifecycleOwner(), aBoolean -> {
-            boolean isClientProduct = aBoolean != null && aBoolean;
+    private void setUpView(@Nullable DetailedProduct product) {
+        if (product != null) {
+            boolean isClientProduct = productVM.isClientProduct(product);
             nameField.setEnabled(isClientProduct);
             priceField.setEnabled(isClientProduct);
             descriptionField.setEnabled(isClientProduct);
             detailsField.setEnabled(isClientProduct);
-            startBtn.setText(isClientProduct ? R.string.delete : R.string.like);
+            startBtn.setVisibility(View.VISIBLE);
+            if(isClientProduct) startBtn.setText(R.string.delete);
             endBtn.setText(isClientProduct ? R.string.submit : R.string.message);
-            setButtonsListeners(isClientProduct);
             galleryAdapter.setIsClientProduct(isClientProduct);
 
             int visibility = isClientProduct ? View.VISIBLE : View.GONE;
@@ -271,10 +268,10 @@ public class ProductFragment extends ImageProviderFragment {
             categoriesRV.setVisibility(visibility);
             hashTagsField.setVisibility(visibility);
             addImageContainer.setVisibility(visibility);
-        });
 
-        productVM.getProduct().observe(getViewLifecycleOwner(), product -> {
-            if (product == null) return;
+            if (!isClientProduct) {
+                startBtn.setText(product.isLiked() ? R.string.unlike : R.string.like);
+            }
             nameField.setText(product.getName());
             descriptionField.setText(product.getDescription());
             detailsField.setText(product.getDetails());
@@ -282,7 +279,22 @@ public class ProductFragment extends ImageProviderFragment {
             viewsField.setText(String.format(getResources().getString(R.string.views_format), product.getViewsQty()));
             String price = String.format(priceField.getResources().getString(R.string.price), product.getPrice());
             priceField.setText(price);
-        });
+            hashTagsField.setText(product.getHashTagsAsText());
+
+            setButtonsListeners(isClientProduct);
+        } else {
+            addImageContainer.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void setUpListeners() {
+
+        endBtn.setOnClickListener(this::submitProduct);
+
+        productVM.getGalleryNo().observe(getViewLifecycleOwner(), no ->
+                picNumField.setText(String.valueOf(no != null ? no : 0)));
+
+        productVM.getProduct().observe(getViewLifecycleOwner(), this::setUpView);
 
         productVM.getCategories().observe(getViewLifecycleOwner(), categories ->
                 categoriesAdapter.submitList(categories != null ? categories : new ArrayList<>()));

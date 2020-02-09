@@ -101,6 +101,14 @@ public interface VMallApi {
         @Part List<MultipartBody.Part> gallery
     );
 
+    @Multipart
+    @PUT("api/products/{id}")
+    Call<DetailedProduct> updateProduct(
+            @Path("id") String productId,
+            @Part("text") RequestBody text,
+            @Part List<MultipartBody.Part> gallery
+    );
+
     @DELETE("api/products/{id}")
     Call<DeleteResponse> deleteProduct(
             @Path("id") String productId

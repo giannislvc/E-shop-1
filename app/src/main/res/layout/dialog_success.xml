@@ -24,7 +24,6 @@
         android:textColor="@color/darkGray"
         android:textSize="18sp"
         android:gravity="center"
-        android:fontFamily="@font/breeze_sans_regular"
-        android:text="@string/product_uploaded_successfully"/>
+        android:fontFamily="@font/breeze_sans_regular"/>
 
 </LinearLayout>
