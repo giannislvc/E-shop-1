@@ -33,8 +33,8 @@ import com.nativeboys.eshop.callbacks.CompletionHandler;
 import com.nativeboys.eshop.customViews.ImageProviderFragment;
 import com.nativeboys.eshop.models.node.Product;
 import com.nativeboys.eshop.ui.main.adapters.CategoriesAdapter;
-import com.nativeboys.eshop.viewModels.ProductViewModel;
-import com.nativeboys.eshop.viewModels.ProductViewModelFactory;
+import com.nativeboys.eshop.viewModels.product.ProductViewModel;
+import com.nativeboys.eshop.viewModels.product.ProductViewModelFactory;
 
 import net.cachapa.expandablelayout.ExpandableLayout;
 
@@ -70,18 +70,14 @@ public class ProductFragment extends ImageProviderFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        String productId;
+        String productId = null;
         if (getArguments() != null) {
             ProductFragmentArgs args = ProductFragmentArgs.fromBundle(getArguments());
             productId = args.getProductId();
-        } else {
-            productId = null;
         }
-        ProductViewModelFactory factory;
+        ProductViewModelFactory factory = null;
         if (getActivity() != null) {
             factory = new ProductViewModelFactory(getActivity().getApplication(), productId);
-        } else {
-            factory = null;
         }
         productVM = (factory != null) ?
                 new ViewModelProvider(this, factory).get(ProductViewModel.class) :

@@ -1,15 +1,13 @@
 package com.nativeboys.eshop.paging;
 
 import androidx.annotation.NonNull;
-import androidx.lifecycle.MutableLiveData;
 import androidx.paging.DataSource;
-import androidx.paging.PageKeyedDataSource;
 
 import com.nativeboys.eshop.models.node.Product;
 import com.nativeboys.eshop.models.query.Filter;
 import com.nativeboys.eshop.models.query.Sort;
 
-public class ProductDataSourceFactory extends DataSource.Factory {
+public class ProductDataSourceFactory extends DataSource.Factory<Integer, Product> {
 
     //private MutableLiveData<PageKeyedDataSource<Integer, Product>> productLiveDataSource;
 
@@ -26,11 +24,12 @@ public class ProductDataSourceFactory extends DataSource.Factory {
 
     @NonNull
     @Override
-    public DataSource create() {
+    public DataSource<Integer, Product> create() {
         //ProductsDataSource productDataSource = new ProductsDataSource(customerId, filter, sort);
         //productLiveDataSource.postValue(productDataSource);
         return new ProductsDataSource(customerId, filter, sort);
     }
+
 
 /*    public MutableLiveData<PageKeyedDataSource<Integer, Product>> getProductLiveDataSource() {
         return productLiveDataSource;

@@ -1,4 +1,4 @@
-package com.nativeboys.eshop.viewModels;
+package com.nativeboys.eshop.viewModels.product;
 
 import android.app.Application;
 import android.net.Uri;
@@ -19,6 +19,7 @@ import com.nativeboys.eshop.models.node.DetailedProduct;
 import com.nativeboys.eshop.models.node.LikeResponse;
 import com.nativeboys.eshop.models.node.NewProduct;
 import com.nativeboys.eshop.ui.main.product.GalleryModel;
+import com.nativeboys.eshop.viewModels.FirebaseClientProvider;
 
 import java.util.ArrayList;
 import java.util.Arrays;

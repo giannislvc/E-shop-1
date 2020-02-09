@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.nativeboys.eshop.R;
@@ -15,10 +16,19 @@ import java.util.List;
 
 public class RecentSearchAdapter extends RecyclerView.Adapter<RecentSearchAdapter.ViewHolder> {
 
+    interface OnClickListener {
+        void onClick(@NonNull String text);
+    }
+
     private List<String> dataSet;
+    private OnClickListener listener;
 
     RecentSearchAdapter() {
         dataSet = new ArrayList<>();
+    }
+
+    void setListener(OnClickListener listener) {
+        this.listener = listener;
     }
 
     @NonNull
@@ -50,6 +60,13 @@ public class RecentSearchAdapter extends RecyclerView.Adapter<RecentSearchAdapte
         ViewHolder(@NonNull View itemView) {
             super(itemView);
             text = itemView.findViewById(R.id.text);
+            ConstraintLayout container = itemView.findViewById(R.id.container);
+            container.setOnClickListener(v -> {
+                int position = getAdapterPosition();
+                if (position != RecyclerView.NO_POSITION && listener != null) {
+                    listener.onClick(dataSet.get(position));
+                }
+            });
         }
 
         private void bind(@NonNull String txt) {

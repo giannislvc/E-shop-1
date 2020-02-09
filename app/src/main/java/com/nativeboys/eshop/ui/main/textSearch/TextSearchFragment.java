@@ -5,6 +5,9 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
@@ -18,14 +21,16 @@ import com.google.android.flexbox.FlexboxLayoutManager;
 import com.google.android.flexbox.JustifyContent;
 import com.nativeboys.eshop.R;
 import com.nativeboys.eshop.ui.main.adapters.ProductsAdapter;
+import com.nativeboys.eshop.viewModels.textSearch.TextSearchViewModel;
+import com.nativeboys.eshop.viewModels.textSearch.TextSearchViewModelFactory;
 
 public class TextSearchFragment extends Fragment {
 
-    private String text;
+    private TextSearchViewModel textSearchVM;
+    private NavController navController;
 
     private ImageView backBtn;
     private TextView headline;
-    private RecyclerView recyclerView;
     private ProductsAdapter adapter;
 
     public TextSearchFragment() {
@@ -35,10 +40,18 @@ public class TextSearchFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        String text = null;
         if (getArguments() != null) {
             TextSearchFragmentArgs args = TextSearchFragmentArgs.fromBundle(getArguments());
             text = args.getText();
         }
+        TextSearchViewModelFactory factory = null;
+        if (getActivity() != null) {
+            factory = new TextSearchViewModelFactory(getActivity().getApplication(), text);
+        }
+        textSearchVM = (factory != null) ?
+                new ViewModelProvider(this, factory).get(TextSearchViewModel.class) :
+                new ViewModelProvider(this).get(TextSearchViewModel.class);
     }
 
     @Override
@@ -51,10 +64,10 @@ public class TextSearchFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        navController = Navigation.findNavController(view);
         backBtn = view.findViewById(R.id.back_btn);
         headline = view.findViewById(R.id.headline);
-        recyclerView = view.findViewById(R.id.recycler_view);
-
+        RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
         adapter = new ProductsAdapter();
         recyclerView.setAdapter(adapter);
         FlexboxLayoutManager flexManager = new FlexboxLayoutManager(recyclerView.getContext());
@@ -62,8 +75,6 @@ public class TextSearchFragment extends Fragment {
         flexManager.setJustifyContent(JustifyContent.FLEX_START);
         recyclerView.setLayoutManager(flexManager);
         recyclerView.setHasFixedSize(true);
-
-        headline.setText(text);
         setUpListeners();
     }
 
@@ -72,13 +83,13 @@ public class TextSearchFragment extends Fragment {
             if (getActivity() != null) getActivity().onBackPressed();
         });
 
+        textSearchVM.getText().observe(getViewLifecycleOwner(), s -> headline.setText(s));
+
+        textSearchVM.getProducts().observe(getViewLifecycleOwner(), products -> adapter.submitList(products));
+
         adapter.setOnProductClickListener((itemView, product) -> {
-            // TODO: Implement
-            /*String userId = globalVM.getUserId();
-            if (userId != null) {
-                ProductFragment.newInstance(userId, product.getProductId())
-                        .show(getChildFragmentManager(), ProductFragment.class.getSimpleName());
-            }*/
+            String productId = product.getProductId();
+            navController.navigate(TextSearchFragmentDirections.actionTextSearchToProduct(productId));
         });
     }
 

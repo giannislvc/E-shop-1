@@ -4,7 +4,6 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
@@ -17,12 +16,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.nativeboys.eshop.R;
 import com.nativeboys.eshop.customViews.AutoCompleteListener;
 import com.nativeboys.eshop.customViews.AutoCompleteSearchView;
-import com.nativeboys.eshop.customViews.NonScrollLayoutManager;
 import com.nativeboys.eshop.models.node.Product;
 import com.nativeboys.eshop.tools.GlobalViewModel;
 
@@ -47,6 +46,7 @@ public class SearchFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        globalVM = new ViewModelProvider(getActivity() != null ? getActivity() : this).get(GlobalViewModel.class);
         if (getActivity() != null) {
             globalVM = new ViewModelProvider(getActivity()).get(GlobalViewModel.class);
         }
@@ -74,7 +74,7 @@ public class SearchFragment extends Fragment {
         searchAdapter = new SearchAdapter(view.getContext());
         searchField.setAdapter(searchAdapter);
 
-        searchesRecyclerView.setLayoutManager(new NonScrollLayoutManager(searchesRecyclerView.getContext()));
+        searchesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recentSearchAdapter = new RecentSearchAdapter();
         searchesRecyclerView.setAdapter(recentSearchAdapter);
 
@@ -89,6 +89,13 @@ public class SearchFragment extends Fragment {
         popularRecyclerView.setAdapter(mostPopularAdapter);
 
         setUpListeners();
+        refreshData();
+    }
+
+    private void refreshData() {
+        globalVM.fetchMostPopular();
+        globalVM.fetchProductHistory();
+        globalVM.fetchSearchHistory();
     }
 
     private void navigateTo(int resource, @NonNull String argument) {
@@ -110,7 +117,7 @@ public class SearchFragment extends Fragment {
         });
 
         viewAllField.setOnClickListener(v -> {
-            ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) searchesRecyclerView.getLayoutParams();
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) searchesRecyclerView.getLayoutParams();
             params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
             searchesRecyclerView.setLayoutParams(params);
             v.setVisibility(View.INVISIBLE);
@@ -121,10 +128,6 @@ public class SearchFragment extends Fragment {
         searchAdapter.setOnItemClickListener(searchField, model -> {
             if (model != null) navigateTo(R.id.textSearchFragment, model);
         });
-
-        if (globalVM == null) return;
-
-        globalVM.fetchMostPopular();
 
         globalVM.getSearches().observe(getViewLifecycleOwner(), strings -> searchAdapter.setDataSet(strings));
 
@@ -151,6 +154,8 @@ public class SearchFragment extends Fragment {
 
         recentViewedAdapter.setOnProductClickListener(this::onClick);
         mostPopularAdapter.setOnProductClickListener(this::onClick);
+
+        recentSearchAdapter.setListener(text -> navigateTo(R.id.textSearchFragment, text));
 
         globalVM.getSearchHistory().observe(getViewLifecycleOwner(),
                 strings -> recentSearchAdapter.setDataSet(strings));

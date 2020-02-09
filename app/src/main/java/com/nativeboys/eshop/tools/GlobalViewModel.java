@@ -51,6 +51,7 @@ public class GlobalViewModel extends AndroidViewModel {
 
     private MutableLiveData<SearchModel> searchModel;
     private LiveData<PagedList<Product>> productPagedList;
+
     //private LiveData<PageKeyedDataSource<Integer, Product>> liveDataSource;
 
     // Server
@@ -140,7 +141,6 @@ public class GlobalViewModel extends AndroidViewModel {
         }
     }
 
-
     private LiveData<PagedList<Product>> getLiveProducts(@Nullable SearchModel model) {
         SearchModel search = model != null ? model : defaultSearch;
         ProductDataSourceFactory dataSourceFactory =
@@ -150,11 +150,11 @@ public class GlobalViewModel extends AndroidViewModel {
                         search.getSort()
         );
         PagedList.Config config =
-                (new PagedList.Config.Builder())
+                new PagedList.Config.Builder()
                         .setEnablePlaceholders(false)
                         .setPageSize(search.getSort().getLimit())
                         .build();
-        return (LiveData<PagedList<Product>>) (new LivePagedListBuilder(dataSourceFactory, config)).build();
+        return new LivePagedListBuilder<>(dataSourceFactory, config).build();
     }
 
     public void updateSearch(@Nullable String categoryId, int order) {
@@ -227,7 +227,7 @@ public class GlobalViewModel extends AndroidViewModel {
         return customerDetails;
     }
 
-    private void fetchProductHistory() {
+    public void fetchProductHistory() {
         repository.getProductHistory(clientId, new StartLimit(20, 0), new CompletionHandler<List<Product>>() {
             @Override
             public void onSuccess(@NonNull List<Product> model) {
@@ -241,7 +241,7 @@ public class GlobalViewModel extends AndroidViewModel {
         });
     }
 
-    private void fetchSearchHistory() {
+    public void fetchSearchHistory() {
         repository.getSearchHistory(clientId, new CompletionHandler<List<String>>() {
             @Override
             public void onSuccess(@NonNull List<String> model) {

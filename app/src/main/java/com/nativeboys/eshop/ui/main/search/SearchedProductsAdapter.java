@@ -40,7 +40,7 @@ public class SearchedProductsAdapter extends ListAdapter<Product, SearchedProduc
         super(DIFF_CALLBACK);
     }
 
-    public void setOnProductClickListener(OnProductClickListener listener) {
+    void setOnProductClickListener(OnProductClickListener listener) {
         clickListener = listener;
     }
 
