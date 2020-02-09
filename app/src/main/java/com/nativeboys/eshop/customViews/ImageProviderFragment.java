@@ -18,11 +18,10 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
 
 import static android.app.Activity.RESULT_OK;
 
-public abstract class ImageProviderFragment extends Fragment {
+public abstract class ImageProviderFragment extends PVCFragment {
 
     private static final int MY_PERMISSIONS_REQUEST = 100;
     private static final int PICK_IMAGE_FROM_GALLERY_REQUEST = 1;

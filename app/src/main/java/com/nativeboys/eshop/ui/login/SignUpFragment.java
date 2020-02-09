@@ -61,6 +61,7 @@ public class SignUpFragment extends Fragment {
         tMessage.setGravity(Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL, 0, 45);
 
         nameField.setPattern(FormEditText.USERNAME_PATTERN);
+        lastNameField.setPattern(FormEditText.USERNAME_PATTERN);
         emailField.setPattern(Patterns.EMAIL_ADDRESS);
         passwordField.setPattern(FormEditText.PASSWORD_PATTERN);
         confirmPassField.setPattern(FormEditText.PASSWORD_PATTERN);

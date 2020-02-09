@@ -1,6 +1,7 @@
 package com.nativeboys.eshop.tools;
 
 import android.app.Application;
+import android.net.Uri;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,6 +21,7 @@ import com.nativeboys.eshop.callbacks.CompletionHandler;
 import com.nativeboys.eshop.http.Repository;
 import com.nativeboys.eshop.models.adapter.SearchModel;
 import com.nativeboys.eshop.models.firebase.MetaDataModel;
+import com.nativeboys.eshop.models.node.Customer;
 import com.nativeboys.eshop.models.node.DetailedCustomer;
 import com.nativeboys.eshop.models.node.Product;
 import com.nativeboys.eshop.models.query.Filter;
@@ -122,6 +124,22 @@ public class GlobalViewModel extends AndroidViewModel {
             public void onFailure(@Nullable String description) { }
         });
     }
+
+    public void updateCustomer(@NonNull Uri uri) {
+        DetailedCustomer customer = getCustomerDetails().getValue();
+        if (customer != null) {
+            repository.updateCustomer(getApplication(), uri, customer, new CompletionHandler<Customer>() {
+                @Override
+                public void onSuccess(@NonNull Customer model) {
+                    fetchCustomerDetails();
+                }
+
+                @Override
+                public void onFailure(@Nullable String description) { }
+            });
+        }
+    }
+
 
     private LiveData<PagedList<Product>> getLiveProducts(@Nullable SearchModel model) {
         SearchModel search = model != null ? model : defaultSearch;

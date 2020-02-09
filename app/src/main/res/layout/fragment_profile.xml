@@ -37,6 +37,7 @@
             app:layout_constraintBottom_toTopOf="@id/user_name_field"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            android:src="@drawable/default_avatar"
             app:shapeAppearanceOverlay="@style/circleImageView" />
 
         <ImageButton
@@ -75,8 +76,7 @@
             android:fontFamily="@font/breeze_sans_regular"
             android:textSize="20sp"
             android:gravity="center"
-            android:textColor="@android:color/white"
-            android:text="@string/likes_"/>
+            android:textColor="@android:color/white" />
 
         <TextView
             android:id="@+id/products_field"
@@ -88,8 +88,7 @@
             android:fontFamily="@font/breeze_sans_regular"
             android:textSize="20sp"
             android:gravity="center"
-            android:textColor="@android:color/white"
-            android:text="@string/products_"/>
+            android:textColor="@android:color/white" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

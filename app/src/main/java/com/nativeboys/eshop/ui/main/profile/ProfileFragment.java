@@ -6,6 +6,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
@@ -24,6 +25,7 @@ import com.nativeboys.eshop.R;
 import com.nativeboys.eshop.customViews.ImageBottomSheetDialog;
 import com.nativeboys.eshop.customViews.ImageProviderFragment;
 import com.nativeboys.eshop.tools.GlobalViewModel;
+import com.nativeboys.eshop.viewModels.FirebaseClientProvider;
 
 import java.util.List;
 
@@ -36,9 +38,6 @@ public class ProfileFragment extends ImageProviderFragment implements ImageBotto
     private ImageButton changeImageBtn;
 
     private TextView userNameField, likesField, productsField;
-    private RecyclerView recyclerView;
-
-    private final String URL = "https://i1.wp.com/www.docker.com/blog/wp-content/uploads/2019/10/Renee-M.jpg?fit=753%2C1024&ssl=1";
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -65,9 +64,9 @@ public class ProfileFragment extends ImageProviderFragment implements ImageBotto
         userNameField = view.findViewById(R.id.user_name_field);
         likesField = view.findViewById(R.id.likes_field);
         productsField = view.findViewById(R.id.products_field);
-        recyclerView = view.findViewById(R.id.recycler_view);
+        RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
         changeImageBtn = view.findViewById(R.id.change_image_btn);
-        globalVM.fetchMostPopular();
+        globalVM.fetchCustomerDetails();
         setUpListeners();
     }
 
@@ -78,9 +77,7 @@ public class ProfileFragment extends ImageProviderFragment implements ImageBotto
             likesField.setText(dCustomer.getLikes());
             likesField.setText(String.format(getString(R.string.likes_), dCustomer.getLikes()));
             productsField.setText(String.format(getString(R.string.products_), dCustomer.getProducts()));
-            if (dCustomer.getProfileImageUrl() == null) {
-                // TODO: Load Default image
-            } else {
+            if (dCustomer.getProfileImageUrl() != null) {
                 Glide.with(userImage.getContext())
                         .load(dCustomer.getProfileImageUrl())
                         .transform(new CenterCrop())
@@ -89,31 +86,25 @@ public class ProfileFragment extends ImageProviderFragment implements ImageBotto
             }
         });
 
-        // Observe Client
-        //loadImageIntoHolder(URL,null);
         changeImageBtn.setOnClickListener(view -> {
             ImageBottomSheetDialog dialog = new ImageBottomSheetDialog();
             dialog.show(getChildFragmentManager(), BottomSheetDialogFragment.class.getSimpleName());
             dialog.setListener(this);
         });
 
-        //TODO: Logout
-    }
-
-    private void loadImageIntoHolder(@Nullable String url, @Nullable Uri uri) {
-        if (uri == null && url == null) return;
-        Glide.with(userImage.getContext())
-                .load(uri != null ? uri : url)
-                .transform(new CenterCrop())
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .into(userImage);
+        logoutBtn.setOnClickListener(v -> {
+            FirebaseClientProvider.getInstance().logout();
+            NavController navController = getParentNavController();
+            if (navController != null) {
+                navController.navigate(R.id.action_main_to_login);
+            }
+        });
     }
 
     @Override
     protected void onImagesRetrieved(@NonNull List<Uri> uris) {
         if (uris.size() > 0) {
-            // TODO: Update Customer
-            loadImageIntoHolder(null, uris.get(0));
+            globalVM.updateCustomer(uris.get(0));
         }
     }
 

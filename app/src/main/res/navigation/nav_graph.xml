@@ -27,6 +27,11 @@
         <action
             android:id="@+id/action_main_to_product"
             app:destination="@id/productFragment" />
+        <action
+            android:id="@+id/action_main_to_login"
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/mainFragment"
+            app:popUpToInclusive="true"/>
     </fragment>
     <fragment
         android:id="@+id/conversationFragment"
