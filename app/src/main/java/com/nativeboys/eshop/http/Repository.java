@@ -58,12 +58,6 @@ public class Repository {
     }
 
     @EverythingIsNonNull
-    public void getCustomer(@NonNull String customerId, CompletionHandler<Customer> completion) {
-        Call<Customer> call = api.getCustomer(customerId);
-        request(call, completion);
-    }
-
-    @EverythingIsNonNull
     public void getCategories(final CompletionHandler<List<Category>> completion) {
         Call<List<Category>> call = api.getCategories();
         request(call, completion);
@@ -83,14 +77,32 @@ public class Repository {
     }
 
     @EverythingIsNonNull
-    public void getProductHistory(String customerId, StartLimit startLimit, CompletionHandler<List<Product>> completion) {
-        Call<List<Product>> call = api.getProductHistory(customerId, gsonHelper.toJson(startLimit));
+    public void getCustomer(@NonNull String customerId, CompletionHandler<Customer> completion) {
+        Call<Customer> call = api.getCustomer(customerId);
         request(call, completion);
     }
 
     @EverythingIsNonNull
-    public void getSearchHistory(String customerId, CompletionHandler<List<String>> completion) {
-        Call<List<String>> call = api.getSearchHistory(customerId);
+    public void getCustomerDetails(String customerId, CompletionHandler<DetailedCustomer> completion) {
+        Call<DetailedCustomer> call = api.getCustomerDetails(customerId);
+        request(call, completion);
+    }
+
+    @EverythingIsNonNull
+    public void getCustomerProductsHistory(String customerId, StartLimit startLimit, CompletionHandler<List<Product>> completion) {
+        Call<List<Product>> call = api.getCustomerProductsHistory(customerId, gsonHelper.toJson(startLimit));
+        request(call, completion);
+    }
+
+    @EverythingIsNonNull
+    public void getCustomerSearchHistory(String customerId, CompletionHandler<List<String>> completion) {
+        Call<List<String>> call = api.getCustomerSearchHistory(customerId);
+        request(call, completion);
+    }
+
+    @EverythingIsNonNull
+    public void getCustomerProducts(String customerId, String clientId, Filter filter, Sort sort, CompletionHandler<List<Product>> completion) {
+        Call<List<Product>> call = api.getCustomerProducts(customerId, clientId, gsonHelper.toJson(filter), gsonHelper.toJson(sort));
         request(call, completion);
     }
 
@@ -141,12 +153,6 @@ public class Repository {
         RequestBody textPart = createPartFromString(gsonHelper.toJson(customer));
         MultipartBody.Part part = prepareFilePart(context, "image", uri);
         Call<Customer> call = api.updateCustomer(customer.getCustomerId(), textPart, part);
-        request(call, completion);
-    }
-
-    @EverythingIsNonNull
-    public void getCustomerDetails(String customerId, CompletionHandler<DetailedCustomer> completion) {
-        Call<DetailedCustomer> call = api.getCustomerDetails(customerId);
         request(call, completion);
     }
 

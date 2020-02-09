@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
@@ -25,6 +26,8 @@ import com.nativeboys.eshop.R;
 import com.nativeboys.eshop.customViews.ImageBottomSheetDialog;
 import com.nativeboys.eshop.customViews.ImageProviderFragment;
 import com.nativeboys.eshop.tools.GlobalViewModel;
+import com.nativeboys.eshop.ui.main.MainFragmentDirections;
+import com.nativeboys.eshop.ui.main.adapters.ProductsAdapter;
 import com.nativeboys.eshop.viewModels.FirebaseClientProvider;
 
 import java.util.List;
@@ -32,11 +35,11 @@ import java.util.List;
 public class ProfileFragment extends ImageProviderFragment implements ImageBottomSheetDialog.OnUserInteractionListener {
 
     private GlobalViewModel globalVM;
+    private ProductsAdapter adapter;
 
     private ShapeableImageView userImage;
-    private ImageView logoutBtn;
     private ImageButton changeImageBtn;
-
+    private ImageView logoutBtn;
     private TextView userNameField, likesField, productsField;
 
     public ProfileFragment() {
@@ -64,9 +67,16 @@ public class ProfileFragment extends ImageProviderFragment implements ImageBotto
         userNameField = view.findViewById(R.id.user_name_field);
         likesField = view.findViewById(R.id.likes_field);
         productsField = view.findViewById(R.id.products_field);
-        RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
         changeImageBtn = view.findViewById(R.id.change_image_btn);
+
+        RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext(),
+                LinearLayoutManager.HORIZONTAL, false));
+        adapter = new ProductsAdapter();
+        recyclerView.setAdapter(adapter);
+
         globalVM.fetchCustomerDetails();
+        globalVM.fetchClientProduts();
         setUpListeners();
     }
 
@@ -98,6 +108,13 @@ public class ProfileFragment extends ImageProviderFragment implements ImageBotto
             if (navController != null) {
                 navController.navigate(R.id.action_main_to_login);
             }
+        });
+
+        globalVM.getCustomerProducts().observe(getViewLifecycleOwner(), products -> adapter.submitList(products));
+
+        adapter.setOnProductClickListener((itemView, product) -> {
+            NavController navController = getParentNavController();
+            navController.navigate(MainFragmentDirections.actionMainToProduct(product.getProductId()));
         });
     }
 

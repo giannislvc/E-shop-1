@@ -13,7 +13,7 @@ import androidx.paging.PagedList;
 import com.nativeboys.eshop.models.node.Product;
 import com.nativeboys.eshop.models.query.Filter;
 import com.nativeboys.eshop.models.query.Sort;
-import com.nativeboys.eshop.paging.ProductDataSourceFactory;
+import com.nativeboys.eshop.paging.produts.ProductDataSourceFactory;
 import com.nativeboys.eshop.viewModels.FirebaseClientProvider;
 
 public class TextSearchViewModel extends AndroidViewModel {

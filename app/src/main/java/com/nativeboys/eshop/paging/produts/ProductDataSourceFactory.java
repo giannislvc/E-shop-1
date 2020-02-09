@@ -1,4 +1,4 @@
-package com.nativeboys.eshop.paging;
+package com.nativeboys.eshop.paging.produts;
 
 import androidx.annotation.NonNull;
 import androidx.paging.DataSource;

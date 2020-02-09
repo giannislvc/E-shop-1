@@ -27,7 +27,8 @@ import com.nativeboys.eshop.models.node.Product;
 import com.nativeboys.eshop.models.query.Filter;
 import com.nativeboys.eshop.models.query.Sort;
 import com.nativeboys.eshop.models.query.StartLimit;
-import com.nativeboys.eshop.paging.ProductDataSourceFactory;
+import com.nativeboys.eshop.paging.produts.ProductDataSourceFactory;
+import com.nativeboys.eshop.paging.customerProducts.CustomerProductsDataSourceFactory;
 import com.nativeboys.eshop.viewModels.FirebaseClientProvider;
 
 import java.util.ArrayList;
@@ -35,49 +36,54 @@ import java.util.List;
 
 public class GlobalViewModel extends AndroidViewModel {
 
-    // TODO: Offline overview, take photo fragment,
-    // TODO: chat_png offline send image
-
     // TODO: offline - send message - another room chat_png - go online (check it ??)
     // TODO: new conversation offline, replace value events, DAO Firebase
+
+    // private LiveData<PageKeyedDataSource<Integer, Product>> liveDataSource;
 
     final static String METADATA = "metadata";
     final static String CONVERSATIONS = "conversations";
 
+    private final String clientId;
     private Repository repository;
     private DatabaseReference metadataRef;
 
-    private MutableLiveData<List<MetaDataModel>> metaData;
-
+    // Products Fragment
     private MutableLiveData<SearchModel> searchModel;
     private LiveData<PagedList<Product>> productPagedList;
 
-    //private LiveData<PageKeyedDataSource<Integer, Product>> liveDataSource;
+    // Conversations Fragment
+    private MutableLiveData<List<MetaDataModel>> metaData;
 
-    // Server
+    // Search Fragment
     private MutableLiveData<List<Product>> popularProducts;
-    private MutableLiveData<List<Product>> productHistory;
-    private MutableLiveData<List<String>> searchHistory;
+    private MutableLiveData<List<Product>> customerProductsHistory;
+    private MutableLiveData<List<String>> customerSearchHistory;
 
     private MutableLiveData<String> textSearch;
     private LiveData<List<String>> searches;
 
+    // Profile Fragment
     private MutableLiveData<DetailedCustomer> customerDetails;
-    private final String clientId;
+    private MutableLiveData<String> customerId;
+    private LiveData<PagedList<Product>> customerProducts;
 
     {
-        metaData = new MutableLiveData<>();
         searchModel = new MutableLiveData<>();
         productPagedList = Transformations.switchMap(searchModel, this::getLiveProducts);
 
+        metaData = new MutableLiveData<>();
+
         popularProducts = new MutableLiveData<>();
-        productHistory = new MutableLiveData<>();
-        searchHistory = new MutableLiveData<>();
+        customerProductsHistory = new MutableLiveData<>();
+        customerSearchHistory = new MutableLiveData<>();
 
         textSearch = new MutableLiveData<>();
         searches = Transformations.switchMap(textSearch, this::getSearch);
 
         customerDetails = new MutableLiveData<>();
+        customerId = new MutableLiveData<>();
+        customerProducts = Transformations.switchMap(customerId, this::getCustomerProducts);
     }
 
     private ValueEventListener metaDataListener = new ValueEventListener() {
@@ -126,6 +132,10 @@ public class GlobalViewModel extends AndroidViewModel {
         });
     }
 
+    public void fetchClientProduts() {
+        customerId.setValue(clientId);
+    }
+
     public void updateCustomer(@NonNull Uri uri) {
         DetailedCustomer customer = getCustomerDetails().getValue();
         if (customer != null) {
@@ -149,10 +159,24 @@ public class GlobalViewModel extends AndroidViewModel {
                         search.getFilter(),
                         search.getSort()
         );
+        // liveDataSource = dataSourceFactory.getProductLiveDataSource();
         PagedList.Config config =
                 new PagedList.Config.Builder()
                         .setEnablePlaceholders(false)
                         .setPageSize(search.getSort().getLimit())
+                        .build();
+        return new LivePagedListBuilder<>(dataSourceFactory, config).build();
+    }
+
+    private LiveData<PagedList<Product>> getCustomerProducts(@NonNull String customerId) {
+        CustomerProductsDataSourceFactory dataSourceFactory =
+                new CustomerProductsDataSourceFactory(
+                        customerId,
+                        clientId);
+        PagedList.Config config =
+                new PagedList.Config.Builder()
+                        .setEnablePlaceholders(false)
+                        .setPageSize(10)
                         .build();
         return new LivePagedListBuilder<>(dataSourceFactory, config).build();
     }
@@ -167,21 +191,6 @@ public class GlobalViewModel extends AndroidViewModel {
         model.getSort().setStart(0);
         searchModel.setValue(model);
     }
-
-/*    private void setUpPaging(String userId) {
-        ProductDataSourceFactory dataSourceFactory = new ProductDataSourceFactory(
-                userId,
-                new Filter(null, "ps"),
-                new Sort(10, 0, 3, false)
-        );
-        //liveDataSource = dataSourceFactory.getProductLiveDataSource();
-        PagedList.Config config =
-                (new PagedList.Config.Builder())
-                    .setEnablePlaceholders(false)
-                    .setPageSize(10)
-                    .build();
-        productPagedList = (new LivePagedListBuilder(dataSourceFactory, config)).build();
-    }*/
 
     private void setListeners(boolean enabled) {
         if (enabled) {
@@ -207,12 +216,12 @@ public class GlobalViewModel extends AndroidViewModel {
         return metaData;
     }
 
-    public LiveData<List<Product>> getProductHistory() {
-        return productHistory;
+    public LiveData<List<Product>> getCustomerProductsHistory() {
+        return customerProductsHistory;
     }
 
-    public LiveData<List<String>> getSearchHistory() {
-        return searchHistory;
+    public LiveData<List<String>> getCustomerSearchHistory() {
+        return customerSearchHistory;
     }
 
     public LiveData<List<String>> getSearches() {
@@ -227,30 +236,34 @@ public class GlobalViewModel extends AndroidViewModel {
         return customerDetails;
     }
 
-    public void fetchProductHistory() {
-        repository.getProductHistory(clientId, new StartLimit(20, 0), new CompletionHandler<List<Product>>() {
+    public LiveData<PagedList<Product>> getCustomerProducts() {
+        return customerProducts;
+    }
+
+    public void fetchCustomerProductsHistory() {
+        repository.getCustomerProductsHistory(clientId, new StartLimit(20, 0), new CompletionHandler<List<Product>>() {
             @Override
             public void onSuccess(@NonNull List<Product> model) {
-                productHistory.setValue(model);
+                customerProductsHistory.setValue(model);
             }
 
             @Override
             public void onFailure(@Nullable String description) {
-                productHistory.setValue(new ArrayList<>());
+                customerProductsHistory.setValue(new ArrayList<>());
             }
         });
     }
 
-    public void fetchSearchHistory() {
-        repository.getSearchHistory(clientId, new CompletionHandler<List<String>>() {
+    public void fetchCustomerSearchHistory() {
+        repository.getCustomerSearchHistory(clientId, new CompletionHandler<List<String>>() {
             @Override
             public void onSuccess(@NonNull List<String> model) {
-                searchHistory.setValue(model);
+                customerSearchHistory.setValue(model);
             }
 
             @Override
             public void onFailure(@Nullable String description) {
-                searchHistory.setValue(new ArrayList<>());
+                customerSearchHistory.setValue(new ArrayList<>());
             }
         });
     }

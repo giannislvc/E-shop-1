@@ -41,18 +41,30 @@ public interface VMallApi {
     Call<Customer> getCustomer(
             @Path("id") String customerId
     );
-    // In order to fetch more users more frequently we can provide
-    // Api which can fetch multiple users
+
+    @GET("api/customers/{id}/details")
+    Call<DetailedCustomer> getCustomerDetails(
+            @Path("id") String customerId
+    );
 
     @GET("api/customers/{id}/productsHistory")
-    Call<List<Product>> getProductHistory(
+    Call<List<Product>> getCustomerProductsHistory(
             @Path("id") String customerId,
             @Query("sort") String startLimit
     );
 
     @GET("api/customers/{id}/searchHistory")
-    Call<List<String>> getSearchHistory(
+    Call<List<String>> getCustomerSearchHistory(
             @Path("id") String customerId
+    );
+
+    @GET("api/customers/{id}/products")
+    @Headers({"Content-Type: application/json"})
+    Call<List<Product>> getCustomerProducts(
+            @Path("id") String customer_id,
+            @Query("customer_id") String client_id,
+            @Query("filter") String filter,
+            @Query("sort") String sort
     );
 
     @POST("api/customers")
@@ -67,11 +79,6 @@ public interface VMallApi {
             @Path("id") String customerId,
             @Part("text") RequestBody text,
             @Part MultipartBody.Part image
-    );
-
-    @GET("api/customers/{id}/details")
-    Call<DetailedCustomer> getCustomerDetails(
-            @Path("id") String customerId
     );
 
     @GET("api/products")

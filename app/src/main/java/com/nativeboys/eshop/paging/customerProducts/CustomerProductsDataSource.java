@@ -1,4 +1,4 @@
-package com.nativeboys.eshop.paging;
+package com.nativeboys.eshop.paging.customerProducts;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -12,21 +12,24 @@ import com.nativeboys.eshop.models.query.Sort;
 
 import java.util.List;
 
-public class ProductsDataSource extends PageKeyedDataSource<Integer, Product> {
+public class CustomerProductsDataSource extends PageKeyedDataSource<Integer, Product> {
 
     private Sort sort;
-    private Filter filter;
-    private String customerId;
+    private final Filter filter;
+    private final String customerId, clientId;
+    private final Repository repository;
 
-    ProductsDataSource(@NonNull String customerId, @NonNull Filter filter, @NonNull Sort sort) {
-        this.filter = filter;
+    CustomerProductsDataSource(@NonNull String customerId, @NonNull String clientId) {
+        repository = Repository.getInstance();
+        this.clientId = clientId;
         this.customerId = customerId;
-        this.sort = sort;
+        filter = new Filter(null, null);
+        sort = new Sort(5, 0, 3, false);
     }
 
     @Override
     public void loadInitial(@NonNull LoadInitialParams<Integer> params, @NonNull LoadInitialCallback<Integer, Product> callback) {
-        Repository.getInstance().getProducts(customerId, filter, sort, new CompletionHandler<List<Product>>() {
+        repository.getCustomerProducts(customerId, clientId, filter, sort, new CompletionHandler<List<Product>>() {
             @Override
             public void onSuccess(@NonNull List<Product> model) {
                 callback.onResult(model, null,
@@ -44,7 +47,7 @@ public class ProductsDataSource extends PageKeyedDataSource<Integer, Product> {
     @Override
     public void loadAfter(@NonNull LoadParams<Integer> params, @NonNull LoadCallback<Integer, Product> callback) {
         sort.setStart(params.key);
-        Repository.getInstance().getProducts(customerId, filter, sort, new CompletionHandler<List<Product>>() {
+        repository.getCustomerProducts(customerId, clientId, filter, sort, new CompletionHandler<List<Product>>() {
             @Override
             public void onSuccess(@NonNull List<Product> model) {
                 Integer key = null;
@@ -52,11 +55,11 @@ public class ProductsDataSource extends PageKeyedDataSource<Integer, Product> {
                     key = params.key + sort.getLimit();
                 }
                 callback.onResult(model, key);
-
             }
 
             @Override
             public void onFailure(@Nullable String description) { }
         });
     }
+
 }

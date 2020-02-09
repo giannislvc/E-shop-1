@@ -94,8 +94,8 @@ public class SearchFragment extends Fragment {
 
     private void refreshData() {
         globalVM.fetchMostPopular();
-        globalVM.fetchProductHistory();
-        globalVM.fetchSearchHistory();
+        globalVM.fetchCustomerProductsHistory();
+        globalVM.fetchCustomerSearchHistory();
     }
 
     private void navigateTo(int resource, @NonNull String argument) {
@@ -157,10 +157,10 @@ public class SearchFragment extends Fragment {
 
         recentSearchAdapter.setListener(text -> navigateTo(R.id.textSearchFragment, text));
 
-        globalVM.getSearchHistory().observe(getViewLifecycleOwner(),
+        globalVM.getCustomerSearchHistory().observe(getViewLifecycleOwner(),
                 strings -> recentSearchAdapter.setDataSet(strings));
 
-        globalVM.getProductHistory().observe(getViewLifecycleOwner(),
+        globalVM.getCustomerProductsHistory().observe(getViewLifecycleOwner(),
                 products -> recentViewedAdapter.submitList(products));
     }
 
