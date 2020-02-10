@@ -126,7 +126,27 @@ public class ProductViewModel extends AndroidViewModel {
 
     private void addImages(@NonNull List<GalleryModel> newList) {
         List<GalleryModel> clones = GalleryModel.getClones(getCurrentImages());
-        clones.addAll(newList);
+        for (GalleryModel g : newList) {
+            boolean exists = false;
+            Uri gUri = g.getUri();
+            String gUrl = g.getUrl();
+            for (GalleryModel clone : clones) {
+                Uri cUri = clone.getUri();
+                String cUrl = clone.getUrl();
+                if(gUri != null && cUri != null) {
+                    if(gUri.equals(cUri)) {
+                        exists = true;
+                        break;
+                    }
+                } else if (gUrl != null && cUrl != null) {
+                    if(gUrl.equals(cUrl)) {
+                        exists = true;
+                        break;
+                    }
+                }
+            }
+            if(!exists) clones.add(g);
+        }
         gallery.setValue(clones);
     }
 

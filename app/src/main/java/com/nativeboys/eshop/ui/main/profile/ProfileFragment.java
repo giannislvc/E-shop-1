@@ -76,7 +76,7 @@ public class ProfileFragment extends ImageProviderFragment implements ImageBotto
         recyclerView.setAdapter(adapter);
 
         globalVM.fetchCustomerDetails();
-        globalVM.fetchClientProduts();
+        globalVM.fetchClientProducts();
         setUpListeners();
     }
 

@@ -5,7 +5,6 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavBackStackEntry;
 import androidx.navigation.NavController;
@@ -13,17 +12,12 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.nativeboys.eshop.R;
-import com.nativeboys.eshop.models.SettingsModel;
-import com.nativeboys.eshop.models.node.Category;
 import com.nativeboys.eshop.viewModels.SettingsViewModel;
-
-import java.util.List;
 
 import static com.nativeboys.eshop.viewModels.SettingsViewModel.CATEGORIES;
 import static com.nativeboys.eshop.viewModels.SettingsViewModel.SORT;

@@ -2,6 +2,7 @@ package com.nativeboys.eshop.tools;
 
 import android.app.Application;
 import android.net.Uri;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -132,7 +133,7 @@ public class GlobalViewModel extends AndroidViewModel {
         });
     }
 
-    public void fetchClientProduts() {
+    public void fetchClientProducts() {
         customerId.setValue(clientId);
     }
 
@@ -297,9 +298,12 @@ public class GlobalViewModel extends AndroidViewModel {
         return searches;
     }
 
+    private static final String TAG = "GlobalViewModel";
+
     @Override
     protected void onCleared() {
         super.onCleared();
         setListeners(false);
+        Log.i(TAG, "onCleared: ");
     }
 }
