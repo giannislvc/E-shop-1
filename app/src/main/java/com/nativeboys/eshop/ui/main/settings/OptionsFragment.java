@@ -25,7 +25,7 @@ import static com.nativeboys.eshop.viewModels.SettingsViewModel.SORT;
 public class OptionsFragment extends Fragment {
 
     private SettingsViewModel settingsVM;
-    private NavController parentNavController;
+    private NavController navController;
 
     private ConstraintLayout sbContainer, cContainer;
     private TextView selectedSbField, selectedCfield;
@@ -50,18 +50,18 @@ public class OptionsFragment extends Fragment {
         selectedSbField = view.findViewById(R.id.selected_sb_field);
         selectedCfield = view.findViewById(R.id.selected_c_field);
 
-        parentNavController = Navigation.findNavController(view);
-        NavBackStackEntry backStackEntry = parentNavController.getBackStackEntry(R.id.settings_nav_graph);
+        navController = Navigation.findNavController(view);
+        NavBackStackEntry backStackEntry = navController.getBackStackEntry(R.id.settings_nav_graph);
         settingsVM = new ViewModelProvider(backStackEntry).get(SettingsViewModel.class);
         setUpListeners();
     }
 
     private void setUpListeners() {
         sbContainer.setOnClickListener(view ->
-                parentNavController.navigate(OptionsFragmentDirections.actionOptionsToDetails(SORT)));
+                navController.navigate(OptionsFragmentDirections.actionOptionsToDetails(SORT)));
 
         cContainer.setOnClickListener(view ->
-                parentNavController.navigate(OptionsFragmentDirections.actionOptionsToDetails(CATEGORIES)));
+                navController.navigate(OptionsFragmentDirections.actionOptionsToDetails(CATEGORIES)));
 
         settingsVM.getSelectedCategory().observe(getViewLifecycleOwner(), category -> {
             String description = category != null ? category.getName() : null;

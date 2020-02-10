@@ -47,9 +47,6 @@ public class SearchFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         globalVM = new ViewModelProvider(getActivity() != null ? getActivity() : this).get(GlobalViewModel.class);
-        if (getActivity() != null) {
-            globalVM = new ViewModelProvider(getActivity()).get(GlobalViewModel.class);
-        }
     }
 
     @Override

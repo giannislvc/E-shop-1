@@ -51,10 +51,10 @@ public class DetailsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        NavController parentNavController = Navigation.findNavController(view);
+        NavController navController = Navigation.findNavController(view);
         RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
 
-        NavBackStackEntry backStackEntry = parentNavController.getBackStackEntry(R.id.settings_nav_graph);
+        NavBackStackEntry backStackEntry = navController.getBackStackEntry(R.id.settings_nav_graph);
         settingsVM = new ViewModelProvider(backStackEntry).get(SettingsViewModel.class);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
