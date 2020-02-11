@@ -239,8 +239,7 @@ public class ProductViewModel extends AndroidViewModel {
                 new CompletionHandler<DetailedProduct>() {
                     @Override
                     public void onSuccess(@NonNull DetailedProduct model) {
-                        ProductViewModel.this.productId.setValue(model.getProductId());
-                        completion.onSuccess(getApplication().getString(R.string.product_created_successfully));
+                        onUpdate(model, 1, completion);
                     }
 
                     @Override
@@ -256,8 +255,7 @@ public class ProductViewModel extends AndroidViewModel {
                 new CompletionHandler<DetailedProduct>() {
                     @Override
                     public void onSuccess(@NonNull DetailedProduct model) {
-                        ProductViewModel.this.productId.setValue(model.getProductId());
-                        completion.onSuccess(getApplication().getString(R.string.product_updated_successfully));
+                        onUpdate(model, 2, completion);
                     }
 
                     @Override
@@ -265,6 +263,16 @@ public class ProductViewModel extends AndroidViewModel {
                         completion.onFailure(description);
                     }
                 });
+    }
+
+    private void onUpdate(@NonNull DetailedProduct product, int type, @NonNull CompletionHandler<String> completion) {
+        gallery.setValue(new ArrayList<>()); // remove gallery
+        productId.setValue(product.getProductId()); // apply product
+        if (type == 1) { // Created
+            completion.onSuccess(getApplication().getString(R.string.product_created_successfully));
+        } else { // Updated
+            completion.onSuccess(getApplication().getString(R.string.product_updated_successfully));
+        }
     }
 
     public void submitProduct(@NonNull String name,
