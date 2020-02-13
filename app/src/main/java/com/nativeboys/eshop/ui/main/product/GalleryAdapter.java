@@ -41,7 +41,7 @@ public class GalleryAdapter extends ListAdapter<GalleryModel, GalleryAdapter.Vie
 
     GalleryAdapter() {
         super(callback);
-        isUserProduct = false;
+        isUserProduct = true;
     }
 
     void setIsClientProduct(boolean isUserProduct) {
