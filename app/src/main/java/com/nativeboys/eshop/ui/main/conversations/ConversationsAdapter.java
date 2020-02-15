@@ -134,7 +134,8 @@ public class ConversationsAdapter extends ListAdapter<MetaDataModel, Conversatio
 
                 userName.setText(user.getFirstName());
                 Glide.with(userImage.getContext())
-                        .load(user.getProfileImageUrl())
+                        .load(user.getProfileImageUrl() != null ? user
+                                .getProfileImageUrl() : R.drawable.default_avatar)
                         .transform(new CenterCrop())
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .into(userImage);
