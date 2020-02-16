@@ -50,6 +50,7 @@ public class ProductsFragment extends PVCFragment implements SettingsFragment.On
         super.onCreate(savedInstanceState);
         globalVM = new ViewModelProvider(getActivity() != null ? getActivity() : this)
                 .get(GlobalViewModel.class);
+        globalVM.refreshProducts();
     }
 
     @Override
@@ -97,7 +98,6 @@ public class ProductsFragment extends PVCFragment implements SettingsFragment.On
     }
 
     private void setUpListeners() {
-        globalVM.refreshProducts();
         swipeRefresh.setOnRefreshListener(() -> globalVM.refreshProducts());
         settingsButton.setOnClickListener(view -> drawerLayout.openDrawer(GravityCompat.START));
         searchBar.setOnClickListener(v -> navigateTo(R.id.action_main_to_search));
